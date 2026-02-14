@@ -1,0 +1,106 @@
+#!/usr/bin/env node
+const fs = require('fs');
+const path = require('path');
+const { spawn, execSync } = require('child_process');
+const db = require('../lib/db');
+
+const PID_FILE = path.join(__dirname, '../setu.pid');
+const LOG_FILE = path.join(__dirname, '../setu.log');
+const INDEX_SCRIPT = path.join(__dirname, '../index.js');
+
+const cmd = process.argv[2];
+const args = process.argv.slice(3);
+
+function log(msg) {
+  console.log(`[SETU] ${msg}`);
+}
+
+function getPid() {
+  if (fs.existsSync(PID_FILE)) {
+    return parseInt(fs.readFileSync(PID_FILE, 'utf8'));
+  }
+  return null;
+}
+
+function isRunning(pid) {
+  try {
+    process.kill(pid, 0);
+    return true;
+  } catch (e) {
+    return false;
+  }
+}
+
+switch (cmd) {
+  case 'start':
+    const pid = getPid();
+    if (pid && isRunning(pid)) {
+      log(`Already running (PID: ${pid})`);
+    } else {
+      log('Starting Setu Kernel...');
+      const out = fs.openSync(LOG_FILE, 'a');
+      const err = fs.openSync(LOG_FILE, 'a');
+      
+      const child = spawn('node', [INDEX_SCRIPT], {
+        detached: true,
+        stdio: ['ignore', out, err]
+      });
+      
+      fs.writeFileSync(PID_FILE, child.pid.toString());
+      child.unref();
+      log(`Started! (PID: ${child.pid}) - Logs: setu.log`);
+    }
+    break;
+
+  case 'stop':
+    const stopPid = getPid();
+    if (stopPid && isRunning(stopPid)) {
+      log(`Stopping Setu (PID: ${stopPid})...`);
+      process.kill(stopPid);
+      fs.unlinkSync(PID_FILE);
+      log('Stopped.');
+    } else {
+      log('Not running.');
+      if (fs.existsSync(PID_FILE)) fs.unlinkSync(PID_FILE);
+    }
+    break;
+
+  case 'status':
+    const statusPid = getPid();
+    const running = statusPid && isRunning(statusPid);
+    console.log(`\n🌉 SETU STATUS: ${running ? '🟢 RUNNING' : '🔴 STOPPED'}`);
+    if (running) console.log(`PID: ${statusPid}`);
+    
+    console.log('\n🤖 AGENTS:');
+    try {
+      const agents = db.db.prepare('SELECT * FROM agents').all();
+      console.table(agents);
+    } catch (e) {
+      console.log('DB Error:', e.message);
+    }
+    break;
+
+  case 'init':
+    log('Initializing Project...');
+    const contextPath = path.join(process.cwd(), 'CONTEXT.md');
+    if (!fs.existsSync(contextPath)) {
+      fs.writeFileSync(contextPath, '# Project Context\n\n');
+      log('Created CONTEXT.md');
+    } else {
+      log('CONTEXT.md already exists.');
+    }
+    break;
+    
+  case 'chat':
+    const message = args.join(' ');
+    if (!message) {
+      log('Usage: setu chat "Hello"');
+    } else {
+      db.send('User', 'Narad', message, 'chat');
+      log(`Sent: "${message}"`);
+    }
+    break;
+
+  default:
+    console.log('Usage: setu [start|stop|status|init|chat]');
+}

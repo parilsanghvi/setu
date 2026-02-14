@@ -1,0 +1,36 @@
+#!/usr/bin/env node
+const fs = require('fs');
+const path = require('path');
+
+const TARGET_DIR = process.cwd();
+const IGNORE_DIRS = ['node_modules', '.git', '.gemini', 'dist', 'coverage', '.journal'];
+
+function initFractionalContext(dir) {
+  const contextPath = path.join(dir, 'CONTEXT.md');
+  const journalPath = path.join(dir, 'JOURNAL.md');
+
+  // 1. Create CONTEXT.md if missing
+  if (!fs.existsSync(contextPath)) {
+    const relativePath = path.relative(TARGET_DIR, dir) || 'root';
+    const stub = `# 📂 Context: ${relativePath}\n\n**Owner:** [Role]\n**Purpose:** [Describe what this folder does]\n\n## Key Files\n\n## Dependencies\n`;
+    fs.writeFileSync(contextPath, stub);
+    console.log(`✅ Created: ${relativePath}/CONTEXT.md`);
+  }
+
+  // 2. Create JOURNAL.md if missing
+  if (!fs.existsSync(journalPath)) {
+    fs.writeFileSync(journalPath, `# 📓 Journal\n\n_Log of recent changes by Interns._\n`);
+  }
+
+  // 3. Recurse
+  const entries = fs.readdirSync(dir, { withFileTypes: true });
+  for (const entry of entries) {
+    if (entry.isDirectory() && !IGNORE_DIRS.includes(entry.name)) {
+      initFractionalContext(path.join(dir, entry.name));
+    }
+  }
+}
+
+console.log(`🧠 Initializing Fractal Context in: ${TARGET_DIR}`);
+initFractionalContext(TARGET_DIR);
+console.log('✨ Done.');
