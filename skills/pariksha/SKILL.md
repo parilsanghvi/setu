@@ -1,6 +1,7 @@
 ---
 name: pariksha
 description: Verifies code correctness through testing. Use when asked to "test", "verify", "check", or "validate".
+tags: general
 ---
 # Pariksha (The Verifier) ✅
 

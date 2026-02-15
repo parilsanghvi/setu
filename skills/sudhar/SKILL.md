@@ -1,6 +1,7 @@
 ---
 name: sudhar
 description: Fixes bugs, applies patches, and refactors code. Use when asked to "fix", "patch", "rewrite", or "correct" code.
+tags: general
 ---
 # Sudhar (The Fixer) 🔧
 

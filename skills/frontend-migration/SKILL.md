@@ -3,6 +3,7 @@ name: frontend-migration
 description: The Standard Operating Procedure (SOP) for frontend UI components (e.g., React Class -> Hooks).
 version: 1.0.0
 author: Frontend-Lead
+tags: frontend
 ---
 
 # 🎨 Frontend Migration Protocol

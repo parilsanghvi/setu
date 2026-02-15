@@ -1,6 +1,7 @@
 ---
 name: drishti
 description: Scans the codebase for patterns, files, and dependencies. Use when asked to "scan", "find", "search", or "analyze" code.
+tags: general
 ---
 # Drishti (The Scanner) 👁️
 

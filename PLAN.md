@@ -70,6 +70,14 @@
     *   If a migration takes >5s -> **Kill Process & Rollback**.
 *   **Skills:** `[SQLScanner, SnapshotManager]`.
 
+### 🛡️ Rakshak (Security Lead / "The Guardian")
+*   **Trait:** Paranoid. Trusts no one.
+*   **Brain:** Uses `lib/LLM.js` with "Security Auditor" system prompt.
+*   **Behavior:**
+    *   Audits every PR for secrets and vulnerabilities.
+    *   **Vetoes** any code with `eval()`, hardcoded keys, or weak crypto.
+*   **Skills:** `[Suraksha, SecretScanner, DependencyAudit]`.
+
 ---
 
 ## 4. The Learning Engine (Guru) 🏹

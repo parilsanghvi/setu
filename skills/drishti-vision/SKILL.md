@@ -3,6 +3,7 @@ name: drishti-vision
 description: Captures screenshots of the application and analyzes them using LLM Vision. Use when asked to "see", "look", "review UI", or "check aesthetics".
 version: 1.0.0
 author: Setu
+tags: general
 ---
 
 # Drishti-Vision (The Eyes) 👁️🖼️

@@ -1,5 +1,5 @@
-const Drona = require('../agents/Drona');
-const drona = new Drona('Drona-Test', 'Drona');
+const Guru = require('../agents/Guru');
+const drona = new Guru('Drona-Test', 'Drona');
 
 const mockResponses = [
     // 1. Raw JSON

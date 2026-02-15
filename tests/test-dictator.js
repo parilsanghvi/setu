@@ -1,6 +1,6 @@
 const bus = require('../lib/db');
 const contractor = require('../lib/Contractor');
-const BackendLead = require('../agents/BackendLead');
+const BackendLead = require('../agents/Tark');
 
 async function testDictator() {
     console.log('--- 🔨 Testing The Dictator Model ---');

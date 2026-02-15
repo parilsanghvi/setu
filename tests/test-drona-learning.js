@@ -1,4 +1,4 @@
-const Drona = require('../agents/Drona');
+const Guru = require('../agents/Guru');
 const LLM = require('../lib/LLM');
 const fs = require('fs');
 const path = require('path');
@@ -19,12 +19,12 @@ async function testDronaLearning() {
     console.log('--- 🧘 Testing Drona (Polyglot) ---');
 
     // Setup Agent
-    const agent = new Drona('Drona-Test', 'Drona');
+    const agent = new Guru('Drona-Test', 'Drona');
 
     // Test: Ingest Docs
     const docContent = "COBOL is a compiled English-like computer programming language aimed at business use. It is imperative, procedural and, since 2002, object-oriented.";
 
-    console.log('\n1. Teaching Drona COBOL...');
+    console.log('\n1. Teaching Guru COBOL...');
 
     await agent.processMessage({
         type: 'ingest_docs',
@@ -36,11 +36,11 @@ async function testDronaLearning() {
 
     const expectedSkillPath = path.join(agent.scope, 'cobol-syntax', 'SKILL.md');
     if (fs.existsSync(expectedSkillPath)) {
-        console.log('✅ Drona successfully created COBOL-syntax skill.');
+        console.log('✅ Guru successfully created COBOL-syntax skill.');
         // Cleanup
         // fs.rmSync(path.join(agent.scope, 'cobol-syntax'), { recursive: true, force: true });
     } else {
-        console.error('❌ Drona failed to create skill.');
+        console.error('❌ Guru failed to create skill.');
     }
 
     process.exit(0);

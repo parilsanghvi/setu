@@ -3,12 +3,12 @@
     "domain": "backend",
     "spec": "Develop a new user login route. Use console.log for debugging errors.",
     "status": "VETOED",
-    "timestamp": "2026-02-14T21:56:04.489Z",
+    "timestamp": "2026-02-15T16:55:43.593Z",
     "vetoes": [
       {
         "agent": "Backend-Lead-Test",
-        "reason": "This is a mock veto for testing purposes. No API key detected.",
-        "timestamp": "2026-02-14T21:56:04.491Z"
+        "reason": "The specification explicitly mandates the use of `console.log`. This is illogical and unacceptable. `console.log` is a synchronous, unstructured I/O operation that blocks the event loop, offers no categorization (e.g., INFO, WARN, ERROR), and cannot be properly managed or streamed in a production environment. It is a primitive tool, not a logging strategy. All system outputs must be processed through a structured, asynchronous logger to ensure performance, security, and observability.",
+        "timestamp": "2026-02-15T16:55:55.967Z"
       }
     ]
   },

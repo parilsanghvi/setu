@@ -19,6 +19,7 @@ Autonmous agents with domain-specific authority.
 1.  **Tark (Backend Lead):** Logic, API, Performance.
 2.  **Shilpi (Frontend Lead):** UI/UX, State, Accessibility.
 3.  **Koshpal (Database Lead):** Schema, Migrations, Integrity.
+4.  **Rakshak (Security Lead):** Audits, Secrets, OWASP Compliance.
 
 ### 🎓 The Shishyas (Interns)
 *   **Ephemeral:** Spawned by Leads for specific tasks.

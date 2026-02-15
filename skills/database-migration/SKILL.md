@@ -3,6 +3,7 @@ name: database-migration
 description: The Standard Operating Procedure (SOP) for database schema changes (SQL/NoSQL).
 version: 1.0.0
 author: Database-Lead
+tags: backend
 ---
 
 # 💾 Database Migration Protocol

@@ -1,59 +1,55 @@
 # 🌉 Setu (सेतु)
 
-**Setu** (Sanskrit: *Bridge*) is a modernizing agent that resurrects dead codebases. It automates the painful process of upgrading legacy stacks (e.g., Node 16 → 24, .NET 5 → 10, VB6 → .NET 9) by running iterative, LLM-powered fix loops inside isolated Docker environments.
+**Setu** (Sanskrit: *Bridge*) is an Ancient Swarm Intelligence designed to resurrect dead codebases. It automates the process of modernizing legacy projects by running iterative, LLM-powered fix loops.
 
-> "Don't rewrite. Evolve."
+## 🚀 Installation & Adoption
+
+Setu is designed to be installed globally to manage all your projects.
+
+### 1. Global Installation
+```bash
+# From the Setu directory (local link for testing)
+npm link
+
+# Or once published
+npm install -g @setu/swarm
+```
+
+### 2. Adopting a Project
+Navigate to any legacy project and summon the Swarm:
+```bash
+cd /path/to/my-legacy-app
+setu adopt
+```
+This initializes the project with `.setu/` and required context files.
+
+### 3. Mission Control
+Ignite the engine to start the setup wizard and mission control:
+```bash
+setu ignite
+```
+This will guide you through LLM configuration (including **Google Antigravity**) and launch the dashboard.
+
+## 🤖 Global Commands
+
+- `setu adopt`: Initialize the current project for Swarm management.
+- `setu ignite`: Launch Mission Control (Setup + Dashboard + Kernel).
+- `setu status`: Check the state of your agents and tasks.
+- `setu chat "msg"`: Send a direct message to Narad (The Messenger).
 
 ## 🏗️ Architecture
 
-Setu operates on four core pillars:
-
-1.  **Drishti (The Scanner) 👁️** - *Already Sanskrit*
-    *   Analyzes the codebase.
-    *   Detects frameworks, versions, and deprecated patterns.
-    *   Generates a `MigrationPlan.json`.
-
-2.  **Ranabhoomi (The Sandbox) ⚔️**
-    *   Spins up a Docker container representing the *target* environment (e.g., Node 24).
-    *   Mounts the codebase.
-    *   Attempts to build/run tests.
-    *   Captures `stdout` and `stderr` (the "pain").
-
-3.  **Sudhar (The Fixer) 🔧**
-    *   Feeds build errors + source code into an LLM.
-    *   Generates precise patches (code edits).
-    *   Applies patches to the codebase.
-    *   **Loop:** Retries until the build passes.
-
-4.  **Pariksha (The Verifier) ✅**
-    *   Runs the full test suite.
-    *   Validates functional correctness.
-    *   Commits changes and generates a Pull Request.
-
-## 🚀 Usage
-
-```bash
-# Clone the repo
-git clone https://github.com/parilsanghvi/Setu.git
-cd Setu
-npm install
-
-# Run the bridge
-node setu.js migrate ./path/to/legacy-project --target node24
-```
-
-## 🛠️ Roadmap
-
-- [ ] **Phase 1 (MVP):** Node.js Upgrades (package.json dependency resolution).
-- [ ] **Phase 2:** Syntax Updates (CommonJS -> ESM, async/await).
-- [ ] **Phase 3:** Framework Shifts (Express -> Fastify, React Class -> Hooks).
-- [ ] **Phase 4:** Cross-Language (VB6 -> .NET, Python 2 -> 3).
+Setu operates on core pillars:
+1. **Narad (The Messenger)**: Orchestrates communication via a central Event Bus.
+2. **Sutradhar (The Architect)**: Manages project context and high-level strategy.
+3. **Tark (The Backend Lead)**: Expert in logic and server-side modernization.
+4. **Shilpi (The Frontend Lead)**: Crafts modern UI/UX from legacy designs.
 
 ## 🧠 Philosophy
 
 *   **Isolation First:** Never run potentially destructive migrations on the host machine. Always use Docker.
 *   **Iterative Healing:** Fix one error at a time. Re-run. Verify. Repeat.
-*   **Human in the Loop:** Always ask for confirmation before major destructive actions (unless `--force` is used).
+*   **Ancient Strategy:** Utilizing timeless patterns (Sanskrit personas) to solve modern technical debt.
 
 ---
-*Built with ❤️ by Paril & Bhondu.*
+*Built with ❤️ by Setu Swarm.*

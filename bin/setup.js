@@ -2,6 +2,8 @@ const fs = require('fs');
 const path = require('path');
 const { Input, Select, Confirm, Password } = require('enquirer');
 const OpenAICompatible = require('../lib/llm/OpenAICompatible');
+const GoogleProvider = require('../lib/models/providers/google');
+const ProfileManager = require('../lib/auth/profile-mgr');
 const { execSync } = require('child_process');
 
 async function setup() {
@@ -17,7 +19,7 @@ async function setup() {
         const provider = await new Select({
             name: 'provider',
             message: `Select Provider for ${type} model:`,
-            choices: ['openai', 'anthropic', 'ollama', 'vllm', 'deepseek', 'custom'],
+            choices: ['openai', 'anthropic', 'ollama', 'vllm', 'deepseek', 'google', 'custom'],
             initial: defaults.provider || 'openai'
         }).run();
 
@@ -35,17 +37,43 @@ async function setup() {
             }).run();
         }
 
-        const apiKey = await new Password({
-            name: 'apiKey',
-            message: 'Enter API Key (leave empty for local if not needed):',
-            initial: defaults.apiKey || ''
-        }).run();
+        let apiKey = '';
+        if (provider !== 'google') {
+            apiKey = await new Password({
+                name: 'apiKey',
+                message: 'Enter API Key (leave empty for local if not needed):',
+                initial: defaults.apiKey || ''
+            }).run();
+        }
 
         // Auto-Discovery
         let models = [];
         console.log('🔍 Attempting to fetch models...');
         try {
-            models = await OpenAICompatible.fetchModels(baseUrl || (provider === 'openai' ? 'https://api.openai.com' : null), apiKey);
+            if (provider === 'google') {
+                let auth = ProfileManager.resolveApiKey('google');
+                if (!auth) {
+                    const doLogin = await new Confirm({
+                        name: 'doLogin',
+                        message: '⚠️  No Google profile found. Would you like to login now via Antigravity?',
+                        initial: true
+                    }).run();
+
+                    if (doLogin) {
+                        console.log('🔗  Launching Google Login Flow...');
+                        // Use spawn instead of exec to handle the interactive nature if needed, 
+                        // though setu-auth login google is mostly automatic now.
+                        execSync('node bin/setu-auth.js login google', { stdio: 'inherit' });
+                        auth = ProfileManager.resolveApiKey('google');
+                    }
+                }
+
+                if (auth && auth.type === 'oauth') {
+                    models = await GoogleProvider.fetchModels(auth.key);
+                }
+            } else {
+                models = await OpenAICompatible.fetchModels(baseUrl || (provider === 'openai' ? 'https://api.openai.com' : null), apiKey);
+            }
         } catch (e) {
             console.log('⚠️ Could not fetch models automatically.');
         }
@@ -60,10 +88,11 @@ async function setup() {
         }
 
         if (!modelName || modelName === 'Type Manually') {
+            const defaultModel = provider === 'google' ? 'gemini-2.0-flash-thinking-exp-1219' : 'gpt-4o';
             modelName = await new Input({
                 name: 'model',
                 message: 'Enter Model Name (e.g., gpt-4o, llama3):',
-                initial: defaults.modelName || 'gpt-4o'
+                initial: defaults.modelName || defaultModel
             }).run();
         }
 

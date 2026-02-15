@@ -1,6 +1,7 @@
 ---
 name: ranabhoomi
 description: Executes code in a secure, isolated Docker sandbox. Use when asked to "run", "execute", or "test" unsafe code.
+tags: general
 ---
 # Ranabhoomi (The Sandbox) ⚔️
 

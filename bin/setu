@@ -125,22 +125,39 @@ switch (cmd) {
     break;
 
   case 'dashboard':
-    const mode = args[0] || '--tui';
-    const { spawn } = require('child_process');
+    const dashboardMode = args[0] || '--tui';
+    const { spawn: dSpawn } = require('child_process');
 
-    if (mode === '--gui' || mode === '--all') {
+    if (dashboardMode === '--gui' || dashboardMode === '--all') {
       log('Starting GUI Dashboard on http://localhost:3000...');
-      const server = spawn('node', [path.join(__dirname, '../lib/server.js')], { stdio: 'inherit' });
+      dSpawn('node', [path.join(__dirname, '../lib/server.js')], { stdio: 'inherit' });
     }
 
-    if (mode === '--tui' || mode === '--all') {
+    if (dashboardMode === '--tui' || dashboardMode === '--all') {
       log('Starting TUI Dashboard...');
-      // TUI needs to take over stdout, so we spawn inheriting stdio
-      const tui = spawn('node', [path.join(__dirname, 'dashboard.js')], { stdio: 'inherit' });
+      const tui = dSpawn('node', [path.join(__dirname, 'dashboard.js')], { stdio: 'inherit' });
       tui.on('exit', () => process.exit(0));
     }
     break;
 
+  case 'ignite':
+    log('🚀 IGNITING SETU MISSION CONTROL...');
+    const ignite = spawn('node', [path.join(__dirname, '../scripts/ignite.js')], {
+      cwd: process.cwd(),
+      stdio: 'inherit'
+    });
+    ignite.on('exit', (code) => process.exit(code));
+    break;
+
+  case 'adopt':
+    log('🚀 Adopting project...');
+    const adopt = spawn('node', [path.join(__dirname, 'setu-init.js')], {
+      cwd: process.cwd(),
+      stdio: 'inherit'
+    });
+    adopt.on('exit', (code) => process.exit(code));
+    break;
+
   default:
-    console.log('Usage: setu [start|stop|status|init|chat|task|dashboard]');
+    console.log('Usage: setu [start|stop|status|init|chat|task|dashboard|ignite|adopt]');
 }

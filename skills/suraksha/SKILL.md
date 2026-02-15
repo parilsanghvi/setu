@@ -1,6 +1,7 @@
 ---
 name: suraksha
 description: Audits code and dependencies for security vulnerabilities. Use when asked to "audit", "secure", or "check security".
+tags: general
 ---
 # Suraksha (The Security Guard) 🛡️
 

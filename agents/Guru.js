@@ -8,23 +8,17 @@ class Guru extends Agent {
         super(name, role, path.join(process.cwd(), 'skills', 'learned'));
         this.persona = "The Guru";
         // System Prompt for Drona
-        this.systemPrompt = `You are Drona, the Guru Agent. Your goal is to analyze completed tasks and extract reusable skills.
-        
-        When analyzing a task:
-        1. Identify the core problem and the solution used.
-        2. Abstract this into a reusable "Skill".
-        3. Format the skill strictly according to the "createskills.md" guide.
-        
-        OUTPUT FORMAT (JSON):
-        {
-            "slug": "kebab-case-skill-name",
-            "description": "What it does. Use when user says [triggers].",
-            "content": "Full Markdown content for SKILL.md (excluding frontmatter)"
-        }
-        `;
+        // Load Skills (Filtered)
+        const SkillLoader = require('../lib/SkillLoader');
+        this.skillLoader = new SkillLoader();
+        this.skills = this.skillLoader.load(['general']);
+        console.log(`[${this.name}] Equipped with ${this.skills.size} specialized skills.`);
     }
 
     async processMessage(msg) {
+        // 🔄 Active Heartbeat for long operations
+        const bus = require('../lib/db');
+        bus.heartbeat(this.name, this.role, this.pid, 'BUSY');
         // Drona listens for "TASK_DONE" events
         if (msg.meta && msg.meta.type === 'TASK_DONE') {
             const taskId = msg.meta.taskId;

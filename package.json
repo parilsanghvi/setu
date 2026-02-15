@@ -1,7 +1,7 @@
 {
   "name": "setu",
   "version": "1.0.0",
-  "description": "",
+  "description": "Ancient Swarm Intelligence for Project Management",
   "main": "index.js",
   "bin": {
     "setu": "./bin/setu"
@@ -9,7 +9,10 @@
   "scripts": {
     "test": "jest",
     "setup": "node bin/setup.js",
-    "doctor": "node agents/Vaidya.js"
+    "doctor": "node agents/Vaidya.js",
+    "init:swarm": "node scripts/init_swarm.js",
+    "ignite": "node scripts/ignite.js",
+    "start": "node scripts/ignite.js"
   },
   "keywords": [],
   "author": "",
@@ -19,6 +22,7 @@
     "better-sqlite3": "^12.6.2",
     "blessed": "^0.1.81",
     "blessed-contrib": "^4.11.0",
+    "cors": "^2.8.6",
     "dotenv": "^17.3.1",
     "enquirer": "^2.4.1",
     "express": "^5.2.1",

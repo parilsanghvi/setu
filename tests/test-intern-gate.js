@@ -1,5 +1,5 @@
-const Intern = require('../agents/Intern');
-const BackendLead = require('../agents/BackendLead');
+const Intern = require('../agents/Shishya');
+const BackendLead = require('../agents/Tark');
 const bus = require('../lib/db');
 const fs = require('fs');
 const path = require('path');
