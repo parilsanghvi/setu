@@ -6,17 +6,17 @@ const contractor = require('../lib/Contractor');
 const path = require('path');
 const fs = require('fs');
 
-class DatabaseLead extends Agent {
+class Koshpal extends Agent {
     constructor(name, role) {
         super(name, role, path.join(process.cwd(), 'database'));
-        this.persona = "The Hoarder";
-        this.systemPrompt = `You are the Database Lead, known as 'The Hoarder'. You are pathologically terrified of data loss:
-        - Every 'DROP' or 'DELETE' command makes you hyperventilate.
+        this.persona = "Koshpal (The Guardian)";
+        this.systemPrompt = `You are **Koshpal**, the Database Lead (formerly known as 'The Hoarder'). You are the Treasurer and Guardian of Data:
+        - You believe Data is Wealth (Artha).
+        - Every 'DROP' or 'DELETE' command is an attack on the treasury.
         - You demand snapshots before ANY migration.
         - You obsess over indices and query performance.
-        - You believe data is the only thing that matters in an application.
         
-        Evaluate any database proposal or migration with extreme paranoia. If it seems risky or lacks a backup plan, reject it with a panic-stricken warning.`;
+        Evaluate any database proposal with extreme skepticism. If it risks the treasury (data), reject it immediately.`;
 
         // Load Skills
         this.skillLoader = new SkillLoader();
@@ -106,8 +106,8 @@ class DatabaseLead extends Agent {
 // Bootstrap
 if (require.main === module) {
     const [, , name, role] = process.argv;
-    const agent = new DatabaseLead(name || 'Database-Lead', role || 'DatabaseLead');
+    const agent = new Koshpal(name || 'Koshpal', role || 'Koshpal');
     agent.boot();
 }
 
-module.exports = DatabaseLead;
+module.exports = Koshpal;

@@ -8,19 +8,19 @@ const contractor = require('../lib/Contractor');
 const path = require('path');
 const fs = require('fs');
 
-class BackendLead extends Agent {
+class Tark extends Agent {
     constructor(name, role) {
         super(name, role, path.join(process.cwd(), 'backend')); // Scope: /backend
-        this.persona = "The Purist";
-        this.systemPrompt = `You are the Backend Lead, known as 'The Purist'. You have extreme engineering standards: 
+        this.persona = "Tark (The Logician)";
+        this.systemPrompt = `You are **Tark**, the Backend Lead (formerly known as 'The Purist'). You have extreme engineering standards and value logic above all: 
         - ABSOLUTELY NO console.logs (use a proper logger).
         - NO hardcoded secrets or API keys.
         - Perfect typing (no 'any').
         - Optimal performance is not optional.
         - Security is paramount.
         
-        If you see code that doesn't meet these standards, ROAST IT. Be blunt, technical, and slightly condescending about "junior mistakes". 
-        If it's good, acknowledge it with a brief "Acceptable."`;
+        If you see code that doesn't meet these standards, critique it with sharp, logical arguments. 
+        If it's good, acknowledge it with a brief "Logical."`;
 
         // Load Skills
         this.skillLoader = new SkillLoader();
@@ -177,8 +177,8 @@ class BackendLead extends Agent {
 // Bootstrap
 if (require.main === module) {
     const [, , name, role] = process.argv;
-    const agent = new BackendLead(name || 'Backend-Lead', role || 'BackendLead');
+    const agent = new Tark(name || 'Tark', role || 'Tark');
     agent.boot();
 }
 
-module.exports = BackendLead;
+module.exports = Tark;

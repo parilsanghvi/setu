@@ -9,11 +9,11 @@
 
 **Objective:** A reactive, crash-proof event bus.
 
-*   **Narad (The Kernel):**
+*   **Sutradhar (The Kernel):**
     *   **Role:** Project Manager & System Process.
     *   **Mechanism:** Watches SQLite `messages` table (The Bus).
     *   **Resurrection:** Polls `agents` table. If `last_heartbeat > 30s`, it kills the PID and respawns the Agent.
-    *   **The Dispatcher:** Routes messages to Leads. Spawns "Interns" on demand.
+    *   **The Dispatcher:** Routes messages to Leads. Spawns "Shishyas" (Interns) on demand.
 
 *   **The Bus (SQLite):**
     *   **Tables:** `messages` (Chat), `tasks` (Kanban), `agents` (Registry).
@@ -46,14 +46,14 @@
 
 **Objective:** Enforce extreme quality standards via distinct personalities backed by LLM Intelligence.
 
-### 🎩 Backend Lead ("The Purist")
+### 🎩 Tark (Backend Lead / "The Purist")
 *   **Trait:** Rejects code with `console.log`, `any`, or lint errors.
 *   **Brain:** Uses `lib/LLM.js` with "Strict Performance Engineer" system prompt.
 *   **Behavior:**
-    *   If `console.log` is found -> **Roast the Intern**.
+    *   If `console.log` is found -> **Roast the Shishya**.
 *   **Skills:** `[NodeScanner, DockerSandbox, LintEnforcer]`.
 
-### 🎨 Frontend Lead ("The Artist")
+### 🎨 Shilpi (Frontend Lead / "The Artist")
 *   **Trait:** Obsessed with Pixel Perfection.
 *   **Brain:** Uses `lib/LLM.js` with "Visual Designer" system prompt.
 *   **Behavior:**
@@ -62,7 +62,7 @@
     *   If diff > 5px -> **Reject PR**.
 *   **Skills:** `[ReactScanner, PlaywrightVisualDiff]`.
 
-### 💾 Database Lead ("The Hoarder")
+### 💾 Koshpal (Database Lead / "The Hoarder")
 *   **Trait:** Terrified of data loss.
 *   **Brain:** Uses `lib/LLM.js` with "Paranoid DBA" system prompt.
 *   **Behavior:**
@@ -72,11 +72,11 @@
 
 ---
 
-## 4. The Learning Engine (Drona) 🏹
+## 4. The Learning Engine (Guru) 🏹
 
 **Objective:** The system gets smarter over time.
 
-*   **The Guru Agent (Drona):**
+*   **The Guru Agent:**
     *   **Trigger:** When a Task is marked `DONE` and was rated "Hard" (High Token Cost).
     *   **Action:**
         1.  Reads the Task Journal.
@@ -91,10 +91,10 @@
 **Objective:** Incentivize efficiency and prevent runaway costs.
 
 *   **The Budget Protocol:**
-    *   **Narad:** Assigns a Budget (e.g., $5.00) to a Feature.
-    *   **Leads:** "Pay" Interns from their budget.
+    *   **Sutradhar:** Assigns a Budget (e.g., $5.00) to a Feature.
+    *   **Leads:** "Pay" Shishyas from their budget.
     *   **Bankruptcy:** If a Lead runs out of money, the Task is **PAUSED**.
-    *   **Bailout (Bribe):** User can inject funds (`setu pay backend-lead 5.00`) to unblock tasks.
+    *   **Bailout (Bribe):** User can inject funds (`setu pay tark 5.00`) to unblock tasks.
 
 ---
 
@@ -108,3 +108,12 @@
     *   **God Mode Dashboard:** TUI for monitoring Chat/Kanban/Budget.
     *   **Big Bang Init:** `setu init --scan` to auto-populate `CONTEXT.md` for existing repos.
     *   **Containerization:** Move all Intern execution to `DockerSandbox` (`network: none`).
+6.  **Phase 6: Mission Control (The Frontend) 🕹️**
+    *   **React Dashboard:** Replace legacy HTML with React+Vite.
+    *   **Live Stream:** Socket.io integration for real-time thought visualization.
+    *   **Chat Room:** Multiplayer interface for User + Narad + Agents.
+7.  **Phase 7: Vaidya (The Healer) ⚕️**
+    *   **Role:** System Doctor Agent.
+    *   **Duties:** Fix `.env`, validate Docker, auto-heal configuration drift.
+    *   **Command:** `setu doctor`.
+

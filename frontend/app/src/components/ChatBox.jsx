@@ -1,15 +1,21 @@
 import React, { useState } from 'react';
+import { useSocket } from '../hooks/useSocket';
 import styles from './ChatBox.module.scss';
 import classNames from 'classnames';
 
 const ChatBox = ({ agents }) => {
+    const { logs } = useSocket();
     const [msg, setMsg] = useState("");
-    const [target, setTarget] = useState("Drona");
-    const [history, setHistory] = useState([]);
+    const [target, setTarget] = useState("Sutradhar");
+
+    // Filter logs for chat messages or show all?
+    // For now, let's show all system logs + chat to give "The Matrix" feel
+    // OR filter for [CHAT] prefix we added in useSocket
+    const chatHistory = logs.filter(l => typeof l === 'string' && l.startsWith('[CHAT]'));
 
     const send = async () => {
         if (!msg) return;
-        setHistory(prev => [...prev, { from: 'Me', to: target, text: msg }]);
+        // Optimistic update not needed as we listen to the socket
         await fetch('/api/chat', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -22,9 +28,9 @@ const ChatBox = ({ agents }) => {
         <div className={styles.container}>
             <div className={styles.header}>COMMS</div>
             <div className={styles.messageList}>
-                {history.map((h, i) => (
-                    <div key={i}>
-                        <span className={styles.sender}>{h.from} → {h.to}:</span> <span className={styles.message}>{h.text}</span>
+                {chatHistory.map((h, i) => (
+                    <div key={i} className={styles.logEntry}>
+                        {h}
                     </div>
                 ))}
             </div>

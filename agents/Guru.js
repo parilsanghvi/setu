@@ -3,7 +3,7 @@ const path = require('path');
 const fs = require('fs');
 const LLM = require('../lib/LLM');
 
-class Drona extends Agent {
+class Guru extends Agent {
     constructor(name, role) {
         super(name, role, path.join(process.cwd(), 'skills', 'learned'));
         this.persona = "The Guru";
@@ -220,8 +220,8 @@ author: Drona
 // Bootstrap
 if (require.main === module) {
     const [, , name, role] = process.argv;
-    const agent = new Drona(name || 'Drona', role || 'Drona');
+    const agent = new Guru(name || 'Guru', role || 'Guru');
     agent.boot();
 }
 
-module.exports = Drona;
+module.exports = Guru;

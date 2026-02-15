@@ -3,7 +3,7 @@ const fs = require('fs');
 const path = require('path');
 const LLM = require('../lib/LLM');
 
-class Intern extends Agent {
+class Shishya extends Agent {
     constructor(name, role, scope, leadRole) {
         super(name, role, scope);
         this.leadRole = leadRole; // e.g., 'BackendLead'
@@ -30,13 +30,13 @@ class Intern extends Agent {
     }
 
     async generatePlan(objective) {
-        const prompt = `You are an Intern agent. Generate a step-by-step PLAN.md for the following objective:
+        const prompt = `You are a **Shishya** (Student Agent). Generate a step-by-step PLAN.md for the following objective:
         "${objective}"
         
         Focus on technical details. If you plan to modify or delete files, state clearly which ones and why.
         Format: Markdown.`;
 
-        return await LLM.generate("System: You are a productive junior engineer.", prompt);
+        return await LLM.generate("System: You are a productive junior engineer/student.", prompt);
     }
 
     writePlan(content) {
@@ -76,4 +76,4 @@ class Intern extends Agent {
     }
 }
 
-module.exports = Intern;
+module.exports = Shishya;

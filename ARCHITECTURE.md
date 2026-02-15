@@ -6,7 +6,7 @@
 
 ## 1. The Hierarchy (The Org Chart)
 
-### 👑 Narad (The Orchestrator)
+### 👑 Sutradhar (The Kernel)
 *   **Role:** Project Manager & System Kernel.
 *   **Responsibilities:**
     *   Interface with the User (You).
@@ -16,11 +16,11 @@
 
 ### 🛠️ The Cohort (The Leads)
 Autonmous agents with domain-specific authority.
-1.  **Backend Lead:** API, Business Logic, Performance.
-2.  **Frontend Lead:** UI/UX, State, Accessibility.
-3.  **Database Lead:** Schema, Migrations, Integrity.
+1.  **Tark (Backend Lead):** Logic, API, Performance.
+2.  **Shilpi (Frontend Lead):** UI/UX, State, Accessibility.
+3.  **Koshpal (Database Lead):** Schema, Migrations, Integrity.
 
-### 🎓 The Interns (Sub-Agents)
+### 🎓 The Shishyas (Interns)
 *   **Ephemeral:** Spawned by Leads for specific tasks.
 *   **Role:** "Refactor these 50 files", "Write unit tests for this module".
 *   **Scope:** Limited to a specific folder or file context.
@@ -91,28 +91,28 @@ Every Lead has a specialized version of these:
 5.  **Suraksha (Security) 🛡️:** Audits for vulnerabilities.
 
 ### Injection Mechanism
-*   When Narad spawns **Backend Lead**, it injects: `[NodeScanner, DockerSandbox, SecurityAudit]`.
-*   When Backend Lead spawns **Intern**, it injects: `[FileRead, FileWrite]`. (Least Privilege).
+*   When Sutradhar spawns **Tark (Backend Lead)**, it injects: `[NodeScanner, DockerSandbox, SecurityAudit]`.
+*   When Tark spawns **Shishya (Intern)**, it injects: `[FileRead, FileWrite]`. (Least Privilege).
 
 ---
 
 ## 5. The Workflow (The Loop) 🔄
 
-1.  **Trigger:** User tells Narad: "Migrate to Node 24."
-2.  **Plan:** Narad creates `TASK-1` (Backend) and `TASK-2` (Frontend) in Kanban.
-3.  **Dispatch:** Narad sends a message to Backend Lead.
+1.  **Trigger:** User tells Sutradhar: "Migrate to Node 24."
+2.  **Plan:** Sutradhar creates `TASK-1` (Backend) and `TASK-2` (Frontend) in Kanban.
+3.  **Dispatch:** Sutradhar sends a message to Tark.
 4.  **Action:**
-    *   Backend Lead wakes up.
+    *   Tark wakes up.
     *   Reads `backend/CONTEXT.md`.
-    *   Spawns `Intern-1` with `Drishti` skill to scan for breaking changes.
+    *   Spawns `Shishya-1` with `Drishti` skill to scan for breaking changes.
 5.  **Execution:**
-    *   Intern finds issues, writes to `backend/JOURNAL.md`.
-    *   Backend Lead reads Journal, plans refactor.
-    *   Backend Lead spawns `Intern-2` to fix code (using `Sudhar`).
+    *   Shishya finds issues, writes to `backend/JOURNAL.md`.
+    *   Tark reads Journal, plans refactor.
+    *   Tark spawns `Shishya-2` to fix code (using `Sudhar`).
 6.  **Verification:**
-    *   Backend Lead runs `Pariksha` (Tests).
+    *   Tark runs `Pariksha` (Tests).
     *   If Green -> Updates Kanban to `DONE`.
-7.  **Closure:** Narad sees `DONE` and notifies User.
+7.  **Closure:** Sutradhar sees `DONE` and notifies User.
 
 ---
 

@@ -3,9 +3,13 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
+  "bin": {
+    "setu": "./bin/setu"
+  },
   "scripts": {
     "test": "jest",
-    "setup": "node bin/setup.js"
+    "setup": "node bin/setup.js",
+    "doctor": "node agents/Vaidya.js"
   },
   "keywords": [],
   "author": "",
@@ -22,5 +26,8 @@
     "playwright-core": "^1.58.2",
     "socket.io": "^4.8.3",
     "sqlite3": "^5.1.7"
+  },
+  "devDependencies": {
+    "socket.io-client": "^4.8.3"
   }
 }

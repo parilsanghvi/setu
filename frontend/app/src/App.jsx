@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { io } from 'socket.io-client';
+import { useSocket } from './hooks/useSocket';
 import AgentCard from './components/AgentCard';
 import TaskBoard from './components/TaskBoard';
 import LogViewer from './components/LogViewer';
@@ -7,26 +7,8 @@ import ChatBox from './components/ChatBox';
 import styles from './App.module.scss';
 import './index.scss';
 
-const socket = io(); // Connects to the same host/port by default, effectively proxied by Vite
-
 const App = () => {
-  const [agents, setAgents] = useState([]);
-  const [tasks, setTasks] = useState([]);
-  const [logs, setLogs] = useState([]);
-
-  useEffect(() => {
-    socket.on('log', (msg) => setLogs((p) => [...p, msg].slice(-100)));
-    socket.on('log_history', (hist) => setLogs(hist));
-    socket.on('agents_update', (data) => setAgents(data));
-    socket.on('tasks_update', (data) => setTasks(data));
-
-    return () => {
-      socket.off('log');
-      socket.off('log_history');
-      socket.off('agents_update');
-      socket.off('tasks_update');
-    };
-  }, []);
+  const { agents, tasks, logs, isConnected } = useSocket();
 
   const activeAgentsCount = agents.filter(a => a.status !== 'OFFLINE').length;
 

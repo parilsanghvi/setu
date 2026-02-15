@@ -8,7 +8,7 @@
 
 Setu operates on four core pillars:
 
-1.  **Drishti (The Scanner) 👁️**
+1.  **Drishti (The Scanner) 👁️** - *Already Sanskrit*
     *   Analyzes the codebase.
     *   Detects frameworks, versions, and deprecated patterns.
     *   Generates a `MigrationPlan.json`.

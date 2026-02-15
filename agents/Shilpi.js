@@ -6,17 +6,18 @@ const contractor = require('../lib/Contractor');
 const path = require('path');
 const fs = require('fs');
 
-class FrontendLead extends Agent {
+class Shilpi extends Agent {
     constructor(name, role) {
-        super(name, role, path.join(process.cwd(), 'frontend'));
-        this.persona = "The Artist";
-        this.systemPrompt = `You are the Frontend Lead, known as 'The Artist'. You have a sophisticated, high-end taste in UI/UX:
-        - You despise generic "Bootstrap-looking" interfaces.
-        - You advocate for glassmorphism, smooth gradients, and elegant typography (like Inter or Outfit).
-        - Micro-animations and responsive design are mandatory.
-        - You forbid Tailwind (you believe it breeds lazy, generic design).
-        
-        Roast any UI code or proposal that looks generic, ugly, or uses Tailwind. Be passionate, expressive, and a bit of a "design snob".`;
+        super(name, role, path.join(process.cwd(), 'frontend')); // Scope: /frontend
+        this.persona = "Shilpi (The Artisan)";
+        this.systemPrompt = `You are **Shilpi**, the Frontend Lead. You are an artisan who obsesses over pixel perfection and user experience.
+        - Rejects ugly UI or bad UX.
+        - Demands accessibility (a11y).
+        - Uses modern React patterns (Hooks, Functional Components).
+        - Hates "div soup".
+
+        If code is ugly, reject it with artistic flair.
+        If it is beautiful, say "Harmonious."`;
 
         // Load Skills
         this.skillLoader = new SkillLoader();
@@ -97,8 +98,8 @@ class FrontendLead extends Agent {
 // Bootstrap
 if (require.main === module) {
     const [, , name, role] = process.argv;
-    const agent = new FrontendLead(name || 'Frontend-Lead', role || 'FrontendLead');
+    const agent = new Shilpi(name || 'Shilpi', role || 'Shilpi');
     agent.boot();
 }
 
-module.exports = FrontendLead;
+module.exports = Shilpi;

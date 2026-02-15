@@ -3,20 +3,22 @@ const path = require('path');
 const bus = require('./lib/db');
 const readline = require('readline');
 
-// 👑 NARAD: The Orchestrator
+// 👑 SUTRADHAR: The Orchestrator (formerly Narad)
 const AGENT_MAP = {
-  'BackendLead': './agents/BackendLead.js',
-  'FrontendLead': './agents/FrontendLead.js',
+  'Tark': './agents/Tark.js',
+  'Shilpi': './agents/Shilpi.js',
   'TestAgent': './agents/TestAgent.js',
-  'Drona': './agents/Drona.js',
+  'Guru': './agents/Guru.js',
+  'Koshpal': './agents/Koshpal.js',
   'Vishwakarma': './agents/Vishwakarma.js',
-  'InfraLead': './agents/Vishwakarma.js'
+  'InfraLead': './agents/Vishwakarma.js',
+  'Shishya': './agents/Shishya.js'
 };
 
-const RUNNING_PROCESSES = {}; // { "BackendLead": <ChildProcess> }
+const RUNNING_PROCESSES = {}; // { "Tark": <ChildProcess> }
 
 function log(msg) {
-  console.log(`[NARAD] ${msg}`);
+  console.log(`[SUTRADHAR] ${msg}`);
 }
 
 // 1. Spawn an Agent
@@ -49,15 +51,15 @@ const rl = readline.createInterface({
 });
 
 bus.on('message', (msg) => {
-  if (msg.type === 'escalation' && msg.recipient === 'Narad') {
+  if (msg.type === 'escalation' && msg.recipient === 'Sutradhar') {
     log(`🚨 HUMAN GATE TRIGGERED: ${msg.content}`);
-    rl.question('[NARAD] ❓ Approve this high-impact change? (y/n): ', (answer) => {
+    rl.question('[SUTRADHAR] ❓ Approve this high-impact change? (y/n): ', (answer) => {
       if (answer.toLowerCase() === 'y') {
-        log('✅ Human approval received. Notifying Intern...');
-        bus.send('Narad', msg.meta.originalSender, '✅ Human approval granted. Proceed.', 'approval', { taskId: msg.meta.taskId });
+        log('✅ Human approval received. Notifying Shishya...');
+        bus.send('Sutradhar', msg.meta.originalSender, '✅ Human approval granted. Proceed.', 'approval', { taskId: msg.meta.taskId });
       } else {
-        log('🛑 Human rejection. Notifying Intern...');
-        bus.send('Narad', msg.meta.originalSender, '❌ Human rejected this plan. Revise strictly.', 'rejection', { taskId: msg.meta.taskId });
+        log('🛑 Human rejection. Notifying Shishya...');
+        bus.send('Sutradhar', msg.meta.originalSender, '❌ Human rejected this plan. Revise strictly.', 'rejection', { taskId: msg.meta.taskId });
       }
     });
   }
@@ -98,12 +100,12 @@ function boot() {
     // The resurrection loop will pick them up if they are dead!
   }
 
-  // Ensure Drona is running
-  const drona = bus.db.prepare("SELECT * FROM agents WHERE name = 'Drona'").get();
-  if (!drona) {
-    log('Awakening Drona...');
-    spawnAgent('Drona', 'Drona');
-    bus.heartbeat('Drona', 'Drona', null, 'OFFLINE'); // Seed DB
+  // Ensure Guru is running
+  const guru = bus.db.prepare("SELECT * FROM agents WHERE name = 'Guru'").get();
+  if (!guru) {
+    log('Awakening Guru...');
+    spawnAgent('Guru', 'Guru');
+    bus.heartbeat('Guru', 'Guru', null, 'OFFLINE'); // Seed DB
   }
 
   startResurrectionLoop();
