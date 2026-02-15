@@ -11,5 +11,25 @@
         "timestamp": "2026-02-14T21:56:04.491Z"
       }
     ]
+  },
+  "TASK-INFRA-BAD": {
+    "domain": "infra",
+    "spec": "We will just run the app on the host machine using sudo node server.js. No Docker needed.",
+    "status": "VETOED",
+    "timestamp": "2026-02-15T06:11:52.303Z",
+    "vetoes": [
+      {
+        "agent": "Vishwakarma-Test",
+        "reason": "Violation of Isolation Principle.",
+        "timestamp": "2026-02-15T06:11:52.305Z"
+      }
+    ]
+  },
+  "TASK-INFRA-GOOD": {
+    "domain": "infra",
+    "spec": "We will use a Dockerfile based on node:18-alpine. It will run as a non-root user 'node'. Healthchecks enabled.",
+    "status": "APPROVED",
+    "timestamp": "2026-02-15T06:11:52.305Z",
+    "vetoes": []
   }
 }

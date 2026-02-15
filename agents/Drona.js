@@ -38,6 +38,74 @@ class Drona extends Agent {
             console.log(`[${this.name}] 💀 Death Learning: Analyzing crash of ${agentName}...`);
             await this.analyzeCrash(agentName, msg.meta);
         }
+
+        // Drona: Knowledge Ingestion
+        if (msg.type === 'ingest_docs') {
+            const { content, language } = msg.meta;
+            console.log(`[${this.name}] 📚 Devouring knowledge for ${language}...`);
+            await this.learnLanguage(content, language);
+        }
+
+        // Drona: Dependency Drift
+        if (msg.type === 'track_drift') {
+            const { packageName, currentVersion } = msg.meta;
+            console.log(`[${this.name}] 🕵️ Checking drift for ${packageName} (v${currentVersion})...`);
+            await this.trackDrift(packageName, currentVersion);
+        }
+    }
+
+    // Drona: Track Drift & Create Migration Skill
+    async trackDrift(packageName, currentVersion) {
+        // In a real scenario, we'd fetch actual changelogs or use 'npm view'
+        // Here we simulate the research phase
+        const researchPrompt = `You are Drona. The user is using ${packageName} v${currentVersion}.
+        Assume the latest version is significantly newer (e.g., v${parseInt(currentVersion) + 1} or higher).
+        
+        Generate a "Migration Skill" that covers breaking changes and upgrade steps.
+        
+        OUTPUT FORMAT (JSON):
+        {
+            "slug": "migrate-${packageName}-v${currentVersion}-to-latest",
+            "description": "Migration guide for ${packageName} from v${currentVersion}.",
+            "content": "# Migration Guide: ${packageName}\\n\\n## Breaking Changes\\n[...]\\n\\n## Automated Fixes\\n[...]"
+        }`;
+
+        try {
+            const response = await LLM.generate(this.systemPrompt, researchPrompt);
+            const skillData = this.parseResponse(response);
+            if (skillData) {
+                this.saveSkill(skillData);
+                console.log(`[${this.name}] 🔄 Migration skill created: ${skillData.slug}`);
+            }
+        } catch (e) {
+            console.error(`[${this.name}] ❌ Failed to track drift for ${packageName}:`, e.message);
+        }
+    }
+
+    // Drona: Learn a new language or framework from docs
+    async learnLanguage(docContent, language) {
+        try {
+            const prompt = `You are Drona. Convert this raw documentation into a structured "Syntax Skill" for ${language}.
+            
+            DOCUMENTATION:
+            ${docContent.substring(0, 5000)}... (truncated)
+
+            OUTPUT FORMAT (JSON):
+            {
+                "slug": "${language.toLowerCase()}-syntax",
+                "description": "Essential syntax and patterns for ${language}.",
+                "content": "# ${language} Guide\n\n## Basic Syntax\n[...]\n\n## Common Patterns\n[...]"
+            }`;
+
+            const response = await LLM.generate(this.systemPrompt, prompt);
+            const skillData = this.parseResponse(response);
+            if (skillData) {
+                this.saveSkill(skillData);
+                console.log(`[${this.name}] 🧠 I now understand ${language}.`);
+            }
+        } catch (e) {
+            console.error(`[${this.name}] ❌ Failed to learn ${language}:`, e.message);
+        }
     }
 
     async analyzeCrash(agentName, meta) {

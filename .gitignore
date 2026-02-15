@@ -1,9 +1,43 @@
+# Dependency directories
 node_modules/
-*.db
-*.db-*
-*.log
-.env
-.DS_Store
-coverage/
+jspm_packages/
+
+# Build outputs
 dist/
+dist-ssr/
 build/
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+
+# Testing
+coverage/
+playwright-report/
+test-results/
+
+# Environment variables
+.env
+.env.test
+.env.production
+.env.local
+
+# IDEs
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+
+# Misc
+*.db
+*.db-shm
+*.db-wal

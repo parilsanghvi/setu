@@ -1,0 +1,39 @@
+// Colors
+$bg-main: #0a0a12;
+$text-main: #c0caf5;
+$card-bg: #16161e;
+$border-color: #24283b;
+$scrollbar-thumb: #414868;
+$scrollbar-track: #16161e;
+
+// Accents
+$pulse-green: #4ade80;
+$pulse-green-transparent: rgba(74, 222, 128, 0);
+
+// Fonts
+$font-stack: 'JetBrains Mono', monospace;
+
+// Mixins
+@mixin scroll-y {
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: $scrollbar-thumb $scrollbar-track;
+  
+  &::-webkit-scrollbar {
+    width: 8px;
+  }
+  &::-webkit-scrollbar-track {
+    background: $scrollbar-track;
+  }
+  &::-webkit-scrollbar-thumb {
+    background-color: $scrollbar-thumb;
+    border-radius: 4px;
+  }
+}
+
+@mixin card {
+    background: $card-bg;
+    border: 1px solid $border-color;
+    border-radius: 8px;
+    overflow: hidden;
+}

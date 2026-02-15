@@ -8,7 +8,9 @@ const AGENT_MAP = {
   'BackendLead': './agents/BackendLead.js',
   'FrontendLead': './agents/FrontendLead.js',
   'TestAgent': './agents/TestAgent.js',
-  'Drona': './agents/Drona.js'
+  'Drona': './agents/Drona.js',
+  'Vishwakarma': './agents/Vishwakarma.js',
+  'InfraLead': './agents/Vishwakarma.js'
 };
 
 const RUNNING_PROCESSES = {}; // { "BackendLead": <ChildProcess> }

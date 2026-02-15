@@ -1,0 +1,30 @@
+@use '../styles/variables' as *;
+
+.loading,
+.empty {
+    font-size: 0.75rem;
+    color: #6b7280; // text-gray-500
+}
+
+.gallery {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+}
+
+.imageLink {
+    display: block;
+    border: 1px solid #374151; // border-gray-700
+    transition: border-color 0.2s;
+
+    &:hover {
+        border-color: #3b82f6; // border-blue-500
+    }
+}
+
+.image {
+    width: 100%;
+    height: auto;
+    display: block;
+}

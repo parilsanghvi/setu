@@ -1,193 +1,280 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Setu: God Mode</title>
+    <title>Setu: Mission Control</title>
     <script src="/socket.io/socket.io.js"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        :root {
-            --bg: #0a0a12;
-            --card-bg: #16161e;
-            --accent: #7aa2f7;
-            --text: #c0caf5;
-            --green: #9ece6a;
-            --red: #f7768e;
-        }
         body {
+            background-color: #0a0a12;
+            color: #c0caf5;
             font-family: 'JetBrains Mono', monospace;
-            background: var(--bg);
-            color: var(--text);
-            margin: 0;
-            padding: 20px;
-            display: grid;
-            grid-template-columns: 300px 1fr;
-            grid-template-rows: 150px 1fr;
-            gap: 20px;
-            height: 100vh;
-            box-sizing: border-box;
         }
 
         .card {
-            background: var(--card-bg);
-            border-radius: 8px;
-            padding: 15px;
+            background: #16161e;
             border: 1px solid #24283b;
-            overflow: auto;
+            border-radius: 8px;
+            overflow: hidden;
         }
 
-        h2 { margin-top: 0; color: var(--accent); font-size: 1.2rem; }
-
-        /* Stats (Top Left) */
-        #stats {grid-column: 1; grid-row: 1; }
-        .stat-item { margin-bottom: 10px; }
-        .stat-value { font-size: 1.5rem; font-weight: bold; color: var(--green); }
-
-        /* Agents (Top Right) */
-        #agents { grid-column: 2; grid-row: 1; display: flex; gap: 10px; }
-        .agent-card {
-            background: #1a1b26;
-            padding: 10px;
-            border-radius: 5px;
-            border-left: 4px solid var(--accent);
-            min-width: 120px;
+        .scroll-y {
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: #414868 #16161e;
         }
-        .agent-card.offline { border-color: var(--red); opacity: 0.6; }
-        .agent-name { font-weight: bold; display: block; }
-        .agent-status { font-size: 0.8rem; }
 
-        /* Logs (Bottom Left) */
-        #logs { grid-column: 1; grid-row: 2; font-size: 0.8rem; color: #a9b1d6; }
-        .log-entry { margin-bottom: 4px; border-bottom: 1px solid #24283b; padding-bottom: 2px;}
-
-        /* Kanban (Bottom Right) */
-        #kanban { grid-column: 2; grid-row: 2; display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
-        .column { background: #1a1b26; padding: 10px; border-radius: 5px; }
-        .column-header { text-align: center; border-bottom: 1px solid var(--accent); padding-bottom: 5px; margin-bottom: 10px; color: var(--accent); }
-        .task-card {
-            background: var(--card-bg);
-            padding: 10px;
-            margin-bottom: 10px;
-            border-radius: 4px;
-            border: 1px solid #414868;
+        .animate-pulse-green {
+            animation: pulse-green 2s infinite;
         }
-        .task-id { font-size: 0.7rem; color: #565f89; }
-        
-        /* Utility */
-        .pulse { animation: pulse 2s infinite; }
-        @keyframes pulse {
-            0% { box-shadow: 0 0 0 0 rgba(122, 162, 247, 0.4); }
-            70% { box-shadow: 0 0 0 10px rgba(122, 162, 247, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(122, 162, 247, 0); }
+
+        @keyframes pulse-green {
+            0% {
+                box-shadow: 0 0 0 0 rgba(74, 222, 128, 0.4);
+            }
+
+            70% {
+                box-shadow: 0 0 0 10px rgba(74, 222, 128, 0);
+            }
+
+            100% {
+                box-shadow: 0 0 0 0 rgba(74, 222, 128, 0);
+            }
         }
     </style>
 </head>
-<body>
 
-    <!-- 1. System Stats -->
-    <div id="stats" class="card">
-        <h2>SYSTEM STATUS</h2>
-        <div class="stat-item">
-            <div>Uptime</div>
-            <div id="uptime" class="stat-value">0s</div>
-        </div>
-        <div class="stat-item">
-            <div>Active Agents</div>
-            <div id="active-agents" class="stat-value">0</div>
-        </div>
-    </div>
+<body class="h-screen w-screen overflow-hidden p-4">
+    <div id="root" class="h-full w-full"></div>
 
-    <!-- 2. Active Agents -->
-    <div id="agents" class="card">
-        <!-- Agent Cards Injected Here -->
-    </div>
-
-    <!-- 3. Logs -->
-    <div id="logs" class="card">
-        <h2>KERNEL LOGS</h2>
-        <div id="log-container"></div>
-    </div>
-
-    <!-- 4. Kanban -->
-    <div id="kanban" class="card">
-        <div class="column" id="col-todo">
-            <div class="column-header">TODO</div>
-            <div class="task-list"></div>
-        </div>
-        <div class="column" id="col-progress">
-            <div class="column-header">IN PROGRESS</div>
-            <div class="task-list"></div>
-        </div>
-        <div class="column" id="col-done">
-            <div class="column-header">DONE</div>
-            <div class="task-list"></div>
-        </div>
-    </div>
-
-    <script>
+    <script type="text/babel">
+        const { useState, useEffect, useRef } = React;
         const socket = io();
-        
-        // Logs
-        const logContainer = document.getElementById('log-container');
-        function addLog(msg) {
-            const div = document.createElement('div');
-            div.className = 'log-entry';
-            div.innerText = msg;
-            logContainer.appendChild(div);
-            logContainer.scrollTop = logContainer.scrollHeight;
-        }
-        
-        socket.on('log_history', (logs) => logs.forEach(addLog));
-        socket.on('log', (msg) => addLog(msg));
 
-        // Agents
-        const agentsContainer = document.getElementById('agents');
-        socket.on('agents_update', (agents) => {
-            agentsContainer.innerHTML = '<h2>AGENTS</h2>'; // Hacky clear
-            agents.forEach(a => {
-                const div = document.createElement('div');
-                div.className = `agent-card ${a.status === 'OFFLINE' ? 'offline' : 'pulse'}`;
-                div.innerHTML = `
-                    <span class="agent-name">${a.name}</span>
-                    <span class="agent-status">${a.role} | ${a.status}</span>
-                `;
-                agentsContainer.appendChild(div);
-            });
-            
-            // Update Stats
-            document.getElementById('active-agents').innerText = agents.filter(a => a.status !== 'OFFLINE').length;
-        });
+        /* --- Components --- */
 
-        // Tasks
-        function renderTask(task) {
-            return `
-                <div class="task-card">
-                    <div class="task-id">${task.id}</div>
-                    <div>${task.title}</div>
-                    <div style="font-size:0.8rem; color: #565f89">Owner: ${task.owner}</div>
+        const Modal = ({ children, onClose }) => (
+            <div class="fixed inset-0 bg-black/80 flex justify-center items-center z-50" onClick={onClose}>
+                <div class="bg-[#16161e] border border-[#24283b] p-4 rounded max-w-4xl max-h-[90vh] overflow-auto" onClick={e => e.stopPropagation()}>
+                    {children}
+                    <button onClick={onClose} class="absolute top-4 right-4 text-white hover:text-red-400">✕</button>
                 </div>
-            `;
-        }
+            </div>
+        );
 
-        socket.on('tasks_update', (tasks) => {
-            document.querySelector('#col-todo .task-list').innerHTML = '';
-            document.querySelector('#col-progress .task-list').innerHTML = '';
-            document.querySelector('#col-done .task-list').innerHTML = '';
+        const ScreenshotGallery = ({ taskId }) => {
+            const [images, setImages] = useState([]);
+            const [loading, setLoading] = useState(true);
 
+            useEffect(() => {
+                fetch(`/api/tasks/${taskId}/screenshots`)
+                    .then(r => r.json())
+                    .then(data => {
+                        setImages(data);
+                        setLoading(false);
+                    })
+                    .catch(() => setLoading(false));
+            }, [taskId]);
+
+            if (loading) return <div class="text-xs text-gray-500">Loading shots...</div>;
+            if (images.length === 0) return <div class="text-xs text-gray-500">No visual history recorded.</div>;
+
+            return (
+                <div class="grid grid-cols-2 gap-2 mt-2">
+                    {images.map(img => (
+                        <a key={img} href={img} target="_blank" class="block border border-gray-700 hover:border-blue-500 transition-colors">
+                            <img src={img} class="w-full h-auto" />
+                        </a>
+                    ))}
+                </div>
+            );
+        };
+
+        const AgentCard = ({ agent }) => {
+            const isOffline = agent.status === 'OFFLINE';
+            return (
+                <div class={`p-3 rounded border-l-4 mb-2 flex justify-between items-center transition-all ${isOffline ? 'bg-gray-900 border-gray-700 opacity-60' : 'bg-gray-800 border-blue-500'}`}>
+                    <div>
+                        <div class="font-bold text-sm text-blue-300">{agent.name}</div>
+                        <div class="text-xs text-gray-400">{agent.role}</div>
+                    </div>
+                    <div class={`px-2 py-1 rounded text-xs font-bold ${isOffline ? 'bg-red-900 text-red-300' : 'bg-green-900 text-green-300 animate-pulse'}`}>
+                        {agent.status}
+                    </div>
+                </div>
+            );
+        };
+
+        const LogViewer = ({ logs }) => {
+            const bottomRef = useRef(null);
+            useEffect(() => bottomRef.current?.scrollIntoView({ behavior: "smooth" }), [logs]);
+
+            return (
+                <div class="card h-full flex flex-col">
+                    <div class="bg-gray-900 p-2 border-b border-gray-700 font-bold text-gray-400 text-xs">KERNEL LOGS</div>
+                    <div class="flex-1 scroll-y p-2 text-xs font-mono space-y-1">
+                        {logs.map((log, i) => (
+                            <div key={i} class="border-b border-gray-800 pb-1 text-gray-300 break-words">{log}</div>
+                        ))}
+                        <div ref={bottomRef} />
+                    </div>
+                </div>
+            );
+        };
+
+        const TaskBoard = ({ tasks }) => {
+            const [newTask, setNewTask] = useState("");
+            const [selectedTask, setSelectedTask] = useState(null);
+
+            const createTask = async () => {
+                if (!newTask) return;
+                await fetch('/api/tasks', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ title: newTask, type: 'gui-task' })
+                });
+                setNewTask("");
+            };
+
+            const cols = { TODO: [], IN_PROGRESS: [], DONE: [] };
             tasks.forEach(t => {
-                let col = '#col-todo';
-                if (t.status === 'IN_PROGRESS') col = '#col-progress';
-                if (t.status === 'DONE') col = '#col-done';
-                
-                document.querySelector(`${col} .task-list`).innerHTML += renderTask(t);
+                const status = t.status === 'TODO' || t.status === 'PROPOSED' ? 'TODO' : t.status;
+                if (cols[status]) cols[status].push(t);
             });
-        });
 
-        // Uptime Tick
-        setInterval(() => {
-            // In real app, sync with server time
-        }, 1000);
+            return (
+                <div class="card h-full flex flex-col relative">
+                    {selectedTask && (
+                        <Modal onClose={() => setSelectedTask(null)}>
+                            <div class="p-2">
+                                <h2 class="text-xl font-bold mb-2 text-blue-400">{selectedTask.title}</h2>
+                                <div class="text-xs text-gray-400 mb-4">ID: {selectedTask.id} | Owner: {selectedTask.owner}</div>
+                                <div class="text-sm font-bold text-gray-300 mb-2">Visual History</div>
+                                <ScreenshotGallery taskId={selectedTask.id} />
+                            </div>
+                        </Modal>
+                    )}
 
+                    <div class="bg-gray-900 p-2 border-b border-gray-700 flex justify-between items-center">
+                        <span class="font-bold text-gray-400 text-xs">KANBAN</span>
+                        <div class="flex gap-2">
+                            <input value={newTask} onChange={e => setNewTask(e.target.value)} placeholder="New Task..." class="bg-gray-800 text-xs text-white px-2 py-1 rounded border border-gray-700 outline-none focus:border-blue-500" />
+                            <button onClick={createTask} class="bg-blue-600 hover:bg-blue-500 text-white text-xs px-2 py-1 rounded">ADD</button>
+                        </div>
+                    </div>
+                    <div class="flex-1 grid grid-cols-3 gap-2 p-2 overflow-hidden">
+                        {Object.entries(cols).map(([status, items]) => (
+                            <div key={status} class="bg-gray-900 rounded p-2 flex flex-col h-full">
+                                <div class="text-xs font-bold text-center mb-2 text-gray-500">{status}</div>
+                                <div class="flex-1 scroll-y space-y-2">
+                                    {items.map(t => (
+                                        <div key={t.id} onClick={() => setSelectedTask(t)} class="bg-gray-800 p-2 rounded text-xs border border-gray-700 cursor-pointer hover:border-blue-400 transition-colors">
+                                            <div class="font-bold text-blue-400">{t.id}</div>
+                                            <div class="mt-1">{t.title || JSON.parse(t.spec || '{}').task}</div>
+                                            <div class="mt-2 text-gray-500 text-[10px] flex justify-between">
+                                                <span>{t.owner || 'Unassigned'}</span>
+                                                <span class="text-blue-300 hover:underline">View 📸</span>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            );
+        };
+
+        const ChatBox = ({ agents }) => {
+            const [msg, setMsg] = useState("");
+            const [target, setTarget] = useState("Drona");
+            const [history, setHistory] = useState([]);
+
+            const send = async () => {
+                if (!msg) return;
+                setHistory(prev => [...prev, { from: 'Me', to: target, text: msg }]);
+                await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ agent: target, message: msg })
+                });
+                setMsg("");
+            };
+
+            return (
+                <div class="card h-full flex flex-col">
+                    <div class="bg-gray-900 p-2 border-b border-gray-700 font-bold text-gray-400 text-xs">COMMS</div>
+                    <div class="flex-1 scroll-y p-2 text-xs space-y-2">
+                        {history.map((h, i) => (
+                            <div key={i}>
+                                <span class="text-blue-400 font-bold">{h.from} → {h.to}:</span> <span class="text-gray-300">{h.text}</span>
+                            </div>
+                        ))}
+                    </div>
+                    <div class="p-2 border-t border-gray-700 flex gap-2">
+                        <select value={target} onChange={e => setTarget(e.target.value)} class="bg-gray-800 text-xs text-white rounded outline-none border border-gray-700 p-1">
+                            {agents.map(a => <option value={a.name}>{a.name}</option>)}
+                        </select>
+                        <input value={msg} onChange={e => setMsg(e.target.value)} onKeyDown={e => e.key === 'Enter' && send()} class="flex-1 bg-gray-800 text-xs text-white rounded px-2 outline-none border border-gray-700" placeholder="Message agent..." />
+                        <button onClick={send} class="text-xs bg-blue-600 px-3 rounded text-white">SEND</button>
+                    </div>
+                </div>
+            )
+        };
+
+        const App = () => {
+            const [agents, setAgents] = useState([]);
+            const [tasks, setTasks] = useState([]);
+            const [logs, setLogs] = useState([]);
+
+            useEffect(() => {
+                socket.on('log', msg => setLogs(p => [...p, msg].slice(-100)));
+                socket.on('log_history', hist => setLogs(hist));
+                socket.on('agents_update', data => setAgents(data));
+                socket.on('tasks_update', data => setTasks(data));
+            }, []);
+
+            return (
+                <div class="grid grid-cols-4 grid-rows-3 gap-4 h-full">
+                    {/* Header / Stats */}
+                    <div class="col-span-1 row-span-1 card p-4 flex flex-col justify-center items-center">
+                        <h1 class="text-2xl font-bold text-blue-500 mb-2">Setu <span class="text-xs text-gray-500">v2.0</span></h1>
+                        <div class="text-4xl font-bold text-white">{agents.filter(a => a.status !== 'OFFLINE').length} <span class="text-sm text-gray-500 font-normal">Active Agents</span></div>
+                    </div>
+
+                    {/* Agent List */}
+                    <div class="col-span-1 row-span-2 card p-2 bg-gray-900 scroll-y">
+                        <div class="text-xs font-bold text-gray-500 mb-2 text-center">FLEET</div>
+                        {agents.map(a => <AgentCard key={a.name} agent={a} />)}
+                    </div>
+
+                    {/* Kanban */}
+                    <div class="col-span-2 row-span-2">
+                        <TaskBoard tasks={tasks} />
+                    </div>
+
+                    {/* Logs */}
+                    <div class="col-span-2 row-span-1">
+                        <LogViewer logs={logs} />
+                    </div>
+
+                    {/* Chat via Drona or specific agents */}
+                    <div class="col-span-2 row-span-1">
+                        <ChatBox agents={agents} />
+                    </div>
+                </div>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
     </script>
 </body>
+
 </html>

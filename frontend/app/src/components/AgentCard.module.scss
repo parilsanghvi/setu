@@ -1,0 +1,67 @@
+@use '../styles/variables' as *;
+
+.card {
+    padding: 0.75rem;
+    border-radius: 0.25rem;
+    border-left-width: 4px;
+    border-left-style: solid;
+    margin-bottom: 0.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: all 0.3s ease;
+
+    &.offline {
+        background-color: #111827; // bg-gray-900
+        border-color: #374151; // border-gray-700
+        opacity: 0.6;
+        border-left-color: #374151;
+    }
+
+    &.active {
+        background-color: #1f2937; // bg-gray-800
+        border-color: #3b82f6; // border-blue-500
+        border-left-color: #3b82f6;
+    }
+}
+
+.name {
+    font-weight: 700;
+    font-size: 0.875rem;
+    color: #93c5fd; // text-blue-300
+}
+
+.role {
+    font-size: 0.75rem;
+    color: #9ca3af; // text-gray-400
+}
+
+.statusBadge {
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.25rem;
+    font-size: 0.75rem;
+    font-weight: 700;
+
+    &.statusOffline {
+        background-color: #7f1d1d; // bg-red-900
+        color: #fca5a5; // text-red-300
+    }
+
+    &.statusActive {
+        background-color: #14532d; // bg-green-900
+        color: #86efac; // text-green-300
+        animation: pulse 2s infinite;
+    }
+}
+
+@keyframes pulse {
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: .5;
+    }
+}
