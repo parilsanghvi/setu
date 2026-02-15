@@ -12,6 +12,11 @@
   "type": "commonjs",
   "dependencies": {
     "better-sqlite3": "^12.6.2",
+    "blessed": "^0.1.81",
+    "blessed-contrib": "^4.11.0",
+    "express": "^5.2.1",
+    "playwright-core": "^1.58.2",
+    "socket.io": "^4.8.3",
     "sqlite3": "^5.1.7"
   }
 }

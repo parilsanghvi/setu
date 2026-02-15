@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Setu: God Mode</title>
+    <script src="/socket.io/socket.io.js"></script>
+    <style>
+        :root {
+            --bg: #0a0a12;
+            --card-bg: #16161e;
+            --accent: #7aa2f7;
+            --text: #c0caf5;
+            --green: #9ece6a;
+            --red: #f7768e;
+        }
+        body {
+            font-family: 'JetBrains Mono', monospace;
+            background: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 20px;
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            grid-template-rows: 150px 1fr;
+            gap: 20px;
+            height: 100vh;
+            box-sizing: border-box;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 8px;
+            padding: 15px;
+            border: 1px solid #24283b;
+            overflow: auto;
+        }
+
+        h2 { margin-top: 0; color: var(--accent); font-size: 1.2rem; }
+
+        /* Stats (Top Left) */
+        #stats {grid-column: 1; grid-row: 1; }
+        .stat-item { margin-bottom: 10px; }
+        .stat-value { font-size: 1.5rem; font-weight: bold; color: var(--green); }
+
+        /* Agents (Top Right) */
+        #agents { grid-column: 2; grid-row: 1; display: flex; gap: 10px; }
+        .agent-card {
+            background: #1a1b26;
+            padding: 10px;
+            border-radius: 5px;
+            border-left: 4px solid var(--accent);
+            min-width: 120px;
+        }
+        .agent-card.offline { border-color: var(--red); opacity: 0.6; }
+        .agent-name { font-weight: bold; display: block; }
+        .agent-status { font-size: 0.8rem; }
+
+        /* Logs (Bottom Left) */
+        #logs { grid-column: 1; grid-row: 2; font-size: 0.8rem; color: #a9b1d6; }
+        .log-entry { margin-bottom: 4px; border-bottom: 1px solid #24283b; padding-bottom: 2px;}
+
+        /* Kanban (Bottom Right) */
+        #kanban { grid-column: 2; grid-row: 2; display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+        .column { background: #1a1b26; padding: 10px; border-radius: 5px; }
+        .column-header { text-align: center; border-bottom: 1px solid var(--accent); padding-bottom: 5px; margin-bottom: 10px; color: var(--accent); }
+        .task-card {
+            background: var(--card-bg);
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+            border: 1px solid #414868;
+        }
+        .task-id { font-size: 0.7rem; color: #565f89; }
+        
+        /* Utility */
+        .pulse { animation: pulse 2s infinite; }
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(122, 162, 247, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(122, 162, 247, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(122, 162, 247, 0); }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 1. System Stats -->
+    <div id="stats" class="card">
+        <h2>SYSTEM STATUS</h2>
+        <div class="stat-item">
+            <div>Uptime</div>
+            <div id="uptime" class="stat-value">0s</div>
+        </div>
+        <div class="stat-item">
+            <div>Active Agents</div>
+            <div id="active-agents" class="stat-value">0</div>
+        </div>
+    </div>
+
+    <!-- 2. Active Agents -->
+    <div id="agents" class="card">
+        <!-- Agent Cards Injected Here -->
+    </div>
+
+    <!-- 3. Logs -->
+    <div id="logs" class="card">
+        <h2>KERNEL LOGS</h2>
+        <div id="log-container"></div>
+    </div>
+
+    <!-- 4. Kanban -->
+    <div id="kanban" class="card">
+        <div class="column" id="col-todo">
+            <div class="column-header">TODO</div>
+            <div class="task-list"></div>
+        </div>
+        <div class="column" id="col-progress">
+            <div class="column-header">IN PROGRESS</div>
+            <div class="task-list"></div>
+        </div>
+        <div class="column" id="col-done">
+            <div class="column-header">DONE</div>
+            <div class="task-list"></div>
+        </div>
+    </div>
+
+    <script>
+        const socket = io();
+        
+        // Logs
+        const logContainer = document.getElementById('log-container');
+        function addLog(msg) {
+            const div = document.createElement('div');
+            div.className = 'log-entry';
+            div.innerText = msg;
+            logContainer.appendChild(div);
+            logContainer.scrollTop = logContainer.scrollHeight;
+        }
+        
+        socket.on('log_history', (logs) => logs.forEach(addLog));
+        socket.on('log', (msg) => addLog(msg));
+
+        // Agents
+        const agentsContainer = document.getElementById('agents');
+        socket.on('agents_update', (agents) => {
+            agentsContainer.innerHTML = '<h2>AGENTS</h2>'; // Hacky clear
+            agents.forEach(a => {
+                const div = document.createElement('div');
+                div.className = `agent-card ${a.status === 'OFFLINE' ? 'offline' : 'pulse'}`;
+                div.innerHTML = `
+                    <span class="agent-name">${a.name}</span>
+                    <span class="agent-status">${a.role} | ${a.status}</span>
+                `;
+                agentsContainer.appendChild(div);
+            });
+            
+            // Update Stats
+            document.getElementById('active-agents').innerText = agents.filter(a => a.status !== 'OFFLINE').length;
+        });
+
+        // Tasks
+        function renderTask(task) {
+            return `
+                <div class="task-card">
+                    <div class="task-id">${task.id}</div>
+                    <div>${task.title}</div>
+                    <div style="font-size:0.8rem; color: #565f89">Owner: ${task.owner}</div>
+                </div>
+            `;
+        }
+
+        socket.on('tasks_update', (tasks) => {
+            document.querySelector('#col-todo .task-list').innerHTML = '';
+            document.querySelector('#col-progress .task-list').innerHTML = '';
+            document.querySelector('#col-done .task-list').innerHTML = '';
+
+            tasks.forEach(t => {
+                let col = '#col-todo';
+                if (t.status === 'IN_PROGRESS') col = '#col-progress';
+                if (t.status === 'DONE') col = '#col-done';
+                
+                document.querySelector(`${col} .task-list`).innerHTML += renderTask(t);
+            });
+        });
+
+        // Uptime Tick
+        setInterval(() => {
+            // In real app, sync with server time
+        }, 1000);
+
+    </script>
+</body>
+</html>

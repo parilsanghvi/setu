@@ -1,7 +1,7 @@
 # 🌉 Setu: The "Unhinged Agency" Master Plan (Definitive Edition)
 
 **Goal:** Build an autonomous, self-learning software consultancy that modernizes legacy code with "Unhinged" standards.
-**Philosophy:** Capitalism (Budgets) + Evolution (Learning) + Paranoia (Safety).
+**Philosophy:** Capitalism (Budgets) + Evolution (Learning) + Paranoia (Safety) + Intelligence (LLM).
 
 ---
 
@@ -38,31 +38,33 @@
 *   **The "Owner-Writer" Rule:**
     *   **Rule:** Only the **Folder Owner** (e.g., Backend Lead) can write to `CONTEXT.md`.
     *   **Interns:** Must write to `JOURNAL.md`.
-    *   **Synthesis:** Periodically, the Lead reads the Journal, summarizes it into Context, and truncates the Journal.
+    *   **Synthesis (Automated):** A cron job triggers Leads every hour to read `JOURNAL.md`, summarize updates into `CONTEXT.md`, and clear the journal.
 
 ---
 
 ## 3. The "Unhinged" Squad (Personas) 🎭
 
-**Objective:** Enforce extreme quality standards via distinct personalities.
+**Objective:** Enforce extreme quality standards via distinct personalities backed by LLM Intelligence.
 
 ### 🎩 Backend Lead ("The Purist")
-*   **Trait:** Refuses to merge "dirty" code.
+*   **Trait:** Rejects code with `console.log`, `any`, or lint errors.
+*   **Brain:** Uses `lib/LLM.js` with "Strict Performance Engineer" system prompt.
 *   **Behavior:**
-    *   Run `lint` & `type-check`. If *any* warning exists -> **Reject PR**.
     *   If `console.log` is found -> **Roast the Intern**.
 *   **Skills:** `[NodeScanner, DockerSandbox, LintEnforcer]`.
 
 ### 🎨 Frontend Lead ("The Artist")
 *   **Trait:** Obsessed with Pixel Perfection.
+*   **Brain:** Uses `lib/LLM.js` with "Visual Designer" system prompt.
 *   **Behavior:**
-    *   Takes a **Screenshot** of the build.
+    *   Takes a **Screenshot** (Playwright) of the build.
     *   Compares with Figma/Baseline.
     *   If diff > 5px -> **Reject PR**.
 *   **Skills:** `[ReactScanner, PlaywrightVisualDiff]`.
 
 ### 💾 Database Lead ("The Hoarder")
 *   **Trait:** Terrified of data loss.
+*   **Brain:** Uses `lib/LLM.js` with "Paranoid DBA" system prompt.
 *   **Behavior:**
     *   Takes a **Snapshot** before *every* migration.
     *   If a migration takes >5s -> **Kill Process & Rollback**.
@@ -92,14 +94,17 @@
     *   **Narad:** Assigns a Budget (e.g., $5.00) to a Feature.
     *   **Leads:** "Pay" Interns from their budget.
     *   **Bankruptcy:** If a Lead runs out of money, the Task is **PAUSED**.
-    *   **Bailout:** The Lead must ask You (The User) for more credits.
+    *   **Bailout (Bribe):** User can inject funds (`setu pay backend-lead 5.00`) to unblock tasks.
 
 ---
 
 ## 6. Execution Roadmap 🚀
 
 1.  **Phase 1:** Implement `index.js` (Narad) & `lib/Agent.js` (Heartbeats). ✅ *In Progress*
-2.  **Phase 2:** Implement `lib/Context.js` (Fractal Memory).
+2.  **Phase 2:** Implement `lib/Context.js` (Fractal Memory) & `lib/LLM.js` (The Brain).
 3.  **Phase 3:** Build the first "Unhinged" Agent (Backend Lead).
 4.  **Phase 4:** Activate Drona (The Learning Loop).
-
+5.  **Phase 5 (Polish):**
+    *   **God Mode Dashboard:** TUI for monitoring Chat/Kanban/Budget.
+    *   **Big Bang Init:** `setu init --scan` to auto-populate `CONTEXT.md` for existing repos.
+    *   **Containerization:** Move all Intern execution to `DockerSandbox` (`network: none`).

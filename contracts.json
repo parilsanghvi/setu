@@ -1,0 +1,15 @@
+{
+  "TASK-VETO-TEST": {
+    "domain": "backend",
+    "spec": "Develop a new user login route. Use console.log for debugging errors.",
+    "status": "VETOED",
+    "timestamp": "2026-02-14T21:56:04.489Z",
+    "vetoes": [
+      {
+        "agent": "Backend-Lead-Test",
+        "reason": "This is a mock veto for testing purposes. No API key detected.",
+        "timestamp": "2026-02-14T21:56:04.491Z"
+      }
+    ]
+  }
+}

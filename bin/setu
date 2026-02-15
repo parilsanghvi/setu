@@ -40,12 +40,12 @@ switch (cmd) {
       log('Starting Setu Kernel...');
       const out = fs.openSync(LOG_FILE, 'a');
       const err = fs.openSync(LOG_FILE, 'a');
-      
+
       const child = spawn('node', [INDEX_SCRIPT], {
         detached: true,
         stdio: ['ignore', out, err]
       });
-      
+
       fs.writeFileSync(PID_FILE, child.pid.toString());
       child.unref();
       log(`Started! (PID: ${child.pid}) - Logs: setu.log`);
@@ -70,7 +70,7 @@ switch (cmd) {
     const running = statusPid && isRunning(statusPid);
     console.log(`\n🌉 SETU STATUS: ${running ? '🟢 RUNNING' : '🔴 STOPPED'}`);
     if (running) console.log(`PID: ${statusPid}`);
-    
+
     console.log('\n🤖 AGENTS:');
     try {
       const agents = db.db.prepare('SELECT * FROM agents').all();
@@ -90,7 +90,7 @@ switch (cmd) {
       log('CONTEXT.md already exists.');
     }
     break;
-    
+
   case 'chat':
     const message = args.join(' ');
     if (!message) {
@@ -101,6 +101,35 @@ switch (cmd) {
     }
     break;
 
+  case 'task':
+    const [taskId, taskStatus, taskOwner] = args;
+    if (!taskId || !taskStatus) {
+      log('Usage: setu task <id> <status> [owner]');
+    } else {
+      db.updateTask(taskId, taskStatus, { owner: taskOwner || 'Unknown' });
+      log(`Task ${taskId} -> ${taskStatus}`);
+    }
+    break;
+
+    break;
+
+  case 'dashboard':
+    const mode = args[0] || '--tui';
+    const { spawn } = require('child_process');
+
+    if (mode === '--gui' || mode === '--all') {
+      log('Starting GUI Dashboard on http://localhost:3000...');
+      const server = spawn('node', [path.join(__dirname, '../lib/server.js')], { stdio: 'inherit' });
+    }
+
+    if (mode === '--tui' || mode === '--all') {
+      log('Starting TUI Dashboard...');
+      // TUI needs to take over stdout, so we spawn inheriting stdio
+      const tui = spawn('node', [path.join(__dirname, 'dashboard.js')], { stdio: 'inherit' });
+      tui.on('exit', () => process.exit(0));
+    }
+    break;
+
   default:
-    console.log('Usage: setu [start|stop|status|init|chat]');
+    console.log('Usage: setu [start|stop|status|init|chat|task|dashboard]');
 }

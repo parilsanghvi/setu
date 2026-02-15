@@ -1,12 +1,14 @@
 const { fork } = require('child_process');
 const path = require('path');
 const bus = require('./lib/db');
+const readline = require('readline');
 
 // 👑 NARAD: The Orchestrator
 const AGENT_MAP = {
   'BackendLead': './agents/BackendLead.js',
   'FrontendLead': './agents/FrontendLead.js',
-  'TestAgent': './agents/TestAgent.js'
+  'TestAgent': './agents/TestAgent.js',
+  'Drona': './agents/Drona.js'
 };
 
 const RUNNING_PROCESSES = {}; // { "BackendLead": <ChildProcess> }
@@ -37,6 +39,27 @@ function spawnAgent(name, role) {
     // We let the Resurrection Loop handle the restart
   });
 }
+
+// 1.5 The Human Gate (Prompt)
+const rl = readline.createInterface({
+  input: process.stdin,
+  output: process.stdout
+});
+
+bus.on('message', (msg) => {
+  if (msg.type === 'escalation' && msg.recipient === 'Narad') {
+    log(`🚨 HUMAN GATE TRIGGERED: ${msg.content}`);
+    rl.question('[NARAD] ❓ Approve this high-impact change? (y/n): ', (answer) => {
+      if (answer.toLowerCase() === 'y') {
+        log('✅ Human approval received. Notifying Intern...');
+        bus.send('Narad', msg.meta.originalSender, '✅ Human approval granted. Proceed.', 'approval', { taskId: msg.meta.taskId });
+      } else {
+        log('🛑 Human rejection. Notifying Intern...');
+        bus.send('Narad', msg.meta.originalSender, '❌ Human rejected this plan. Revise strictly.', 'rejection', { taskId: msg.meta.taskId });
+      }
+    });
+  }
+});
 
 // 2. Resurrection Loop (The Reaper)
 function startResurrectionLoop() {
@@ -71,6 +94,14 @@ function boot() {
   } else {
     log('Resuming existing agents...');
     // The resurrection loop will pick them up if they are dead!
+  }
+
+  // Ensure Drona is running
+  const drona = bus.db.prepare("SELECT * FROM agents WHERE name = 'Drona'").get();
+  if (!drona) {
+    log('Awakening Drona...');
+    spawnAgent('Drona', 'Drona');
+    bus.heartbeat('Drona', 'Drona', null, 'OFFLINE'); // Seed DB
   }
 
   startResurrectionLoop();

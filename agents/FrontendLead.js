@@ -1,5 +1,8 @@
 const Agent = require('../lib/Agent');
 const context = require('../lib/Context');
+const SkillLoader = require('../lib/SkillLoader');
+const LLM = require('../lib/LLM');
+const contractor = require('../lib/Contractor');
 const path = require('path');
 const fs = require('fs');
 
@@ -7,20 +10,38 @@ class FrontendLead extends Agent {
     constructor(name, role) {
         super(name, role, path.join(process.cwd(), 'frontend'));
         this.persona = "The Artist";
+        this.systemPrompt = `You are the Frontend Lead, known as 'The Artist'. You have a sophisticated, high-end taste in UI/UX:
+        - You despise generic "Bootstrap-looking" interfaces.
+        - You advocate for glassmorphism, smooth gradients, and elegant typography (like Inter or Outfit).
+        - Micro-animations and responsive design are mandatory.
+        - You forbid Tailwind (you believe it breeds lazy, generic design).
+        
+        Roast any UI code or proposal that looks generic, ugly, or uses Tailwind. Be passionate, expressive, and a bit of a "design snob".`;
+
+        // Load Skills
+        this.skillLoader = new SkillLoader();
+        this.skills = this.skillLoader.load();
+        console.log(`[${this.name}] Equipped with skills: ${Array.from(this.skills.keys()).join(', ')}`);
     }
 
     async processMessage(msg) {
         console.log(`[${this.name}] 🎨 Analyzing aesthetics... (Persona: ${this.persona})`);
 
-        // 1. Persona Checks
-        if (this.isUgly(msg.content)) {
-            this.speak(msg.sender, `🤮 This looks generic. We are not building a Bootstrap MVP. Make it POP.`);
+        // 0. Spec Negotiation (The Dictator Model)
+        if (msg.meta?.type === 'PROPOSE_SPEC') {
+            await this.handleSpecProposal(msg);
             return;
         }
 
-        if (msg.content.includes('Tailwind')) {
-            this.speak(msg.sender, `🛑 I forbid Tailwind. Use Vanilla CSS or I will reject the PR.`);
-            return;
+        // 1. Persona Checks via LLM
+        if (msg.type === 'ui_review' || this.looksLikeUI(msg.content)) {
+            console.log(`[${this.name}] 🎨 Critiquing aesthetics with LLM...`);
+            const critique = await LLM.generate(this.systemPrompt, msg.content);
+            this.speak(msg.sender, `🎨 CRITIQUE FROM THE ARTIST:\n${critique}`);
+
+            if (critique.toLowerCase().includes("generic") || critique.toLowerCase().includes("tailwind") || critique.toLowerCase().includes("ugly")) {
+                return; // Design rejected
+            }
         }
 
         // 2. Commands
@@ -32,9 +53,35 @@ class FrontendLead extends Agent {
         }
     }
 
-    isUgly(content) {
-        // Simulating specific taste
-        return content.includes('border: 1px solid black') || content.includes('Times New Roman');
+    async handleSpecProposal(msg) {
+        const taskId = msg.meta.taskId;
+        const spec = msg.content;
+
+        console.log(`[${this.name}] 🖌️ Evaluating UI spec for Task ${taskId}...`);
+
+        const evaluationPrompt = `You are 'The Artist'. Evaluate this UI/Frontend spec for Task ${taskId}. 
+        Does it align with high-end aesthetic standards? (Gradients, glassmorphism, no Tailwind).
+        
+        SPEC:
+        ${spec}
+        
+        If it is generic or ugly, respond with "VETO: [reason]".
+        If it is acceptable, respond with "APPROVED".`;
+
+        const evaluation = await LLM.generate(this.systemPrompt, evaluationPrompt);
+
+        if (evaluation.includes("VETO")) {
+            const reason = evaluation.split("VETO:")[1].trim();
+            contractor.recordVeto(taskId, this.name, reason);
+            this.speak(msg.sender, `🛑 VETOED! ${reason}`, 'veto', { taskId });
+        } else {
+            contractor.approve(taskId);
+            this.speak(msg.sender, `✅ Spec Approved. Ready to paint.`, 'approval', { taskId });
+        }
+    }
+
+    looksLikeUI(content) {
+        return content.includes('<div') || content.includes('css') || content.includes('style') || content.includes('className');
     }
 
     initializeScope() {

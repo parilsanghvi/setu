@@ -1,5 +1,8 @@
 const Agent = require('../lib/Agent');
 const context = require('../lib/Context');
+const SkillLoader = require('../lib/SkillLoader');
+const LLM = require('../lib/LLM');
+const contractor = require('../lib/Contractor');
 const path = require('path');
 const fs = require('fs');
 
@@ -7,28 +10,42 @@ class DatabaseLead extends Agent {
     constructor(name, role) {
         super(name, role, path.join(process.cwd(), 'database'));
         this.persona = "The Hoarder";
+        this.systemPrompt = `You are the Database Lead, known as 'The Hoarder'. You are pathologically terrified of data loss:
+        - Every 'DROP' or 'DELETE' command makes you hyperventilate.
+        - You demand snapshots before ANY migration.
+        - You obsess over indices and query performance.
+        - You believe data is the only thing that matters in an application.
+        
+        Evaluate any database proposal or migration with extreme paranoia. If it seems risky or lacks a backup plan, reject it with a panic-stricken warning.`;
+
+        // Load Skills
+        this.skillLoader = new SkillLoader();
+        this.skills = this.skillLoader.load();
+        console.log(`[${this.name}] Equipped with skills: ${Array.from(this.skills.keys()).join(', ')}`);
     }
 
     async processMessage(msg) {
         console.log(`[${this.name}] 💾 Guarding the bits... (Persona: ${this.persona})`);
 
-        // 1. Persona Checks
-        if (msg.content.includes("DROP TABLE")) {
-            this.speak(msg.sender, `😱 DROP TABLE DETECTED! Are you insane? I'm taking a snapshot first.`);
-            this.takeSnapshot();
+        // 0. Spec Negotiation (The Dictator Model)
+        if (msg.meta?.type === 'PROPOSE_SPEC') {
+            await this.handleSpecProposal(msg);
             return;
         }
 
-        if (msg.content.includes("migration")) {
-            console.log(`[${this.name}] Migration request. Simulating dry-run...`);
-            // Simulate slow migration check
-            if (Math.random() > 0.8) {
-                this.speak(msg.sender, `⛔ Migration took >5s in simulation. Rollback initiated. Optimize your indices.`);
-                return;
+        // 1. Persona Checks via LLM
+        if (msg.type === 'db_review' || this.looksLikeQuery(msg.content)) {
+            console.log(`[${this.name}] 💾 Assessing risk with LLM...`);
+            const assessment = await LLM.generate(this.systemPrompt, msg.content);
+            this.speak(msg.sender, `💾 ASSESSMENT FROM THE HOARDER:\n${assessment}`);
+
+            if (assessment.toLowerCase().includes("snapshot") || assessment.toLowerCase().includes("backup") || assessment.toLowerCase().includes("risky")) {
+                this.takeSnapshot();
             }
-            this.takeSnapshot();
-            this.speak(msg.sender, `Snapshot taken. Proceeding with migration (fingers crossed).`);
-            return;
+
+            if (assessment.toLowerCase().includes("reject") || assessment.toLowerCase().includes("stop")) {
+                return; // Blocked by fear
+            }
         }
 
         // 2. Commands
@@ -38,6 +55,38 @@ class DatabaseLead extends Agent {
         } else {
             this.speak(msg.sender, `Received. Writing to write-ahead log...`);
         }
+    }
+
+    async handleSpecProposal(msg) {
+        const taskId = msg.meta.taskId;
+        const spec = msg.content;
+
+        console.log(`[${this.name}] 💾 Evaluating Schema spec for Task ${taskId}...`);
+
+        const evaluationPrompt = `You are 'The Hoarder'. Evaluate this Database/Schema spec for Task ${taskId}. 
+        Is there ANY risk of data loss? Is it missing indices? Is it just dangerous?
+        
+        SPEC:
+        ${spec}
+        
+        If it is risky, respond with "VETO: [reason]".
+        If it is acceptable, respond with "APPROVED".`;
+
+        const evaluation = await LLM.generate(this.systemPrompt, evaluationPrompt);
+
+        if (evaluation.includes("VETO")) {
+            const reason = evaluation.split("VETO:")[1].trim();
+            contractor.recordVeto(taskId, this.name, reason);
+            this.speak(msg.sender, `🛑 VETOED! ${reason}`, 'veto', { taskId });
+        } else {
+            contractor.approve(taskId);
+            this.speak(msg.sender, `✅ Spec Approved. Data is safe.`, 'approval', { taskId });
+        }
+    }
+
+    looksLikeQuery(content) {
+        const keywords = ['SELECT', 'INSERT', 'UPDATE', 'DELETE', 'CREATE', 'DROP', 'ALTER', 'migration'];
+        return keywords.some(k => content.toUpperCase().includes(k));
     }
 
     takeSnapshot() {
