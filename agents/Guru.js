@@ -1,29 +1,48 @@
-const Agent = require('../lib/Agent');
+const CoreAgent = require('../lib/CoreAgent');
 const path = require('path');
 const fs = require('fs');
 const LLM = require('../lib/LLM');
 
-class Guru extends Agent {
+class Guru extends CoreAgent {
     constructor(name, role) {
         super(name, role, path.join(process.cwd(), 'skills', 'learned'));
-        this.persona = "The Guru";
-        // System Prompt for Drona
-        // Load Skills (Filtered)
+        this.persona = "Guru (Knowledge)";
+        this.systemPrompt = `You are **Guru**, the Knowledge and Skill Master. 
+        - Extract patterns from code and tasks with surgical precision.
+        - Documentation must be clear, structured, and useful.
+        - No philosophy. Just knowledge crystallization.`;
+
         const SkillLoader = require('../lib/SkillLoader');
         this.skillLoader = new SkillLoader();
         this.skills = this.skillLoader.load(['general']);
         console.log(`[${this.name}] Equipped with ${this.skills.size} specialized skills.`);
+
+        // Define Tools
+        this.setTools([
+            {
+                name: "read_file",
+                description: "Read file content.",
+                parameters: { type: "object", properties: { path: { type: "string" } }, required: ["path"] }
+            },
+            {
+                name: "write_file",
+                description: "Write content to file.",
+                parameters: { type: "object", properties: { path: { type: "string" }, content: { type: "string" } }, required: ["path", "content"] }
+            }
+        ]);
     }
 
     async processMessage(msg) {
         // 🔄 Active Heartbeat for long operations
         const bus = require('../lib/db');
         bus.heartbeat(this.name, this.role, this.pid, 'BUSY');
+
         // Drona listens for "TASK_DONE" events
         if (msg.meta && msg.meta.type === 'TASK_DONE') {
             const taskId = msg.meta.taskId;
-            console.log(`[${this.name}] 🧘 Meditating on completed Task ${taskId}...`);
+            console.log(`[GURU] Crystallizing patterns from Task ${taskId}...`);
             await this.extractPattern(taskId, msg.meta);
+            return;
         }
 
         // Death Learning: Analyze agent crashes
@@ -31,6 +50,7 @@ class Guru extends Agent {
             const agentName = msg.meta.agentName;
             console.log(`[${this.name}] 💀 Death Learning: Analyzing crash of ${agentName}...`);
             await this.analyzeCrash(agentName, msg.meta);
+            return;
         }
 
         // Drona: Knowledge Ingestion
@@ -38,6 +58,7 @@ class Guru extends Agent {
             const { content, language } = msg.meta;
             console.log(`[${this.name}] 📚 Devouring knowledge for ${language}...`);
             await this.learnLanguage(content, language);
+            return;
         }
 
         // Drona: Dependency Drift
@@ -45,7 +66,11 @@ class Guru extends Agent {
             const { packageName, currentVersion } = msg.meta;
             console.log(`[${this.name}] 🕵️ Checking drift for ${packageName} (v${currentVersion})...`);
             await this.trackDrift(packageName, currentVersion);
+            return;
         }
+
+        // Default Chat
+        await super.processMessage(msg);
     }
 
     // Drona: Track Drift & Create Migration Skill

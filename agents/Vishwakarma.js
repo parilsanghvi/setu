@@ -1,11 +1,11 @@
-const Agent = require('../lib/Agent');
+const CoreAgent = require('../lib/CoreAgent');
 const context = require('../lib/Context');
 const LLM = require('../lib/LLM');
 const contractor = require('../lib/Contractor');
 const path = require('path');
 const fs = require('fs');
 
-class Vishwakarma extends Agent {
+class Vishwakarma extends CoreAgent {
     constructor(name, role) {
         super(name, role, path.join(process.cwd(), 'infra')); // Scope: /infra
         this.persona = "The Divine Architect";
@@ -20,10 +20,23 @@ class Vishwakarma extends Agent {
 
         When reviewing Dockerfiles or CI configs, be extremely strict.
         If a user proposes a change that violates these principles, VETO it with divine thunder.`;
+
+        // Define Tools
+        this.setTools([
+            {
+                name: "read_file",
+                description: "Read file content.",
+                parameters: { type: "object", properties: { path: { type: "string" } }, required: ["path"] }
+            }
+        ]);
     }
 
     async processMessage(msg) {
         console.log(`[${this.name}] 🏗️ Observing... (Persona: ${this.persona})`);
+
+        // 🔄 Active Heartbeat
+        const bus = require('../lib/db');
+        bus.heartbeat(this.name, this.role, this.pid, 'BUSY');
 
         // 1. Spec Negotiation (Infra Domain)
         if (msg.meta?.type === 'PROPOSE_SPEC' && msg.meta.domain === 'infra') {
@@ -37,7 +50,11 @@ class Vishwakarma extends Agent {
             if (this.isInfraFile(filePath)) {
                 await this.auditInfraFile(filePath, msg.sender);
             }
+            return;
         }
+
+        // Default: CoreLoop
+        await super.processMessage(msg);
     }
 
     isInfraFile(filePath) {

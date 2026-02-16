@@ -106,10 +106,36 @@ app.post('/api/chat', (req, res) => {
   res.json({ status: 'sent', to: agent });
 });
 
+// API: Interrupt Agent
+app.post('/api/agents/:name/interrupt', (req, res) => {
+  const { name } = req.params;
+  const process = RUNNING_PROCESSES[name];
+  if (!process) return res.status(404).json({ error: `Agent ${name} not running` });
+
+  log(`🛑 Sending STOP signal to ${name}...`);
+  process.send({ type: 'control', command: 'STOP' });
+  res.json({ status: 'sent', signal: 'STOP' });
+});
+
+// API: Redirect Agent
+app.post('/api/agents/:name/redirect', (req, res) => {
+  const { name } = req.params;
+  const { prompt } = req.body;
+  if (!prompt) return res.status(400).json({ error: 'Prompt required for redirect' });
+
+  const process = RUNNING_PROCESSES[name];
+  if (!process) return res.status(404).json({ error: `Agent ${name} not running` });
+
+  log(`🔀 Sending REDIRECT signal to ${name}...`);
+  process.send({ type: 'control', command: 'REDIRECT', payload: prompt });
+  res.json({ status: 'sent', signal: 'REDIRECT' });
+});
+
 // --- END DASHBOARD API ROUTES ---
 
 const AGENT_MAP = {
   // Sanskrit Personas
+  'Sutradhar': './agents/Sutradhar.js',
   'Tark': './agents/Tark.js',
   'Shilpi': './agents/Shilpi.js',
   'TestAgent': './agents/TestAgent.js',
@@ -202,10 +228,9 @@ bus.on('message', (msg) => {
   // NOTE: We do NOT emit 'chat_message' here anymore to avoid duplicates with the polling loop.
   // The polling loop handles broadcasting ALL messages (local & remote).
 
-  // Brain: Process messages sent to Sutradhar
-  if (msg.type === 'chat' && msg.recipient === 'Sutradhar') {
-    handleSutradharChat(msg);
-  }
+  // Brain: Sutradhar is now an independent agent.
+  // We no longer intercept 'chat' to Sutradhar here.
+  // The message poller broadcasts it, and the Sutradhar process picks it up.
 
   if (msg.type === 'escalation' && msg.recipient === 'Sutradhar') {
     log(`🚨 HUMAN GATE TRIGGERED: ${msg.content}`);
@@ -222,31 +247,7 @@ bus.on('message', (msg) => {
 });
 
 // Sutradhar Intelligence
-async function handleSutradharChat(msg) {
-  log(`🧠 Sutradhar thinking about: ${msg.content}`);
-  debug(`Sutradhar received message from: ${msg.sender}`);
-  const systemPrompt = `You are Sutradhar, the divine director of this AI swarm. 
-Your goal is to coordinate the Sanskrit swarm (Tark, Shilpi, Guru) to fulfill the user's mission.
-Tark: Logic/Backend Lead.
-Shilpi: Creative/Frontend Builder.
-Guru: Skill/Knowledge master.
-When the user gives a command, you should respond as Sutradhar and either provide a high-level plan or delegate specific sub-tasks to Tark, Shilpi, or Guru by instructing the user or the system on what will happen next.
-Keep responses concise, premium, and in character (Sanskrit-themed wisdom).`;
-
-  try {
-    debug('Calling LLM.generate for Sutradhar...');
-    const response = await LLM.generate(systemPrompt, msg.content);
-    debug(`Sutradhar generated response: ${response.substring(0, 50)}...`);
-    const msgId = bus.send('Sutradhar', msg.sender, response, 'chat');
-    debug(`Sutradhar message sent to DB. ID: ${msgId}`);
-    // Mark the incoming message as read
-    bus.markRead([msg.id]);
-  } catch (e) {
-    log(`❌ Sutradhar Brain Error: ${e.message}`, 'error');
-    console.error(e);
-    bus.send('Sutradhar', msg.sender, "The cosmos is clouded. I cannot process this mission segment right now.", 'chat');
-  }
-}
+// Sutradhar Intelligence moved to agents/Sutradhar.js
 
 // Socket.IO Events
 io.on('connection', (socket) => {
@@ -347,9 +348,11 @@ function startSystemLoops() {
           if (typeof msg.meta === 'string') msg.meta = JSON.parse(msg.meta);
         } catch (e) { }
 
-        if (msg.type === 'chat' || msg.recipient === 'ALL' || msg.type === 'status') {
-          log(`[CHAT] [${msg.sender}] ${msg.content}`);
+        if (['chat', 'status', 'tool_start', 'tool_end'].includes(msg.type) || msg.recipient === 'ALL') {
+          log(`[${msg.type.toUpperCase()}] [${msg.sender}] ${msg.content}`);
         }
+
+        // Sutradhar is now an agent, so we don't handle it here manually.
 
         io.emit('chat_message', msg);
         lastMessageId = msg.id;
@@ -357,7 +360,7 @@ function startSystemLoops() {
     }
 
     // E. SUTRADHAR Heartbeat (Kernel Persistence)
-    bus.heartbeat('Sutradhar', 'Sutradhar', process.pid, 'IDLE');
+    // E. Sutradhar is now a separate process, so no kernel heartbeat for it.
 
   }, 1000); // Check every 1s (High frequency for responsiveness)
 
@@ -380,7 +383,7 @@ function startSystemLoops() {
 function boot() {
   // Clear stale logs for fresh start
   try {
-    fs.writeFileSync(path.join(__dirname, 'setu.log'), `[SUTRADHAR] Mission Control Booting at ${new Date().toISOString()}\n`);
+    fs.appendFileSync(path.join(__dirname, 'setu.log'), `\n[SUTRADHAR] Mission Control Booting at ${new Date().toISOString()}\n`);
   } catch (e) { }
 
   log('Starting System Kernel...');
@@ -399,11 +402,7 @@ function boot() {
   ];
 
   seedAgents.forEach(a => {
-    if (a.name === 'Sutradhar') {
-      bus.heartbeat(a.name, a.role, process.pid, 'IDLE');
-    } else {
-      bus.heartbeat(a.name, a.role, null, 'OFFLINE');
-    }
+    bus.heartbeat(a.name, a.role, null, 'OFFLINE');
     log(`✨ Seeded Agent: ${a.name} (${a.role})`);
   });
 

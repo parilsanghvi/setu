@@ -1,4 +1,4 @@
-const Agent = require('../lib/Agent');
+const CoreAgent = require('../lib/CoreAgent');
 const context = require('../lib/Context');
 const SkillLoader = require('../lib/SkillLoader');
 const LLM = require('../lib/LLM');
@@ -6,7 +6,7 @@ const contractor = require('../lib/Contractor');
 const path = require('path');
 const fs = require('fs');
 
-class Koshpal extends Agent {
+class Koshpal extends CoreAgent {
     constructor(name, role) {
         super(name, role, path.join(process.cwd(), 'database'));
         this.persona = "Koshpal (The Guardian)";
@@ -22,10 +22,23 @@ class Koshpal extends Agent {
         this.skillLoader = new SkillLoader();
         this.skills = this.skillLoader.load();
         console.log(`[${this.name}] Equipped with skills: ${Array.from(this.skills.keys()).join(', ')}`);
+
+        // Define Tools
+        this.setTools([
+            {
+                name: "read_file",
+                description: "Read file content.",
+                parameters: { type: "object", properties: { path: { type: "string" } }, required: ["path"] }
+            }
+        ]);
     }
 
     async processMessage(msg) {
         console.log(`[${this.name}] 💾 Guarding the bits... (Persona: ${this.persona})`);
+
+        // 🔄 Active Heartbeat
+        const bus = require('../lib/db');
+        bus.heartbeat(this.name, this.role, this.pid, 'BUSY');
 
         // 0. Spec Negotiation (The Dictator Model)
         if (msg.meta?.type === 'PROPOSE_SPEC') {
@@ -48,13 +61,14 @@ class Koshpal extends Agent {
             }
         }
 
-        // 2. Commands
+        // 2. Default Chat
         if (msg.content.includes("initialize scope")) {
             this.initializeScope();
             this.speak(msg.sender, `Database Vault Secured. 🔒`);
-        } else {
-            this.speak(msg.sender, `Received. Writing to write-ahead log...`);
+            return;
         }
+
+        await super.processMessage(msg);
     }
 
     async handleSpecProposal(msg) {

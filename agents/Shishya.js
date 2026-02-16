@@ -1,13 +1,27 @@
-const Agent = require('../lib/Agent');
+const CoreAgent = require('../lib/CoreAgent');
 const fs = require('fs');
 const path = require('path');
 const LLM = require('../lib/LLM');
 
-class Shishya extends Agent {
+class Shishya extends CoreAgent {
     constructor(name, role, scope, leadRole) {
         super(name, role, scope);
         this.leadRole = leadRole; // e.g., 'BackendLead'
         this.status = 'IDLE'; // IDLE, PLANNING, WAITING_FOR_APPROVAL, EXECUTING
+
+        // Define Tools
+        this.setTools([
+            {
+                name: "read_file",
+                description: "Read file content.",
+                parameters: { type: "object", properties: { path: { type: "string" } }, required: ["path"] }
+            },
+            {
+                name: "write_file",
+                description: "Write content to file.",
+                parameters: { type: "object", properties: { path: { type: "string" }, content: { type: "string" } }, required: ["path", "content"] }
+            }
+        ]);
     }
 
     /**
@@ -54,6 +68,7 @@ class Shishya extends Agent {
             console.log(`[${this.name}] ✅ Plan approved! Moving to EXECUTION.`);
             this.status = 'EXECUTING';
             this.onApproval(msg);
+            return;
         }
 
         // Handle Rejection
@@ -62,7 +77,11 @@ class Shishya extends Agent {
             console.warn(`[${this.name}] ❌ Plan rejected. Reason: ${critique}`);
             this.status = 'PLANNING';
             await this.revisePlan(critique);
+            return;
         }
+
+        // Default: CoreLoop
+        await super.processMessage(msg);
     }
 
     async revisePlan(critique) {

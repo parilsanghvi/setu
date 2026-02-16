@@ -1,9 +1,9 @@
-const Agent = require('../lib/Agent');
+const CoreAgent = require('../lib/CoreAgent');
 const path = require('path');
 const SkillLoader = require('../lib/SkillLoader');
 const LLM = require('../lib/LLM');
 
-class Rakshak extends Agent {
+class Rakshak extends CoreAgent {
     constructor(name, role) {
         super(name, role, path.join(process.cwd(), 'security_audit')); // Scope: /security_audit
         this.persona = "Rakshak (The Guardian)";
@@ -20,10 +20,23 @@ class Rakshak extends Agent {
         this.skillLoader = new SkillLoader();
         this.skills = this.skillLoader.load(); // Loads suraksha, drishti, etc.
         console.log(`[${this.name}] Equipped with skills: ${Array.from(this.skills.keys()).join(', ')}`);
+
+        // Define Tools
+        this.setTools([
+            {
+                name: "read_file",
+                description: "Read file content.",
+                parameters: { type: "object", properties: { path: { type: "string" } }, required: ["path"] }
+            }
+        ]);
     }
 
     async processMessage(msg) {
         console.log(`[${this.name}] 🛡️ Scanning packet... (Persona: ${this.persona})`);
+
+        // 🔄 Active Heartbeat
+        const bus = require('../lib/db');
+        bus.heartbeat(this.name, this.role, this.pid, 'BUSY');
 
         // Security Audit Request
         if (msg.type === 'audit' || msg.content.toLowerCase().includes('audit') || msg.content.toLowerCase().includes('security')) {
@@ -33,8 +46,8 @@ class Rakshak extends Agent {
             return;
         }
 
-        // Default: Acknowledge with suspicion
-        this.speak(msg.sender, `Received. I am watching. 👁️`);
+        // Default: use CoreLoop
+        await super.processMessage(msg);
     }
 }
 
