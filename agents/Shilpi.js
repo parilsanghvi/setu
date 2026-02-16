@@ -15,7 +15,7 @@ class Shilpi extends CoreAgent {
         - Use modern React patterns.
         - NO TAILWIND.`;
 
-        this.skillLoader = new SkillLoader();
+        this.skillLoader = SkillLoader;
         this.skills = this.skillLoader.load(['frontend', 'general']);
         console.log(`Equipped with ${this.skills.size} specialized skills.`);
 

@@ -26,7 +26,7 @@ export const useSocket = () => {
         }
 
         function onLog(msg) {
-            setLogs((prev) => [...prev, msg].slice(-100)); // Keep last 100 lines
+            setLogs((prev) => [...prev, msg]); // Show all logs
         }
 
         function onLogHistory(hist) {
@@ -44,13 +44,20 @@ export const useSocket = () => {
         function onChatMessage(msg) {
             // In a real app we might separate chat from logs, but for now
             // we treat chat messages as high-priority logs
-            setLogs((prev) => [...prev, `[CHAT] ${msg.sender} -> ${msg.recipient}: ${msg.content}`].slice(-100));
+            setLogs((prev) => [...prev, `[CHAT] ${msg.sender} -> ${msg.recipient}: ${msg.content}`]);
+        }
+
+        function onChatHistory(history) {
+            // Convert structured history to log format
+            const formatted = history.map(msg => `[CHAT] ${msg.sender} -> ${msg.recipient}: ${msg.content}`);
+            setLogs((prev) => [...prev, ...formatted]); // Append, assuming logs loaded first or we just mix
         }
 
         socket.on('connect', onConnect);
         socket.on('disconnect', onDisconnect);
         socket.on('log', onLog);
         socket.on('log_history', onLogHistory);
+        socket.on('chat_history', onChatHistory);
         socket.on('agents_update', onAgentsUpdate);
         socket.on('tasks_update', onTasksUpdate);
         socket.on('chat_message', onChatMessage);
@@ -60,6 +67,7 @@ export const useSocket = () => {
             socket.off('disconnect', onDisconnect);
             socket.off('log', onLog);
             socket.off('log_history', onLogHistory);
+            socket.off('chat_history', onChatHistory);
             socket.off('agents_update', onAgentsUpdate);
             socket.off('tasks_update', onTasksUpdate);
             socket.off('chat_message', onChatMessage);

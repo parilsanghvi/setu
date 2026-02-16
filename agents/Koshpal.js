@@ -19,7 +19,7 @@ class Koshpal extends CoreAgent {
         Evaluate any database proposal with extreme skepticism. If it risks the treasury (data), reject it immediately.`;
 
         // Load Skills
-        this.skillLoader = new SkillLoader();
+        this.skillLoader = SkillLoader;
         this.skills = this.skillLoader.load();
         console.log(`[${this.name}] Equipped with skills: ${Array.from(this.skills.keys()).join(', ')}`);
 

@@ -17,7 +17,7 @@ class Rakshak extends CoreAgent {
         If code is safe, grant a reluctant "Secure... for now."`;
 
         // Load Skills
-        this.skillLoader = new SkillLoader();
+        this.skillLoader = SkillLoader;
         this.skills = this.skillLoader.load(); // Loads suraksha, drishti, etc.
         console.log(`[${this.name}] Equipped with skills: ${Array.from(this.skills.keys()).join(', ')}`);
 

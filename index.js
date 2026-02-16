@@ -312,6 +312,18 @@ io.on('connection', (socket) => {
     } catch (e) { }
   }
 
+  // Send Chat History (STRUCTURED)
+  try {
+    const chatHistory = bus.db.prepare(`
+      SELECT * FROM messages 
+      WHERE type = 'chat' 
+      ORDER BY id ASC
+    `).all(); // All messages, oldest first
+    socket.emit('chat_history', chatHistory);
+  } catch (e) {
+    console.error('Failed to fetch chat history', e);
+  }
+
   // Handle incoming chat messages from Dashboard Socket (Alternate to HTTP API)
   socket.on('chat_message', (msg) => {
     log(`💬 Socket Message: ${msg.content || msg.message} (To: ${msg.recipient || msg.agent})`);

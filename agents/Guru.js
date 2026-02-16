@@ -13,7 +13,7 @@ class Guru extends CoreAgent {
         - No philosophy. Just knowledge crystallization.`;
 
         const SkillLoader = require('../lib/SkillLoader');
-        this.skillLoader = new SkillLoader();
+        this.skillLoader = SkillLoader;
         this.skills = this.skillLoader.load(['general']);
         console.log(`[${this.name}] Equipped with ${this.skills.size} specialized skills.`);
 

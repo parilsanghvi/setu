@@ -18,7 +18,7 @@ class Tark extends CoreAgent {
         - Perfect typing. No 'any'.`;
 
         // Load Skills (Filtered)
-        this.skillLoader = new SkillLoader();
+        this.skillLoader = SkillLoader;
         this.skills = this.skillLoader.load(['backend', 'general']);
         console.log(`Equipped with ${this.skills.size} specialized skills.`);
 
