@@ -131,6 +131,49 @@ app.post('/api/agents/:name/redirect', (req, res) => {
   res.json({ status: 'sent', signal: 'REDIRECT' });
 });
 
+// API: List Sessions (Time Travel)
+app.get('/api/sessions', (req, res) => {
+  const sessionDir = path.join(__dirname, 'logs/sessions');
+  if (!fs.existsSync(sessionDir)) return res.json([]);
+
+  try {
+    const files = fs.readdirSync(sessionDir)
+      .filter(f => f.endsWith('.jsonl'))
+      .map(f => {
+        const stat = fs.statSync(path.join(sessionDir, f));
+        return { name: f, time: stat.mtime };
+      })
+      .sort((a, b) => b.time - a.time);
+
+    res.json(files);
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
+// API: Get Session Content
+app.get('/api/sessions/:filename', (req, res) => {
+  const { filename } = req.params;
+  const filePath = path.join(__dirname, 'logs/sessions', filename);
+
+  // Security check: prevent directory traversal
+  if (path.dirname(filePath) !== path.join(__dirname, 'logs/sessions')) {
+    return res.status(403).json({ error: 'Access denied' });
+  }
+
+  if (!fs.existsSync(filePath)) return res.status(404).json({ error: 'Session not found' });
+
+  try {
+    const content = fs.readFileSync(filePath, 'utf8');
+    const lines = content.trim().split('\n').map(l => {
+      try { return JSON.parse(l); } catch (e) { return null; }
+    }).filter(x => x);
+    res.json(lines);
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
 // --- END DASHBOARD API ROUTES ---
 
 const AGENT_MAP = {
@@ -348,8 +391,8 @@ function startSystemLoops() {
           if (typeof msg.meta === 'string') msg.meta = JSON.parse(msg.meta);
         } catch (e) { }
 
-        if (['chat', 'status', 'tool_start', 'tool_end'].includes(msg.type) || msg.recipient === 'ALL') {
-          log(`[${msg.type.toUpperCase()}] [${msg.sender}] ${msg.content}`);
+        if (['chat', 'status', 'tool_start', 'tool_end', 'thought_start', 'thought_end', 'context_compact_start', 'context_compact_end'].includes(msg.type) || msg.recipient === 'ALL') {
+          log(`[${msg.type.toUpperCase()}] [${msg.sender}] ${msg.content.substring(0, 100)}...`);
         }
 
         // Sutradhar is now an agent, so we don't handle it here manually.

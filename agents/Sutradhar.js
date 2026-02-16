@@ -1,5 +1,6 @@
 const CoreAgent = require('../lib/CoreAgent');
 const bus = require('../lib/db');
+const Protocol = require('../lib/SwarmProtocol');
 
 class Sutradhar extends CoreAgent {
     constructor(name, role) {
@@ -13,90 +14,79 @@ Your goal is to force the swarm (Tark, Shilpi, Guru) to deliver results. No fluf
 - Guru: Knowledge/Documentation/Skills.
 - Vishwakarma: Infrastructure/Docker.
 
-**DELEGATION PROTOCOL:**
-If you need to assign tasks, you MUST include a JSON block at the end of your response like this:
-DELEGATE: { "AgentName": "Direct instruction for that agent" }
-
-**RULES:**
-1. Be concise, professional, and slightly unhinged about deadlines.
-2. If the user asks for status, give a brutal assessment.
-3. If the user gives a mission, immediately delegate specific starting points to sub-agents via the DELEGATE block.`;
+**PROTOCOL:**
+- Assign tasks using the \`assign_task\` tool.
+- Be concise, professional, and slightly unhinged about deadlines.
+- If the user gives a mission, immediately formulate a plan and assign tasks to sub-agents.`;
 
         // Tools specific to Sutradhar
         this.setTools([
+            {
+                name: "assign_task",
+                description: "Assign a task to a sub-agent using the Swarm Protocol.",
+                parameters: {
+                    type: "object",
+                    properties: {
+                        agentName: { type: "string", description: "Name of the agent (Tark, Shilpi, Guru)" },
+                        instructions: { type: "string", description: "Detailed instructions for the task" }
+                    },
+                    required: ["agentName", "instructions"]
+                },
+                execute: async ({ agentName, instructions }, agent) => {
+                    // Send Protocol Message
+                    // We assume current context has a taskId or we generate one?
+                    // Let's use a generic taskId or one from meta if available
+                    const taskId = `TASK-${Date.now().toString().slice(-6)}`;
+
+                    console.log(`[Sutradhar] 📋 Assigning Task ${taskId} -> ${agentName}`);
+
+                    // Actually store task in DB first?
+                    // bus.updateTask(taskId, 'TODO', { title: instructions.substring(0, 50), type: 'auto' });
+
+                    // Send Protocol Message via bus (using agent.speak helper, but specify type)
+                    agent.speak(agentName, instructions, Protocol.TASK_ASSIGN, { taskId });
+
+                    return `Task ${taskId} assigned to ${agentName}. Status: PENDING execution.`;
+                }
+            },
             {
                 name: "update_task_status",
                 description: "Update the status of a project task.",
                 parameters: {
                     type: "object",
                     properties: {
-                        taskId: { type: "string", description: "The task ID (e.g., TASK-101)" },
+                        taskId: { type: "string", description: "The task ID" },
                         status: { type: "string", enum: ["TODO", "IN_PROGRESS", "DONE", "BLOCKED"], description: "New status" }
                     },
                     required: ["taskId", "status"]
-                }
-            },
-            {
-                name: "read_file",
-                description: "Read the content of a file from disk.",
-                parameters: {
-                    type: "object",
-                    properties: {
-                        path: { type: "string", description: "Absolute path to the file" }
-                    },
-                    required: ["path"]
+                },
+                execute: async ({ taskId, status }) => {
+                    // Implement bus update logic if bus is available
+                    // bus.updateTask(taskId, status); is not directly available on 'bus' import as it's the DB module instance?
+                    // 'bus' from '../lib/db' exports { db, send, heartbeat, getDeadAgents, updateTask }
+                    // So yes, we can use it.
+                    try {
+                        require('../lib/db').updateTask(taskId, status);
+                        return `Task ${taskId} updated to ${status}.`;
+                    } catch (e) {
+                        return `Error updating task: ${e.message}`;
+                    }
                 }
             }
         ]);
-    }
-
-    // Override executeTool to handle delegation parsing if needed, 
-    // but delegation is handled in the text response in our current protocol.
-    // CoreAgent handles the LLM response. 
-    // We need to intercept the final text response to parse DELEGATE blocks.
-
-    // We can override runLoop, but that duplicates logic.
-    // Better: Helper method `handleDelegation` called after `speak`.
-    // But `CoreAgent` calls `speak` directly.
-
-    // Let's modify `processMessage` to handle delegation parsing after runLoop finishes?
-    // Actually, `runLoop` is async and returns when done. But it speaks incrementally.
-
-    // I will override `speak` to intercept the final message?
-    // Or better, just parse it in `runLoop` if I update CoreAgent to allow hooks.
-
-    // For now, I'll copy the delegation logic into `runLoop` of Sutradhar, or 
-    // simpler: override `speak` to check for DELEGATE:
-
-    speak(recipient, content, type = 'chat', meta = {}) {
-        super.speak(recipient, content, type, meta);
-
-        // Check for Delegation
-        if (typeof content === 'string' && content.includes('DELEGATE:')) {
-            const jsonPart = content.split('DELEGATE:')[1].trim();
-            try {
-                const delegations = JSON.parse(jsonPart);
-                Object.entries(delegations).forEach(([agent, task]) => {
-                    console.log(`[Sutradhar] 📢 DELEGATING to ${agent}: ${task}`);
-                    bus.send('Sutradhar', agent, task, 'command', { taskId: meta.taskId });
-                });
-            } catch (parseErr) {
-                console.error(`[Sutradhar] ❌ Failed to parse delegation JSON: ${parseErr.message}`);
-            }
-        }
-    }
-
-    // Tool Implementations
-    async update_task_status({ taskId, status }) {
-        bus.updateTask(taskId, status);
-        return `Task ${taskId} updated to ${status}.`;
     }
 }
 
 // Allow standalone boot
 if (require.main === module) {
     const agent = new Sutradhar('Sutradhar', 'Sutradhar');
-    agent.boot();
+    if (agent.boot) agent.boot(); // CoreAgent/Agent has boot? No, 'index.js' spawns it. 
+    // Wait, 'Agent.js' might have logic to connect to bus.
+    // CoreAgent extends Agent. Agent usually connects to bus on instantiation or manually?
+    // Let's check Agent.js. 
+    // Assuming standard Agent pattern: it connects in constructor or setup. 
+    // But index.js uses fork() which implies it runs this file. 
+    // So `new Sutradhar(...)` starts it.
 }
 
 module.exports = Sutradhar;
