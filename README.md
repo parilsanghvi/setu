@@ -1,55 +1,56 @@
 # 🌉 Setu (सेतु)
 
-**Setu** (Sanskrit: *Bridge*) is an Ancient Swarm Intelligence designed to resurrect dead codebases. It automates the process of modernizing legacy projects by running iterative, LLM-powered fix loops.
+**Setu** (Sanskrit: *Bridge*) is an Agentic Engineering Platform designed to manage and modernize complex codebases. It automates the process of development and modernization by running iterative, LLM-powered fix loops across a swarm of specialized agents.
 
 ## 🚀 Installation & Adoption
 
-Setu is designed to be installed globally to manage all your projects.
-
-### 1. Global Installation
+### 1. Installation
 ```bash
-# From the Setu directory (local link for testing)
-npm link
-
-# Or once published
-npm install -g @setu/swarm
+npm install
+npm run dev # Launches Dashboard + Kernel
 ```
 
 ### 2. Adopting a Project
-Navigate to any legacy project and summon the Swarm:
+Navigate to any project and initialize the Swarm:
 ```bash
-cd /path/to/my-legacy-app
 setu adopt
 ```
-This initializes the project with `.setu/` and required context files.
 
-### 3. Mission Control
-Ignite the engine to start the setup wizard and mission control:
-```bash
-setu ignite
-```
-This will guide you through LLM configuration (including **Google Antigravity**) and launch the dashboard.
+## 🧠 Key Features
 
-## 🤖 Global Commands
-
-- `setu adopt`: Initialize the current project for Swarm management.
-- `setu ignite`: Launch Mission Control (Setup + Dashboard + Kernel).
-- `setu status`: Check the state of your agents and tasks.
-- `setu chat "msg"`: Send a direct message to Narad (The Messenger).
+| Feature | Description |
+|---|---|
+| **Swarm Orchestration** | Structured delegation via `TASK_ASSIGN` protocol. |
+| **Skills as Code** | Dynamically extend agent capabilities with executable `.js` skills. |
+| **Time Travel Debugging** | Replay and inspect past agent sessions turn-by-turn. |
+| **Context Compaction** | Automatic long-term memory management using LLM summarization. |
+| **Mission Control** | Real-time React dashboard for visual monitoring. |
 
 ## 🏗️ Architecture
 
 Setu operates on core pillars:
-1. **Narad (The Messenger)**: Orchestrates communication via a central Event Bus.
-2. **Sutradhar (The Architect)**: Manages project context and high-level strategy.
-3. **Tark (The Backend Lead)**: Expert in logic and server-side modernization.
-4. **Shilpi (The Frontend Lead)**: Crafts modern UI/UX from legacy designs.
+1. **Sutradhar (The Manager)**: Orchestrates tasks and manages the high-level roadmap.
+2. **Tark (The Backend Lead)**: Expert in logic, architecture, and server-side code.
+3. **Shilpi (The Frontend Lead)**: Crafts modern UI/UX and handles layout migrations.
+4. **Guru (The Wise)**: Manages knowledge, documentation, and agent skills.
 
-## 🧠 Philosophy
+## 🛠️ Global Commands
 
-*   **Isolation First:** Never run potentially destructive migrations on the host machine. Always use Docker.
-*   **Iterative Healing:** Fix one error at a time. Re-run. Verify. Repeat.
+- `setu ignite`: Launch Mission Control (Setup + Dashboard + Kernel).
+- `setu status`: Check the state of your agents and tasks.
+- `setu chat "msg"`: Send a direct message to the Swarm.
+
+## 🤝 Philosophy & Principles
+
+### Modern Agentic Engineering
+*   **Structured Autonomy:** Agents work independently but report via a strict protocol (`TASK_ASSIGN` -> `TASK_COMPLETE`).
+*   **Skill-Based Evolution:** Agents learn new tools dynamically by scanning the `skills/` directory for executable logic.
+*   **Full Observability:** "Time Travel" debugging ensures every thought and tool execution is logged and visualizable.
+
+### Ancient Foundation
 *   **Ancient Strategy:** Utilizing timeless patterns (Sanskrit personas) to solve modern technical debt.
+*   **Isolation First:** Never run potentially destructive migrations on the host machine; prioritize containerized execution.
+*   **Iterative Healing:** Modernization is a journey—fix one error, verify, and repeat until the bridge is built.
 
 ---
-*Built with ❤️ by Setu Swarm.*
+*Built with ❤️ by Paril and Bhondu.*
