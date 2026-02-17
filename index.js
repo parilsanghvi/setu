@@ -345,6 +345,9 @@ io.on('connection', (socket) => {
 
 // 2. Resurrection Loop (The Reaper) & Message Poller
 function startSystemLoops() {
+  let lastTasksState = { t: 0, c: 0 };
+  let lastAgentsJson = '';
+
   // Initialize lastMessageId to the latest message to avoid re-broadcasting old history on boot
   // Or should we? Maybe recent history is good.
   // Let's just catch new ones.
@@ -357,8 +360,15 @@ function startSystemLoops() {
 
   setInterval(() => {
     // debug('--- System Loop Pulse ---');
-    // A. Resurrection Logic (with 30s Grace Period)
-    const deadAgents = bus.getDeadAgents(30);
+    // A. Resurrection Logic & State Broadcast
+    const currentAgents = bus.db.prepare('SELECT * FROM agents ORDER BY name').all();
+
+    // Filter dead agents in memory ( > 30s since last heartbeat)
+    const deadAgents = currentAgents.filter(agent => {
+      const lastHeartbeat = agent.last_heartbeat || 0;
+      // SQLite returns last_heartbeat as seconds (strftime('%s', 'now'))
+      return (Date.now() / 1000 - lastHeartbeat) > 30;
+    });
 
     if (deadAgents.length > 0) {
       deadAgents.forEach(agent => {
@@ -383,12 +393,20 @@ function startSystemLoops() {
       });
     }
 
-    // B. State Broadcast
-    const currentAgents = bus.db.prepare('SELECT * FROM agents').all();
-    io.emit('agents_update', currentAgents);
+    // Broadcast Agents (only if changed)
+    const currentAgentsJson = JSON.stringify(currentAgents);
+    if (currentAgentsJson !== lastAgentsJson) {
+      io.emit('agents_update', currentAgents);
+      lastAgentsJson = currentAgentsJson;
+    }
 
-    const currentTasks = bus.db.prepare('SELECT * FROM tasks').all();
-    io.emit('tasks_update', currentTasks);
+    // B. Tasks Broadcast (only if changed)
+    const taskMeta = bus.db.prepare('SELECT MAX(updated_at) as t, COUNT(*) as c FROM tasks').get();
+    if (!taskMeta || taskMeta.t !== lastTasksState.t || taskMeta.c !== lastTasksState.c) {
+      const currentTasks = bus.db.prepare('SELECT * FROM tasks').all();
+      io.emit('tasks_update', currentTasks);
+      lastTasksState = taskMeta || { t: 0, c: 0 };
+    }
 
     // C. Message Polling (The Pulse)
     const newMessages = bus.db.prepare('SELECT * FROM messages WHERE id > ? ORDER BY id ASC').all(lastMessageId);
