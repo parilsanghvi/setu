@@ -40,8 +40,13 @@ Your goal is to force the swarm (Tark, Shilpi, Guru) to deliver results. No fluf
 
                     console.log(`[Sutradhar] 📋 Assigning Task ${taskId} -> ${agentName}`);
 
-                    // Actually store task in DB first?
-                    // bus.updateTask(taskId, 'TODO', { title: instructions.substring(0, 50), type: 'auto' });
+                    // Actually store task in DB first
+                    bus.updateTask(taskId, 'TODO', {
+                        title: instructions.substring(0, 50),
+                        type: 'auto',
+                        owner: agent.name,
+                        assignee: agentName
+                    });
 
                     // Send Protocol Message via bus (using agent.speak helper, but specify type)
                     agent.speak(agentName, instructions, Protocol.TASK_ASSIGN, { taskId });
@@ -61,12 +66,8 @@ Your goal is to force the swarm (Tark, Shilpi, Guru) to deliver results. No fluf
                     required: ["taskId", "status"]
                 },
                 execute: async ({ taskId, status }) => {
-                    // Implement bus update logic if bus is available
-                    // bus.updateTask(taskId, status); is not directly available on 'bus' import as it's the DB module instance?
-                    // 'bus' from '../lib/db' exports { db, send, heartbeat, getDeadAgents, updateTask }
-                    // So yes, we can use it.
                     try {
-                        require('../lib/db').updateTask(taskId, status);
+                        bus.updateTask(taskId, status);
                         return `Task ${taskId} updated to ${status}.`;
                     } catch (e) {
                         return `Error updating task: ${e.message}`;

@@ -4,6 +4,7 @@ const http = require('http');
 const express = require('express');
 const { Server } = require('socket.io');
 const cors = require('cors');
+const helmet = require('helmet');
 const bus = require('./lib/db');
 const readline = require('readline');
 const fs = require('fs');
@@ -14,14 +15,15 @@ const PORT = 3000;
 const app = express();
 const server = http.createServer(app);
 
-// Enable CORS for frontend development
+// Security Headers & CORS
+app.use(helmet());
 app.use(cors());
 app.use(express.json());
 
 // Serve Static Files (Production Build & Screenshots)
 const frontendDist = path.join(__dirname, 'frontend/app/dist');
 app.use(express.static(frontendDist));
-app.use('/screenshots', express.static(path.join(__dirname, 'frontend/dashboard/screenshots')));
+app.use('/screenshots', express.static(path.join(__dirname, 'frontend/dashboard/screenshots'), { index: false }));
 
 // Initialize Socket.IO
 const io = new Server(server, {
@@ -82,14 +84,29 @@ app.post('/api/tasks', (req, res) => {
 // API: Get Screenshots for Task
 app.get('/api/tasks/:id/screenshots', (req, res) => {
   const taskId = req.params.id;
-  const screenshotDir = path.join(__dirname, 'frontend/dashboard/screenshots', taskId);
 
-  if (!fs.existsSync(screenshotDir)) {
+  // Security: Validate taskId to prevent Path Traversal
+  if (!/^[a-zA-Z0-9-_]+$/.test(taskId)) {
+    return res.status(400).json({ error: 'Invalid Task ID format' });
+  }
+
+  const baseDir = path.join(__dirname, 'frontend/dashboard/screenshots');
+  const screenshotDir = path.join(baseDir, taskId);
+
+  // Security check: Prevent path traversal
+  const resolvedPath = path.resolve(screenshotDir);
+  const resolvedBase = path.resolve(baseDir);
+
+  if (!resolvedPath.startsWith(resolvedBase)) {
+    return res.status(403).json({ error: 'Access denied' });
+  }
+
+  if (!fs.existsSync(resolvedPath)) {
     return res.json([]);
   }
 
   try {
-    const files = fs.readdirSync(screenshotDir).filter(f => f.endsWith('.png'));
+    const files = fs.readdirSync(resolvedPath).filter(f => f.endsWith('.png'));
     const urls = files.map(f => `/screenshots/${taskId}/${f}`);
     res.json(urls);
   } catch (e) {
