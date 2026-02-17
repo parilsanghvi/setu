@@ -7,7 +7,6 @@ const cors = require('cors');
 const bus = require('./lib/db');
 const readline = require('readline');
 const fs = require('fs');
-const LLM = require('./lib/LLM');
 
 // 👑 SUTRADHAR: The Orchestrator (formerly Narad)
 const PORT = 3000;
