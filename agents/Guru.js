@@ -5,12 +5,13 @@ const LLM = require('../lib/LLM');
 
 class Guru extends CoreAgent {
     constructor(name, role) {
-        super(name, role, path.join(process.cwd(), 'skills', 'learned'));
+        super(name, role, path.join(process.cwd(), 'skills', 'learned'), { main: 'expensive' }); // Can override 'expensive' here
         this.persona = "Guru (Knowledge)";
         this.systemPrompt = `You are **Guru**, the Knowledge and Skill Master. 
         - Extract patterns from code and tasks with surgical precision.
         - Documentation must be clear, structured, and useful.
-        - No philosophy. Just knowledge crystallization.`;
+        - No philosophy. Just knowledge crystallization.
+        - When fixing code, act as a Senior Engineer: Analyze, Plan, and Patch.`;
 
         const SkillLoader = require('../lib/SkillLoader');
         this.skillLoader = SkillLoader;
@@ -128,9 +129,10 @@ class Guru extends CoreAgent {
     }
 
     async analyzeCrash(agentName, meta) {
-        const crashJournal = `Agent: ${agentName}\nReason: ${meta.reason || 'Unknown'}\nLast Journal Entry: ${meta.lastJournal || 'N/A'}`;
+        const crashJournal = `Agent: ${agentName}\nReason: ${meta.reason || 'Unknown'}\nLast Journal Entry: ${meta.lastJournal || 'N/A'}\nStack Trace: ${meta.stack || 'N/A'}`;
 
         try {
+            // 1. Generate Warning Skill (Passive Learning)
             const crashSystemPrompt = `You are Drona, the Guru. An agent has crashed. 
             Identify the "Lethal Pattern" (e.g., Infinite loop, regex bomb, stack overflow) that killed it.
             Abstract this into a Warning Skill so others don't repeat the mistake.
@@ -139,17 +141,81 @@ class Guru extends CoreAgent {
             {
                 "slug": "lethal-pattern-name",
                 "description": "AVOID THIS: [description].",
-                "content": "# WARNING: Lethal Pattern\n\n## Description\n[details]\n\n## Prevention\n[steps]"
+                "content": "# WARNING: Lethal Pattern\\n\\n## Description\\n[details]\\n\\n## Prevention\\n[steps]"
             }`;
 
-            const response = await LLM.generate(crashSystemPrompt, `Analyze this crash:\n${crashJournal}`);
+            const response = await LLM.generate(crashSystemPrompt, `Analyze this crash:\n${crashJournal}`, this.modelConfig.main);
             const skillData = this.parseResponse(response);
             if (skillData) {
                 this.saveSkill(skillData);
                 console.log(`[${this.name}] 🛡️ Lethal pattern crystallized to prevent future deaths.`);
             }
+
+            // 2. Attempt Self-Repair (Active Repair)
+            if (meta.stack) {
+                console.log(`[${this.name}] 🔧 Initiating Phoenix Protocol: Attempting Self-Repair...`);
+                await this.attemptSelfRepair(meta.stack, meta.reason);
+            }
+
         } catch (e) {
             console.error(`[${this.name}] ❌ Failed to learn from death:`, e.message);
+        }
+    }
+
+    async attemptSelfRepair(stackTrace, errorMsg) {
+        // 1. Locate File
+        const match = stackTrace.match(/\((.+?):(\d+):(\d+)\)/);
+        if (!match) {
+            console.warn(`[${this.name}] ⚠️ Could not parse file path from stack trace.`);
+            return;
+        }
+
+        const [, filePath, line, col] = match;
+        
+        // Security Check: Only edit files within scope
+        if (!filePath.startsWith(process.cwd())) {
+             console.warn(`[${this.name}] ⚠️ Target file is outside workspace: ${filePath}`);
+             return;
+        }
+
+        try {
+            const content = fs.readFileSync(filePath, 'utf8');
+            
+            // 2. Generate Fix
+            const repairPrompt = `You are a Senior Debugging Engineer. A crash occurred at ${filePath}:${line}.
+            
+            ERROR: ${errorMsg}
+            STACK: ${stackTrace}
+            
+            SOURCE CODE:
+            ${content}
+            
+            TASK:
+            1. Analyze the bug.
+            2. Return the COMPLETE fixed file content. Do not truncate.
+            
+            OUTPUT FORMAT (JSON):
+            {
+                "explanation": "Brief explanation of the fix",
+                "fixedContent": "..."
+            }`;
+
+            const response = await LLM.generate(this.systemPrompt, repairPrompt, this.modelConfig.main);
+            const result = this.parseResponse(response);
+
+            if (result && result.fixedContent) {
+                // 3. Apply Fix
+                const backupPath = `${filePath}.bak`;
+                fs.writeFileSync(backupPath, content); // Backup first
+                fs.writeFileSync(filePath, result.fixedContent);
+                console.log(`[${this.name}] ✅ PHOENIX PROTOCOL SUCCESS: Patched ${filePath}. (Backup: ${backupPath})`);
+                console.log(`[${this.name}] 📝 Logic: ${result.explanation}`);
+            } else {
+                console.warn(`[${this.name}] ⚠️ Failed to generate a valid patch.`);
+            }
+
+        } catch (e) {
+            console.error(`[${this.name}] ❌ Self-Repair Failed:`, e.message);
         }
     }
 
