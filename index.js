@@ -4,6 +4,7 @@ const http = require('http');
 const express = require('express');
 const { Server } = require('socket.io');
 const cors = require('cors');
+const helmet = require('helmet');
 const bus = require('./lib/db');
 const readline = require('readline');
 const fs = require('fs');
@@ -14,14 +15,15 @@ const PORT = 3000;
 const app = express();
 const server = http.createServer(app);
 
-// Enable CORS for frontend development
+// Security Headers & CORS
+app.use(helmet());
 app.use(cors());
 app.use(express.json());
 
 // Serve Static Files (Production Build & Screenshots)
 const frontendDist = path.join(__dirname, 'frontend/app/dist');
 app.use(express.static(frontendDist));
-app.use('/screenshots', express.static(path.join(__dirname, 'frontend/dashboard/screenshots')));
+app.use('/screenshots', express.static(path.join(__dirname, 'frontend/dashboard/screenshots'), { index: false }));
 
 // Initialize Socket.IO
 const io = new Server(server, {
