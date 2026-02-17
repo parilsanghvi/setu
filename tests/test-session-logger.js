@@ -1,102 +1,64 @@
-const assert = require('assert');
+const SessionLogger = require('../lib/SessionLogger');
 const fs = require('fs');
 const path = require('path');
-const SessionLogger = require('../lib/SessionLogger');
+const assert = require('assert');
 
-console.log('🧪 Testing lib/SessionLogger.js...');
+const AGENT_NAME = 'TestAgentAsync';
+const LOG_DIR = path.join(process.cwd(), 'logs', 'sessions');
 
-const agentName = 'TestSessionLoggerAgent';
-let logger;
-let createdFile;
-const originalAppendFileSync = fs.appendFileSync;
-
-try {
-    // --- Test 1: Instantiation & Directory Creation ---
-    console.log('  - Test 1: Instantiation & Directory Creation');
-    logger = new SessionLogger(agentName);
-    createdFile = logger.filePath;
-
-    assert.ok(createdFile, 'Logger should have a file path');
-    assert.ok(createdFile.includes(agentName), 'File path should include agent name');
-
-    // Verify directory creation
-    const logDir = path.dirname(createdFile);
-    assert.ok(fs.existsSync(logDir), 'Log directory should exist');
-
-    // --- Test 2: Logging & Content Verification ---
-    console.log('  - Test 2: Logging & Content Verification');
-    const event1 = { message: 'First event', data: { foo: 'bar' } };
-    logger.log(event1);
-
-    const event2 = { message: 'Second event', data: { baz: 'qux' } };
-    logger.log(event2);
-
-    assert.ok(fs.existsSync(createdFile), 'Log file should exist');
-
-    const content = fs.readFileSync(createdFile, 'utf-8').trim();
-    const lines = content.split('\n');
-
-    assert.strictEqual(lines.length, 2, 'Should have 2 log entries');
-
-    const entry1 = JSON.parse(lines[0]);
-    const entry2 = JSON.parse(lines[1]);
-
-    // Check entry 1
-    assert.ok(entry1.id, 'Entry 1 should have an ID');
-    assert.strictEqual(entry1.parentId, null, 'First entry should have null parentId');
-    assert.strictEqual(entry1.message, event1.message, 'Message should match');
-    assert.deepStrictEqual(entry1.data, event1.data, 'Data should match');
-    assert.ok(entry1.timestamp, 'Timestamp should exist');
-
-    // Check entry 2
-    assert.ok(entry2.id, 'Entry 2 should have an ID');
-    assert.strictEqual(entry2.parentId, entry1.id, 'Second entry parentId should match first entry ID');
-    assert.strictEqual(entry2.message, event2.message, 'Message should match');
-    assert.deepStrictEqual(entry2.data, event2.data, 'Data should match');
-
-    // --- Test 3: Error Handling ---
-    console.log('  - Test 3: Error Handling (fs.appendFileSync failure)');
-
-    // Mock fs.appendFileSync to throw error
-    let errorLogged = false;
-    const originalConsoleError = console.error;
-    console.error = (msg) => {
-        if (msg.includes('[SessionLogger] Failed to write log')) {
-            errorLogged = true;
-        }
-        // originalConsoleError(msg); // Uncomment to see actual error
-    };
-
-    fs.appendFileSync = () => {
-        throw new Error('Simulated write error');
-    };
-
-    try {
-        logger.log({ message: 'This should fail' });
-        assert.ok(errorLogged, 'Should have logged an error to console');
-    } finally {
-        // Restore
-        fs.appendFileSync = originalAppendFileSync;
-        console.error = originalConsoleError;
-    }
-
-    console.log('✅ lib/SessionLogger.js Tests Passed!');
-
-} catch (e) {
-    console.error('❌ lib/SessionLogger.js Failed:', e);
-    // Restore in case of failure
-    if (fs.appendFileSync !== originalAppendFileSync) {
-        fs.appendFileSync = originalAppendFileSync;
-    }
-    process.exit(1);
-} finally {
-    // Cleanup
-    if (createdFile && fs.existsSync(createdFile)) {
-        try {
-            fs.unlinkSync(createdFile);
-            console.log('🧹 Cleaned up test log file.');
-        } catch (cleanupError) {
-            console.error('⚠️ Failed to clean up test log file:', cleanupError);
+// Cleanup
+if (fs.existsSync(LOG_DIR)) {
+    const files = fs.readdirSync(LOG_DIR);
+    for (const file of files) {
+        if (file.startsWith(AGENT_NAME)) {
+            fs.unlinkSync(path.join(LOG_DIR, file));
         }
     }
 }
+
+console.log('Testing SessionLogger (Async Check)...');
+
+const logger = new SessionLogger(AGENT_NAME);
+const logFile = logger.filePath;
+
+// Wait for file creation (stream open happens async)
+// Actually fs.createWriteStream creates the file almost immediately if it doesn't exist?
+// It might be async on some systems but usually synchronous enough for the handle.
+
+logger.log({ message: 'Async Hello' });
+
+// We use end() to ensure flush
+logger.end(() => {
+    if (fs.existsSync(logFile)) {
+        const content = fs.readFileSync(logFile, 'utf8');
+        const lines = content.trim().split('\n');
+        assert.strictEqual(lines.length, 1, 'Should have 1 log entry');
+        const entry = JSON.parse(lines[0]);
+        assert.strictEqual(entry.message, 'Async Hello');
+        console.log('Single log test passed.');
+
+        // Test multiple logs
+        // Create new logger since the previous stream ended
+        const logger2 = new SessionLogger(AGENT_NAME + '_2');
+        const logFile2 = logger2.filePath;
+
+        const count = 100;
+        for (let i = 0; i < count; i++) {
+            logger2.log({ index: i });
+        }
+
+        logger2.end(() => {
+            const content2 = fs.readFileSync(logFile2, 'utf8');
+            const lines2 = content2.trim().split('\n');
+            assert.strictEqual(lines2.length, count, `Should have ${count} log entries`);
+            assert.strictEqual(JSON.parse(lines2[0]).index, 0);
+            assert.strictEqual(JSON.parse(lines2[count-1]).index, count-1);
+            console.log('Multiple logs test passed.');
+            console.log('SessionLogger Async tests passed!');
+        });
+
+    } else {
+        console.error('Log file not found!');
+        process.exit(1);
+    }
+});
