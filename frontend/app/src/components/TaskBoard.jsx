@@ -2,20 +2,31 @@ import React, { useState } from 'react';
 import Modal from './Modal';
 import ScreenshotGallery from './ScreenshotGallery';
 import styles from './TaskBoard.module.scss';
-import classNames from 'classnames';
 
 const TaskBoard = ({ tasks }) => {
     const [newTask, setNewTask] = useState("");
     const [selectedTask, setSelectedTask] = useState(null);
+    const [isCreating, setIsCreating] = useState(false);
 
     const createTask = async () => {
         if (!newTask) return;
-        await fetch('/api/tasks', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ title: newTask, type: 'gui-task' })
-        });
-        setNewTask("");
+        setIsCreating(true);
+        try {
+            await fetch('/api/tasks', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ title: newTask, type: 'gui-task' })
+            });
+            setNewTask("");
+        } finally {
+            setIsCreating(false);
+        }
+    };
+
+    const handleKeyDown = (e) => {
+        if (e.key === 'Enter' && !isCreating) {
+            createTask();
+        }
     };
 
     const cols = { TODO: [], IN_PROGRESS: [], DONE: [] };
@@ -43,10 +54,19 @@ const TaskBoard = ({ tasks }) => {
                     <input
                         value={newTask}
                         onChange={e => setNewTask(e.target.value)}
+                        onKeyDown={handleKeyDown}
+                        disabled={isCreating}
                         placeholder="New Task..."
+                        aria-label="New task title"
                         className={styles.input}
                     />
-                    <button onClick={createTask} className={styles.addButton}>ADD</button>
+                    <button
+                        onClick={createTask}
+                        disabled={isCreating}
+                        className={styles.addButton}
+                    >
+                        {isCreating ? "..." : "ADD"}
+                    </button>
                 </div>
             </div>
 
