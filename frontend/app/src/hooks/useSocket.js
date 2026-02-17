@@ -37,7 +37,23 @@ export const useSocket = () => {
         }
 
         function onLogHistory(hist) {
-            setLogs(hist.slice(-MAX_LOGS));
+            setLogs((prev) => {
+                // If new items are more than MAX_LOGS, just take the last MAX_LOGS of them
+                if (hist.length >= MAX_LOGS) {
+                    return hist.slice(-MAX_LOGS);
+                }
+
+                // Calculate how many we can keep from prev
+                const keepCount = MAX_LOGS - hist.length;
+
+                // If prev has more than we can keep, slice it
+                if (prev.length > keepCount) {
+                    return [...prev.slice(-keepCount), ...hist];
+                }
+
+                // Otherwise just combine
+                return [...prev, ...hist];
+            });
         }
 
         function onAgentsUpdate(data) {
