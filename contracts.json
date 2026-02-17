@@ -2,20 +2,26 @@
   "TASK-VETO-TEST": {
     "domain": "backend",
     "spec": "Develop a new user login route. Use console.log for debugging errors.",
-    "status": "PROPOSED",
-    "timestamp": "2026-02-17T21:06:57.101Z",
-    "vetoes": []
+    "status": "VETOED",
+    "timestamp": "2026-02-15T16:55:43.593Z",
+    "vetoes": [
+      {
+        "agent": "Backend-Lead-Test",
+        "reason": "The specification explicitly mandates the use of `console.log`. This is illogical and unacceptable. `console.log` is a synchronous, unstructured I/O operation that blocks the event loop, offers no categorization (e.g., INFO, WARN, ERROR), and cannot be properly managed or streamed in a production environment. It is a primitive tool, not a logging strategy. All system outputs must be processed through a structured, asynchronous logger to ensure performance, security, and observability.",
+        "timestamp": "2026-02-15T16:55:55.967Z"
+      }
+    ]
   },
   "TASK-INFRA-BAD": {
     "domain": "infra",
     "spec": "We will just run the app on the host machine using sudo node server.js. No Docker needed.",
     "status": "VETOED",
-    "timestamp": "2026-02-17T21:07:09.062Z",
+    "timestamp": "2026-02-15T06:11:52.303Z",
     "vetoes": [
       {
         "agent": "Vishwakarma-Test",
         "reason": "Violation of Isolation Principle.",
-        "timestamp": "2026-02-17T21:07:09.063Z"
+        "timestamp": "2026-02-15T06:11:52.305Z"
       }
     ]
   },
@@ -23,7 +29,7 @@
     "domain": "infra",
     "spec": "We will use a Dockerfile based on node:18-alpine. It will run as a non-root user 'node'. Healthchecks enabled.",
     "status": "APPROVED",
-    "timestamp": "2026-02-17T21:07:09.065Z",
+    "timestamp": "2026-02-15T06:11:52.305Z",
     "vetoes": []
   }
 }
