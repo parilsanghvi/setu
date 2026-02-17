@@ -21,7 +21,7 @@ try {
 
     console.log('✅ lib/server.js Tests Passed!');
     // No need to listen() to verify structure.
-
+    process.exit(0);
 } catch (e) {
     console.error('❌ lib/server.js Failed:', e);
     process.exit(1);
