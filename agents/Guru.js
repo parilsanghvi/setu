@@ -200,10 +200,8 @@ class Guru extends CoreAgent {
             try {
                 return JSON.parse(match[1].trim());
             } catch (e) {
-                errors.push(`Markdown block: ${e.message}`);
+                errors.push(`Markdown JSON: ${e.message}`);
             }
-        } else {
-            errors.push('No markdown JSON block found');
         }
 
         // 3. Fallback: search for first { and last }
@@ -214,13 +212,13 @@ class Guru extends CoreAgent {
                 const potentialJson = response.substring(firstBrace, lastBrace + 1);
                 return JSON.parse(potentialJson.trim());
             } catch (e) {
-                errors.push(`Fallback extraction: ${e.message}`);
+                errors.push(`Fallback JSON: ${e.message}`);
             }
-        } else {
-            errors.push('No valid JSON structure found in fallback search');
         }
 
-        console.warn(`[Guru] Failed to parse response. Errors: ${errors.join(' | ')}`);
+        if (errors.length > 0) {
+            console.warn(`[${this.name}] ⚠️ Failed to parse response. Errors: ${errors.join(' | ')}`);
+        }
         return null;
     }
 
