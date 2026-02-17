@@ -2,6 +2,7 @@ const { fork } = require('child_process');
 const path = require('path');
 const http = require('http');
 const express = require('express');
+const helmet = require('helmet');
 const { Server } = require('socket.io');
 const cors = require('cors');
 const bus = require('./lib/db');
@@ -13,6 +14,9 @@ const LLM = require('./lib/LLM');
 const PORT = 3000;
 const app = express();
 const server = http.createServer(app);
+
+// Security Headers
+app.use(helmet());
 
 // Enable CORS for frontend development
 app.use(cors());
