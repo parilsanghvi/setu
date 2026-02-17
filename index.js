@@ -71,10 +71,24 @@ app.get('/api/agents', (req, res) => {
 // API: Create Task
 app.post('/api/tasks', (req, res) => {
   const { title, type } = req.body;
-  if (!title) return res.status(400).json({ error: 'Title required' });
+
+  if (!title || typeof title !== 'string' || title.trim().length === 0) {
+    return res.status(400).json({ error: 'Valid title required' });
+  }
+
+  if (title.length > 100) {
+    return res.status(400).json({ error: 'Title too long (max 100 chars)' });
+  }
+
+  if (type && (typeof type !== 'string' || type.length > 50)) {
+    return res.status(400).json({ error: 'Invalid type' });
+  }
+
+  const cleanTitle = title.trim();
+  const cleanType = type ? type.trim() : 'generic';
 
   const id = `TASK-${Date.now().toString().slice(-4)}`;
-  bus.updateTask(id, 'TODO', { title, type: type || 'generic', created_at: new Date().toISOString() });
+  bus.updateTask(id, 'TODO', { title: cleanTitle, type: cleanType, created_at: new Date().toISOString() });
 
   res.json({ id, status: 'TODO' });
 });
