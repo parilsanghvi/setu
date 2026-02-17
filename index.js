@@ -9,6 +9,7 @@ const bus = require('./lib/db');
 const readline = require('readline');
 const fs = require('fs');
 const LLM = require('./lib/LLM');
+const authMiddleware = require('./lib/middleware/auth');
 
 // 👑 SUTRADHAR: The Orchestrator (formerly Narad)
 const PORT = 3000;
@@ -19,6 +20,9 @@ const server = http.createServer(app);
 app.use(cors());
 app.use(helmet());
 app.use(express.json());
+
+// 🛡️ Security: Authentication Middleware
+app.use(authMiddleware);
 
 // Serve Static Files (Production Build & Screenshots)
 const frontendDist = path.join(__dirname, 'frontend/app/dist');
