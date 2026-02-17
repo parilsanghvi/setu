@@ -4,6 +4,7 @@ const http = require('http');
 const express = require('express');
 const { Server } = require('socket.io');
 const cors = require('cors');
+const helmet = require('helmet');
 const bus = require('./lib/db');
 const readline = require('readline');
 const fs = require('fs');
@@ -16,6 +17,7 @@ const server = http.createServer(app);
 
 // Enable CORS for frontend development
 app.use(cors());
+app.use(helmet());
 app.use(express.json());
 
 // Serve Static Files (Production Build & Screenshots)
@@ -24,10 +26,22 @@ app.use(express.static(frontendDist));
 app.use('/screenshots', express.static(path.join(__dirname, 'frontend/dashboard/screenshots')));
 
 // Initialize Socket.IO
+const ALLOWED_ORIGINS = [
+  "http://localhost:3000",
+  "http://127.0.0.1:3000",
+  "http://localhost:5173",
+  "http://127.0.0.1:5173"
+];
+
+if (process.env.ALLOWED_ORIGINS) {
+  ALLOWED_ORIGINS.push(...process.env.ALLOWED_ORIGINS.split(',').map(s => s.trim()));
+}
+
 const io = new Server(server, {
   cors: {
-    origin: "*",
-    methods: ["GET", "POST"]
+    origin: ALLOWED_ORIGINS,
+    methods: ["GET", "POST"],
+    credentials: true
   }
 });
 
@@ -479,8 +493,9 @@ function boot() {
   startSystemLoops();
 
   // Start HTTP Server
-  server.listen(PORT, () => {
-    log(`🌍 Server running on http://localhost:${PORT}`);
+  const HOST = process.env.HOST || '127.0.0.1';
+  server.listen(PORT, HOST, () => {
+    log(`🌍 Server running on http://${HOST}:${PORT}`);
     log(`📡 Socket.IO listening on port ${PORT}`);
     debug('Dashboard API ready (merged from lib/server.js)');
   });
