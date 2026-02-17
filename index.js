@@ -113,14 +113,28 @@ app.post('/api/tasks', (req, res) => {
 // API: Get Screenshots for Task
 app.get('/api/tasks/:id/screenshots', (req, res) => {
   const taskId = req.params.id;
-  const screenshotDir = path.join(__dirname, 'frontend/dashboard/screenshots', taskId);
 
-  if (!fs.existsSync(screenshotDir)) {
+    // Security: Validate taskId to prevent Path Traversal
+    if (!/^[a-zA-Z0-9-_]+$/.test(taskId)) {
+      return res.status(400).json({ error: 'Invalid Task ID format' });
+    }
+  const baseDir = path.join(__dirname, 'frontend/dashboard/screenshots');
+  const screenshotDir = path.join(baseDir, taskId);
+
+  // Security check: Prevent path traversal
+  const resolvedPath = path.resolve(screenshotDir);
+  const resolvedBase = path.resolve(baseDir);
+
+  if (!resolvedPath.startsWith(resolvedBase)) {
+    return res.status(403).json({ error: 'Access denied' });
+  }
+
+  if (!fs.existsSync(resolvedPath)) {
     return res.json([]);
   }
 
   try {
-    const files = fs.readdirSync(screenshotDir).filter(f => f.endsWith('.png'));
+    const files = fs.readdirSync(resolvedPath).filter(f => f.endsWith('.png'));
     const urls = files.map(f => `/screenshots/${taskId}/${f}`);
     res.json(urls);
   } catch (e) {
