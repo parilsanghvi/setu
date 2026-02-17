@@ -184,10 +184,14 @@ class Guru extends CoreAgent {
     }
 
     parseResponse(response) {
+        const errors = [];
+
         // 1. Try raw JSON
         try {
             return JSON.parse(response.trim());
-        } catch (e) { }
+        } catch (e) {
+            errors.push(`Raw JSON: ${e.message}`);
+        }
 
         // 2. Try Markdown block regex
         const jsonBlockRegex = /```json\s*([\s\S]*?)\s*```/;
@@ -195,7 +199,11 @@ class Guru extends CoreAgent {
         if (match) {
             try {
                 return JSON.parse(match[1].trim());
-            } catch (e) { }
+            } catch (e) {
+                errors.push(`Markdown block: ${e.message}`);
+            }
+        } else {
+            errors.push('No markdown JSON block found');
         }
 
         // 3. Fallback: search for first { and last }
@@ -205,9 +213,14 @@ class Guru extends CoreAgent {
             try {
                 const potentialJson = response.substring(firstBrace, lastBrace + 1);
                 return JSON.parse(potentialJson.trim());
-            } catch (e) { }
+            } catch (e) {
+                errors.push(`Fallback extraction: ${e.message}`);
+            }
+        } else {
+            errors.push('No valid JSON structure found in fallback search');
         }
 
+        console.warn(`[Guru] Failed to parse response. Errors: ${errors.join(' | ')}`);
         return null;
     }
 
