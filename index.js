@@ -38,7 +38,7 @@ app.use(express.json()); // 4. Body Parsing
 // Serve Static Files (Production Build & Screenshots)
 const frontendDist = path.join(__dirname, 'frontend/app/dist');
 app.use(express.static(frontendDist));
-app.use('/screenshots', express.static(path.join(__dirname, 'frontend/dashboard/screenshots')));
+app.use('/screenshots', express.static(path.join(__dirname, 'frontend/dashboard/screenshots'), { index: false }));
 
 // Initialize Socket.IO
 const io = new Server(server, {
