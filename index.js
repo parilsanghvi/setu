@@ -8,7 +8,6 @@ const helmet = require('helmet');
 const bus = require('./lib/db');
 const readline = require('readline');
 const fs = require('fs');
-const LLM = require('./lib/LLM');
 const authMiddleware = require('./lib/middleware/auth');
 
 // 👑 SUTRADHAR: The Orchestrator (formerly Narad)
