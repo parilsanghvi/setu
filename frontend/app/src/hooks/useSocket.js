@@ -6,6 +6,8 @@ const socket = io({
     autoConnect: false, // We'll connect manually in useEffect
 });
 
+const MAX_LOGS = 500;
+
 export const useSocket = () => {
     const [isConnected, setIsConnected] = useState(socket.connected);
     const [agents, setAgents] = useState([]);
@@ -26,11 +28,11 @@ export const useSocket = () => {
         }
 
         function onLog(msg) {
-            setLogs((prev) => [...prev, msg]); // Show all logs
+            setLogs((prev) => [...prev, msg].slice(-MAX_LOGS)); // Limit logs
         }
 
         function onLogHistory(hist) {
-            setLogs(hist);
+            setLogs(hist.slice(-MAX_LOGS));
         }
 
         function onAgentsUpdate(data) {
@@ -44,13 +46,13 @@ export const useSocket = () => {
         function onChatMessage(msg) {
             // In a real app we might separate chat from logs, but for now
             // we treat chat messages as high-priority logs
-            setLogs((prev) => [...prev, `[CHAT] ${msg.sender} -> ${msg.recipient}: ${msg.content}`]);
+            setLogs((prev) => [...prev, `[CHAT] ${msg.sender} -> ${msg.recipient}: ${msg.content}`].slice(-MAX_LOGS));
         }
 
         function onChatHistory(history) {
             // Convert structured history to log format
             const formatted = history.map(msg => `[CHAT] ${msg.sender} -> ${msg.recipient}: ${msg.content}`);
-            setLogs((prev) => [...prev, ...formatted]); // Append, assuming logs loaded first or we just mix
+            setLogs((prev) => [...prev, ...formatted].slice(-MAX_LOGS)); // Append, assuming logs loaded first or we just mix
         }
 
         socket.on('connect', onConnect);
