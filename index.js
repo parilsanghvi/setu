@@ -303,6 +303,15 @@ function spawnAgent(name, role) {
   child.on('exit', (code) => {
     log(`⚠️ Agent ${name} exited with code ${code}`);
     delete RUNNING_PROCESSES[name];
+    
+    // Broadcast Crash Event for Guru (Death Learning)
+    bus.send('System', 'ALL', `Agent ${name} crashed`, 'event', {
+      type: 'AGENT_CRASH',
+      agentName: name,
+      reason: `Exited with code ${code}`,
+      timestamp: Date.now()
+    });
+
     // We let the Resurrection Loop handle the restart
   });
 }
