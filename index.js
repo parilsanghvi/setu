@@ -10,25 +10,6 @@ const readline = require('readline');
 const fs = require('fs');
 const authMiddleware = require('./lib/middleware/auth');
 
-// 👑 SUTRADHAR: The Orchestrator (formerly Narad)
-const PORT = 3000;
-const app = express();
-const server = http.createServer(app);
-
-// Enable CORS for frontend development
-app.use(cors());
-app.use(helmet());
-app.use(express.json());
-
-// 🛡️ Security: Authentication Middleware
-app.use(authMiddleware);
-
-// Serve Static Files (Production Build & Screenshots)
-const frontendDist = path.join(__dirname, 'frontend/app/dist');
-app.use(express.static(frontendDist));
-app.use('/screenshots', express.static(path.join(__dirname, 'frontend/dashboard/screenshots')));
-
-// Initialize Socket.IO
 const ALLOWED_ORIGINS = [
   "http://localhost:3000",
   "http://127.0.0.1:3000",
@@ -40,6 +21,26 @@ if (process.env.ALLOWED_ORIGINS) {
   ALLOWED_ORIGINS.push(...process.env.ALLOWED_ORIGINS.split(',').map(s => s.trim()));
 }
 
+// 👑 SUTRADHAR: The Orchestrator (formerly Narad)
+const PORT = 3000;
+const app = express();
+const server = http.createServer(app);
+
+// 🛡️ Security: Middleware Pipeline
+app.use(helmet()); // 1. Security Headers
+app.use(cors({ // 2. CORS (Strict)
+  origin: ALLOWED_ORIGINS,
+  credentials: true
+}));
+app.use(authMiddleware); // 3. Authentication (Block unauth before parsing body)
+app.use(express.json()); // 4. Body Parsing
+
+// Serve Static Files (Production Build & Screenshots)
+const frontendDist = path.join(__dirname, 'frontend/app/dist');
+app.use(express.static(frontendDist));
+app.use('/screenshots', express.static(path.join(__dirname, 'frontend/dashboard/screenshots')));
+
+// Initialize Socket.IO
 const io = new Server(server, {
   cors: {
     origin: ALLOWED_ORIGINS,
