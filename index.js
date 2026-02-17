@@ -393,6 +393,7 @@ io.on('connection', (socket) => {
 function startSystemLoops() {
   let lastTasksState = { t: 0, c: 0 };
   let lastAgentsJson = '';
+  let lastAgentBroadcast = 0;
 
   // Initialize lastMessageId to the latest message to avoid re-broadcasting old history on boot
   // Or should we? Maybe recent history is good.
@@ -406,15 +407,9 @@ function startSystemLoops() {
 
   setInterval(() => {
     // debug('--- System Loop Pulse ---');
-    // A. Resurrection Logic & State Broadcast
-    const currentAgents = bus.db.prepare('SELECT * FROM agents ORDER BY name').all();
-
-    // Filter dead agents in memory ( > 30s since last heartbeat)
-    const deadAgents = currentAgents.filter(agent => {
-      const lastHeartbeat = agent.last_heartbeat || 0;
-      // SQLite returns last_heartbeat as seconds (strftime('%s', 'now'))
-      return (Date.now() / 1000 - lastHeartbeat) > 30;
-    });
+    // A. Resurrection Logic (Optimized: Targeted Query)
+    const deadAgents = bus.getDeadAgents(30);
+    let resurrectionOccurred = false;
 
     if (deadAgents.length > 0) {
       deadAgents.forEach(agent => {
@@ -429,6 +424,7 @@ function startSystemLoops() {
         }
 
         log(`💀 Agent ${agent.name} is dead (${Math.round(elapsed)}s since last spawn). Resurrecting...`);
+        resurrectionOccurred = true;
 
         // Kill if process still exists but zombie
         if (RUNNING_PROCESSES[agent.name]) {
@@ -439,11 +435,17 @@ function startSystemLoops() {
       });
     }
 
-    // Broadcast Agents (only if changed)
-    const currentAgentsJson = JSON.stringify(currentAgents);
-    if (currentAgentsJson !== lastAgentsJson) {
-      io.emit('agents_update', currentAgents);
-      lastAgentsJson = currentAgentsJson;
+    // Broadcast Agents (Throttled + On Resurrection)
+    const now = Date.now();
+    // Throttle to every 2 seconds unless a critical event happened
+    if (resurrectionOccurred || (now - lastAgentBroadcast > 2000)) {
+      const currentAgents = bus.db.prepare('SELECT * FROM agents ORDER BY name').all();
+      const currentAgentsJson = JSON.stringify(currentAgents);
+      if (currentAgentsJson !== lastAgentsJson) {
+        io.emit('agents_update', currentAgents);
+        lastAgentsJson = currentAgentsJson;
+      }
+      lastAgentBroadcast = now;
     }
 
     // B. Tasks Broadcast (only if changed)
