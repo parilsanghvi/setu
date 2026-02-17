@@ -8,17 +8,32 @@ const helmet = require('helmet');
 const bus = require('./lib/db');
 const readline = require('readline');
 const fs = require('fs');
-const LLM = require('./lib/LLM');
+const authMiddleware = require('./lib/middleware/auth');
+
+const ALLOWED_ORIGINS = [
+  "http://localhost:3000",
+  "http://127.0.0.1:3000",
+  "http://localhost:5173",
+  "http://127.0.0.1:5173"
+];
+
+if (process.env.ALLOWED_ORIGINS) {
+  ALLOWED_ORIGINS.push(...process.env.ALLOWED_ORIGINS.split(',').map(s => s.trim()));
+}
 
 // 👑 SUTRADHAR: The Orchestrator (formerly Narad)
 const PORT = 3000;
 const app = express();
 const server = http.createServer(app);
 
-// Security Headers & CORS
-app.use(helmet());
-app.use(cors());
-app.use(express.json());
+// 🛡️ Security: Middleware Pipeline
+app.use(helmet()); // 1. Security Headers
+app.use(cors({ // 2. CORS (Strict)
+  origin: ALLOWED_ORIGINS,
+  credentials: true
+}));
+app.use(authMiddleware); // 3. Authentication (Block unauth before parsing body)
+app.use(express.json()); // 4. Body Parsing
 
 // Serve Static Files (Production Build & Screenshots)
 const frontendDist = path.join(__dirname, 'frontend/app/dist');
@@ -28,8 +43,9 @@ app.use('/screenshots', express.static(path.join(__dirname, 'frontend/dashboard/
 // Initialize Socket.IO
 const io = new Server(server, {
   cors: {
-    origin: "*",
-    methods: ["GET", "POST"]
+    origin: ALLOWED_ORIGINS,
+    methods: ["GET", "POST"],
+    credentials: true
   }
 });
 
@@ -73,10 +89,24 @@ app.get('/api/agents', (req, res) => {
 // API: Create Task
 app.post('/api/tasks', (req, res) => {
   const { title, type } = req.body;
-  if (!title) return res.status(400).json({ error: 'Title required' });
+
+  if (!title || typeof title !== 'string' || title.trim().length === 0) {
+    return res.status(400).json({ error: 'Valid title required' });
+  }
+
+  if (title.length > 100) {
+    return res.status(400).json({ error: 'Title too long (max 100 chars)' });
+  }
+
+  if (type && (typeof type !== 'string' || type.length > 50)) {
+    return res.status(400).json({ error: 'Invalid type' });
+  }
+
+  const cleanTitle = title.trim();
+  const cleanType = type ? type.trim() : 'generic';
 
   const id = `TASK-${Date.now().toString().slice(-4)}`;
-  bus.updateTask(id, 'TODO', { title, type: type || 'generic', created_at: new Date().toISOString() });
+  bus.updateTask(id, 'TODO', { title: cleanTitle, type: cleanType, created_at: new Date().toISOString() });
 
   res.json({ id, status: 'TODO' });
 });
@@ -84,14 +114,28 @@ app.post('/api/tasks', (req, res) => {
 // API: Get Screenshots for Task
 app.get('/api/tasks/:id/screenshots', (req, res) => {
   const taskId = req.params.id;
-  const screenshotDir = path.join(__dirname, 'frontend/dashboard/screenshots', taskId);
 
-  if (!fs.existsSync(screenshotDir)) {
+    // Security: Validate taskId to prevent Path Traversal
+    if (!/^[a-zA-Z0-9-_]+$/.test(taskId)) {
+      return res.status(400).json({ error: 'Invalid Task ID format' });
+    }
+  const baseDir = path.join(__dirname, 'frontend/dashboard/screenshots');
+  const screenshotDir = path.join(baseDir, taskId);
+
+  // Security check: Prevent path traversal
+  const resolvedPath = path.resolve(screenshotDir);
+  const resolvedBase = path.resolve(baseDir);
+
+  if (!resolvedPath.startsWith(resolvedBase)) {
+    return res.status(403).json({ error: 'Access denied' });
+  }
+
+  if (!fs.existsSync(resolvedPath)) {
     return res.json([]);
   }
 
   try {
-    const files = fs.readdirSync(screenshotDir).filter(f => f.endsWith('.png'));
+    const files = fs.readdirSync(resolvedPath).filter(f => f.endsWith('.png'));
     const urls = files.map(f => `/screenshots/${taskId}/${f}`);
     res.json(urls);
   } catch (e) {
@@ -347,6 +391,9 @@ io.on('connection', (socket) => {
 
 // 2. Resurrection Loop (The Reaper) & Message Poller
 function startSystemLoops() {
+  let lastTasksState = { t: 0, c: 0 };
+  let lastAgentsJson = '';
+
   // Initialize lastMessageId to the latest message to avoid re-broadcasting old history on boot
   // Or should we? Maybe recent history is good.
   // Let's just catch new ones.
@@ -359,8 +406,15 @@ function startSystemLoops() {
 
   setInterval(() => {
     // debug('--- System Loop Pulse ---');
-    // A. Resurrection Logic (with 30s Grace Period)
-    const deadAgents = bus.getDeadAgents(30);
+    // A. Resurrection Logic & State Broadcast
+    const currentAgents = bus.db.prepare('SELECT * FROM agents ORDER BY name').all();
+
+    // Filter dead agents in memory ( > 30s since last heartbeat)
+    const deadAgents = currentAgents.filter(agent => {
+      const lastHeartbeat = agent.last_heartbeat || 0;
+      // SQLite returns last_heartbeat as seconds (strftime('%s', 'now'))
+      return (Date.now() / 1000 - lastHeartbeat) > 30;
+    });
 
     if (deadAgents.length > 0) {
       deadAgents.forEach(agent => {
@@ -385,12 +439,20 @@ function startSystemLoops() {
       });
     }
 
-    // B. State Broadcast
-    const currentAgents = bus.db.prepare('SELECT * FROM agents').all();
-    io.emit('agents_update', currentAgents);
+    // Broadcast Agents (only if changed)
+    const currentAgentsJson = JSON.stringify(currentAgents);
+    if (currentAgentsJson !== lastAgentsJson) {
+      io.emit('agents_update', currentAgents);
+      lastAgentsJson = currentAgentsJson;
+    }
 
-    const currentTasks = bus.db.prepare('SELECT * FROM tasks').all();
-    io.emit('tasks_update', currentTasks);
+    // B. Tasks Broadcast (only if changed)
+    const taskMeta = bus.db.prepare('SELECT MAX(updated_at) as t, COUNT(*) as c FROM tasks').get();
+    if (!taskMeta || taskMeta.t !== lastTasksState.t || taskMeta.c !== lastTasksState.c) {
+      const currentTasks = bus.db.prepare('SELECT * FROM tasks').all();
+      io.emit('tasks_update', currentTasks);
+      lastTasksState = taskMeta || { t: 0, c: 0 };
+    }
 
     // C. Message Polling (The Pulse)
     const newMessages = bus.db.prepare('SELECT * FROM messages WHERE id > ? ORDER BY id ASC').all(lastMessageId);
@@ -467,8 +529,9 @@ function boot() {
   startSystemLoops();
 
   // Start HTTP Server
-  server.listen(PORT, () => {
-    log(`🌍 Server running on http://localhost:${PORT}`);
+  const HOST = process.env.HOST || '127.0.0.1';
+  server.listen(PORT, HOST, () => {
+    log(`🌍 Server running on http://${HOST}:${PORT}`);
     log(`📡 Socket.IO listening on port ${PORT}`);
     debug('Dashboard API ready (merged from lib/server.js)');
   });
