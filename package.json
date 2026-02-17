@@ -2,11 +2,10 @@
   "name": "sutradhar-backend",
   "version": "1.0.0",
   "description": "Backend for Sutradhar Application",
-  "main": "dist/index.js",
+  "main": "index.js",
   "scripts": {
-    "start": "node dist/index.js",
-    "dev": "ts-node-dev --respawn --transpile-only src/index.ts",
-    "build": "tsc",
+    "start": "node index.js",
+    "dev": "node --watch index.js",
     "ignite": "node scripts/ignite.js"
   },
   "keywords": [],
@@ -21,11 +20,6 @@
     "socket.io": "^4.8.3"
   },
   "devDependencies": {
-    "@types/cors": "^2.8.17",
-    "@types/express": "^4.17.21",
-    "@types/node": "^20.12.12",
-    "socket.io-client": "^4.8.3",
-    "ts-node-dev": "^2.0.0",
-    "typescript": "^5.4.5"
+    "socket.io-client": "^4.8.3"
   }
 }
