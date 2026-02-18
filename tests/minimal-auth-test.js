@@ -1,4 +1,17 @@
 console.log('Start of script');
+
+// Mock dotenv for environment where node_modules are missing
+const Module = require('module');
+const originalRequire = Module.prototype.require;
+Module.prototype.require = function(id) {
+    if (id === 'dotenv') {
+        return {
+            config: () => ({})
+        };
+    }
+    return originalRequire.apply(this, arguments);
+};
+
 const AuthStore = require('../lib/auth/auth-store');
 console.log('AuthStore required');
 const GoogleAuth = require('../lib/auth/google');
