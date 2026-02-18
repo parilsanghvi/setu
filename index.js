@@ -247,13 +247,13 @@ function log(msg, level = 'info') {
   if (LOG_LEVEL === 'error' && level !== 'error') return;
 
   const logMsg = `[SUTRADHAR] ${msg}`;
-  console.log(logMsg);
 
-  // Also write to setu.log for Dashboard consistency
+  // Write to setu.log (primary log destination)
   try {
     fs.appendFileSync(path.join(__dirname, 'setu.log'), logMsg + '\n');
   } catch (e) { }
 
+  // Broadcast to dashboard via socket
   io.emit('log', logMsg);
 }
 
@@ -422,6 +422,13 @@ function startSystemLoops() {
 
     if (deadAgents.length > 0) {
       deadAgents.forEach(agent => {
+        // GUARD: Only resurrect agents that exist in our AGENT_MAP (prevents test-injected zombies)
+        if (!AGENT_MAP[agent.role]) {
+          debug(`🧹 Skipping unknown agent '${agent.name}' (role: ${agent.role}). Cleaning from DB.`);
+          bus.db.prepare('DELETE FROM agents WHERE name = ?').run(agent.name);
+          return;
+        }
+
         // CRITICAL: Check grace period to avoid "Murder Loops"
         const now = Date.now();
         const lastSpawn = SPAWN_TIMES[agent.name] || 0;
