@@ -2,6 +2,7 @@ const CoreAgent = require('../lib/CoreAgent');
 const path = require('path');
 const fs = require('fs');
 const LLM = require('../lib/LLM');
+const JsonParser = require('../lib/utils/JsonParser');
 
 class Guru extends CoreAgent {
     constructor(name, role) {
@@ -250,42 +251,11 @@ class Guru extends CoreAgent {
     }
 
     parseResponse(response) {
-        const errors = [];
-
-        // 1. Try raw JSON
-        try {
-            return JSON.parse(response.trim());
-        } catch (e) {
-            errors.push(`Raw JSON: ${e.message}`);
+        const result = JsonParser.parse(response);
+        if (!result) {
+            console.warn(`[${this.name}] ⚠️ Failed to parse response.`);
         }
-
-        // 2. Try Markdown block regex
-        const jsonBlockRegex = /```json\s*([\s\S]*?)\s*```/;
-        const match = response.match(jsonBlockRegex);
-        if (match) {
-            try {
-                return JSON.parse(match[1].trim());
-            } catch (e) {
-                errors.push(`Markdown JSON: ${e.message}`);
-            }
-        }
-
-        // 3. Fallback: search for first { and last }
-        const firstBrace = response.indexOf('{');
-        const lastBrace = response.lastIndexOf('}');
-        if (firstBrace !== -1 && lastBrace !== -1 && lastBrace > firstBrace) {
-            try {
-                const potentialJson = response.substring(firstBrace, lastBrace + 1);
-                return JSON.parse(potentialJson.trim());
-            } catch (e) {
-                errors.push(`Fallback JSON: ${e.message}`);
-            }
-        }
-
-        if (errors.length > 0) {
-            console.warn(`[${this.name}] ⚠️ Failed to parse response. Errors: ${errors.join(' | ')}`);
-        }
-        return null;
+        return result;
     }
 
     saveSkill(data) {

@@ -1,3 +1,37 @@
+const Module = require('module');
+const originalRequire = Module.prototype.require;
+
+// Mock native/external dependencies
+Module.prototype.require = function(id) {
+    if (id === 'better-sqlite3') {
+        return function() { // Mock Database Constructor
+            return {
+                pragma: () => {},
+                exec: () => {},
+                prepare: () => ({
+                    run: () => ({ lastInsertRowid: 1 }),
+                    all: () => [],
+                    get: () => ({})
+                })
+            };
+        };
+    }
+    if (id === 'dotenv') {
+        return { config: () => ({}) };
+    }
+    if (id === 'zod') {
+        class ZodType {}
+        return {
+            z: {
+                object: () => ({ parse: () => {} }),
+                string: () => ({}),
+                ZodType: ZodType
+            }
+        };
+    }
+    return originalRequire.apply(this, arguments);
+};
+
 const Guru = require('../agents/Guru');
 const LLM = require('../lib/LLM');
 const fs = require('fs');

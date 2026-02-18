@@ -22,7 +22,7 @@ if (process.env.ALLOWED_ORIGINS) {
 }
 
 // 👑 SUTRADHAR: The Orchestrator (formerly Narad)
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 const app = express();
 const server = http.createServer(app);
 
@@ -198,7 +198,7 @@ app.get('/api/sessions', (req, res) => {
 });
 
 // API: Get Session Content
-app.get('/api/sessions/:filename', (req, res) => {
+app.get('/api/sessions/:filename', async (req, res) => {
   const { filename } = req.params;
   const filePath = path.join(__dirname, 'logs/sessions', filename);
 
@@ -207,15 +207,16 @@ app.get('/api/sessions/:filename', (req, res) => {
     return res.status(403).json({ error: 'Access denied' });
   }
 
-  if (!fs.existsSync(filePath)) return res.status(404).json({ error: 'Session not found' });
-
   try {
-    const content = fs.readFileSync(filePath, 'utf8');
+    const content = await fs.promises.readFile(filePath, 'utf8');
     const lines = content.trim().split('\n').map(l => {
       try { return JSON.parse(l); } catch (e) { return null; }
     }).filter(x => x);
     res.json(lines);
   } catch (e) {
+    if (e.code === 'ENOENT') {
+      return res.status(404).json({ error: 'Session not found' });
+    }
     res.status(500).json({ error: e.message });
   }
 });
@@ -493,6 +494,15 @@ function startSystemLoops() {
 
         io.emit('chat_message', msg);
         lastMessageId = msg.id;
+
+        // ⚡ OPTIMIZATION: Push Notification via IPC (Avoid N+1 Polling)
+        if (msg.recipient === 'ALL') {
+          Object.values(RUNNING_PROCESSES).forEach(proc => {
+            try { proc.send({ type: 'new_message' }); } catch (e) { }
+          });
+        } else if (RUNNING_PROCESSES[msg.recipient]) {
+          try { RUNNING_PROCESSES[msg.recipient].send({ type: 'new_message' }); } catch (e) { }
+        }
       });
     }
 
@@ -504,15 +514,47 @@ function startSystemLoops() {
   // D. Log File Watcher (Stream setu.log to GUI)
   const logFile = path.join(__dirname, 'setu.log');
   if (fs.existsSync(logFile)) {
-    let fileSize = fs.statSync(logFile).size;
-    fs.watchFile(logFile, { interval: 500 }, (curr, prev) => {
-      if (curr.size > prev.size) {
-        const stream = fs.createReadStream(logFile, { start: prev.size, end: curr.size });
-        stream.on('data', (chunk) => {
-          io.emit('log', chunk.toString());
+    let lastSize = fs.statSync(logFile).size;
+    let debounceTimer = null;
+
+    const checkUpdates = () => {
+      fs.stat(logFile, (err, stats) => {
+        if (err) return;
+        if (stats.size > lastSize) {
+          const stream = fs.createReadStream(logFile, { start: lastSize, end: stats.size - 1 });
+          stream.on('data', (chunk) => {
+            io.emit('log', chunk.toString());
+          });
+          lastSize = stats.size;
+        } else if (stats.size < lastSize) {
+          lastSize = stats.size;
+        }
+      });
+    };
+
+    const watchLog = () => {
+      try {
+        const watcher = fs.watch(logFile, (eventType) => {
+          if (eventType === 'rename') {
+            watcher.close();
+            if (fs.existsSync(logFile)) {
+              watchLog();
+              checkUpdates();
+            }
+          } else if (eventType === 'change') {
+            if (!debounceTimer) {
+              debounceTimer = setTimeout(() => {
+                debounceTimer = null;
+                checkUpdates();
+              }, 500);
+            }
+          }
         });
-      }
-    });
+        watcher.on('error', () => {});
+      } catch (e) {}
+    };
+
+    watchLog();
   }
 }
 
