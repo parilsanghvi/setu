@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { io } from 'socket.io-client';
+import { updateLogs } from '../utils/logUtils';
 
 // Initialize socket outside component to prevent multiple connections
 const socket = io({
@@ -28,32 +29,11 @@ export const useSocket = () => {
         }
 
         function onLog(msg) {
-            setLogs((prev) => {
-                if (prev.length >= MAX_LOGS) {
-                    return [...prev.slice(1), msg];
-                }
-                return [...prev, msg];
-            }); // Limit logs
+            setLogs((prev) => updateLogs(prev, msg, MAX_LOGS));
         }
 
         function onLogHistory(hist) {
-            setLogs((prev) => {
-                // If new items are more than MAX_LOGS, just take the last MAX_LOGS of them
-                if (hist.length >= MAX_LOGS) {
-                    return hist.slice(-MAX_LOGS);
-                }
-
-                // Calculate how many we can keep from prev
-                const keepCount = MAX_LOGS - hist.length;
-
-                // If prev has more than we can keep, slice it
-                if (prev.length > keepCount) {
-                    return [...prev.slice(-keepCount), ...hist];
-                }
-
-                // Otherwise just combine
-                return [...prev, ...hist];
-            });
+            setLogs((prev) => updateLogs(prev, hist, MAX_LOGS));
         }
 
         function onAgentsUpdate(data) {
@@ -68,34 +48,13 @@ export const useSocket = () => {
             // In a real app we might separate chat from logs, but for now
             // we treat chat messages as high-priority logs
             const logMsg = `[CHAT] ${msg.sender} -> ${msg.recipient}: ${msg.content}`;
-            setLogs((prev) => {
-                if (prev.length >= MAX_LOGS) {
-                    return [...prev.slice(1), logMsg];
-                }
-                return [...prev, logMsg];
-            });
+            setLogs((prev) => updateLogs(prev, logMsg, MAX_LOGS));
         }
 
         function onChatHistory(history) {
             // Convert structured history to log format
             const formatted = history.map(msg => `[CHAT] ${msg.sender} -> ${msg.recipient}: ${msg.content}`);
-            setLogs((prev) => {
-                // If new items are more than MAX_LOGS, just take the last MAX_LOGS of them
-                if (formatted.length >= MAX_LOGS) {
-                    return formatted.slice(-MAX_LOGS);
-                }
-
-                // Calculate how many we can keep from prev
-                const keepCount = MAX_LOGS - formatted.length;
-
-                // If prev has more than we can keep, slice it
-                if (prev.length > keepCount) {
-                    return [...prev.slice(-keepCount), ...formatted];
-                }
-
-                // Otherwise just combine
-                return [...prev, ...formatted];
-            });
+            setLogs((prev) => updateLogs(prev, formatted, MAX_LOGS));
         }
 
         socket.on('connect', onConnect);
