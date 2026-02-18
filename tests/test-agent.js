@@ -20,7 +20,7 @@ const mockBus = {
     },
 
     getUnread: function (recipient) {
-        // Return dummy messages if needed
+        // Return dummy messages if needed. For this unit test, we return empty to avoid processing loops.
         return [];
     },
 
