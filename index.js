@@ -530,12 +530,16 @@ function boot() {
   log('🧹 Purging legacy agent registry...');
   bus.db.prepare('DELETE FROM agents').run();
 
-  // 2. SEED SANSKRIT SWARM (The Core Four)
+  // 2. SEED SANSKRIT SWARM (The Core Swarm)
   const seedAgents = [
-    { name: 'Sutradhar', role: 'Sutradhar' }, // Managed via index.js directly, but useful in DB
+    { name: 'Sutradhar', role: 'Sutradhar' },
     { name: 'Tark', role: 'Tark' },
     { name: 'Shilpi', role: 'Shilpi' },
-    { name: 'Guru', role: 'Guru' }
+    { name: 'Guru', role: 'Guru' },
+    { name: 'Shishya', role: 'Shishya' },
+    { name: 'Koshpal', role: 'Koshpal' },
+    { name: 'Rakshak', role: 'Rakshak' },
+    { name: 'Vishwakarma', role: 'Vishwakarma' }
   ];
 
   seedAgents.forEach(a => {

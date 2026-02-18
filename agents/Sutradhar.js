@@ -5,72 +5,68 @@ const Protocol = require('../lib/SwarmProtocol');
 class Sutradhar extends CoreAgent {
     constructor(name, role) {
         super(name, role);
-        this.systemPrompt = `You are **Sutradhar**, the Brutal Project Manager of this AI swarm. 
-Your goal is to force the swarm (Tark, Shilpi, Guru) to deliver results. No fluff. No poetry. Just execution.
+        this.systemPrompt = `You are **Sutradhar**, the Orchestrator. 
+Your goal: Manage the swarm (Tark, Shilpi, Guru, Shishya, etc.) to complete the User's mission.
+
+**MISSION PROTOCOL:**
+1. **ADOPT:** On a new project, FIRST use \`read_file\` on the root. DO NOT assume folder structure. 
+2. **DOCUMENT:** Generate \`PROJECT.md\` describing the architecture, tech stack, and goals.
+3. **PLAN:** Break the mission into tasks and assign via \`assign_task\`.
+4. **GOAL-ORIENTED:** Once all tasks are DONE and the mission is achieved, use \`update_task_status\` with taskId: 'MISSION' and status: 'DONE' to signal completion.
 
 **SUB-AGENTS:**
-- Tark: Backend/Logic/Architecture.
-- Shilpi: Frontend/UI/Design.
-- Guru: Knowledge/Documentation/Skills.
-- Vishwakarma: Infrastructure/Docker.
+- Tark: Backend/Logic. | Shilpi: Frontend/UI. | Guru: Knowledge/Docs. | Vishwakarma: Infra/Docker. | Shishya: Junior/Assistant.
 
-**PROTOCOL:**
-- Assign tasks using the \`assign_task\` tool.
-- Be concise, professional, and slightly unhinged about deadlines.
-- If the user gives a mission, immediately formulate a plan and assign tasks to sub-agents.`;
+**RULES:**
+- Be concise. Professional. Results-only.
+- If the User sends a message, prioritize it. Change course if the User asks.`;
 
         // Tools specific to Sutradhar
         this.setTools([
             {
                 name: "assign_task",
-                description: "Assign a task to a sub-agent using the Swarm Protocol.",
+                description: "Assign a task to a sub-agent.",
                 parameters: {
                     type: "object",
                     properties: {
-                        agentName: { type: "string", description: "Name of the agent (Tark, Shilpi, Guru)" },
-                        instructions: { type: "string", description: "Detailed instructions for the task" }
+                        agentName: { type: "string" },
+                        instructions: { type: "string" }
                     },
                     required: ["agentName", "instructions"]
                 },
                 execute: async ({ agentName, instructions }, agent) => {
-                    // Send Protocol Message
-                    // We assume current context has a taskId or we generate one?
-                    // Let's use a generic taskId or one from meta if available
                     const taskId = `TASK-${Date.now().toString().slice(-6)}`;
-
                     console.log(`[Sutradhar] 📋 Assigning Task ${taskId} -> ${agentName}`);
-
-                    // Actually store task in DB first
                     bus.updateTask(taskId, 'TODO', {
                         title: instructions.substring(0, 50),
                         type: 'auto',
                         owner: agent.name,
                         assignee: agentName
                     });
-
-                    // Send Protocol Message via bus (using agent.speak helper, but specify type)
                     agent.speak(agentName, instructions, Protocol.TASK_ASSIGN, { taskId });
-
-                    return `Task ${taskId} assigned to ${agentName}. Status: PENDING execution.`;
+                    return `Task ${taskId} assigned to ${agentName}. Status: PENDING.`;
                 }
             },
             {
                 name: "update_task_status",
-                description: "Update the status of a project task.",
+                description: "Update task status. Use taskId: 'MISSION', status: 'DONE' to signal mission completion.",
                 parameters: {
                     type: "object",
                     properties: {
-                        taskId: { type: "string", description: "The task ID" },
-                        status: { type: "string", enum: ["TODO", "IN_PROGRESS", "DONE", "BLOCKED"], description: "New status" }
+                        taskId: { type: "string" },
+                        status: { type: "string", enum: ["TODO", "IN_PROGRESS", "DONE", "BLOCKED"] }
                     },
                     required: ["taskId", "status"]
                 },
-                execute: async ({ taskId, status }) => {
+                execute: async ({ taskId, status }, agent) => {
                     try {
+                        if (taskId === 'MISSION' && status === 'DONE') {
+                            agent.speak('ALL', '🚀 MISSION COMPLETE. System entering Standby mode.', 'event', { type: 'MISSION_COMPLETE' });
+                        }
                         bus.updateTask(taskId, status);
                         return `Task ${taskId} updated to ${status}.`;
                     } catch (e) {
-                        return `Error updating task: ${e.message}`;
+                        return `Error: ${e.message}`;
                     }
                 }
             }
