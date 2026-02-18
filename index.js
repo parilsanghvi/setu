@@ -198,7 +198,7 @@ app.get('/api/sessions', (req, res) => {
 });
 
 // API: Get Session Content
-app.get('/api/sessions/:filename', (req, res) => {
+app.get('/api/sessions/:filename', async (req, res) => {
   const { filename } = req.params;
   const filePath = path.join(__dirname, 'logs/sessions', filename);
 
@@ -207,15 +207,16 @@ app.get('/api/sessions/:filename', (req, res) => {
     return res.status(403).json({ error: 'Access denied' });
   }
 
-  if (!fs.existsSync(filePath)) return res.status(404).json({ error: 'Session not found' });
-
   try {
-    const content = fs.readFileSync(filePath, 'utf8');
+    const content = await fs.promises.readFile(filePath, 'utf8');
     const lines = content.trim().split('\n').map(l => {
       try { return JSON.parse(l); } catch (e) { return null; }
     }).filter(x => x);
     res.json(lines);
   } catch (e) {
+    if (e.code === 'ENOENT') {
+      return res.status(404).json({ error: 'Session not found' });
+    }
     res.status(500).json({ error: e.message });
   }
 });
