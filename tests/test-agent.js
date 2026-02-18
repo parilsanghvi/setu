@@ -8,60 +8,65 @@ console.log('🧪 Testing lib/Agent.js...');
 // Mock Bus
 const mockBus = {
     sentMessages: [],
+    heartbeats: [],
+    readMarkers: [],
+
     send: function (sender, recipient, content, type) {
         this.sentMessages.push({ sender, recipient, content, type });
     },
-    // We need to swap the real bus with this mock for the Agent.
-    // However, Agent requires '../lib/db' internally.
-    // For this simple test, we can check basic property initialization
-    // and maybe mock the 'speak' method's dependency if we could inject it.
-    // Since we can't easily inject without rewriting Agent, 
-    // we will test the parts that don't depend on the DB *live connection* 
-    // OR we accept that it writes to the real DB (integration test style).
-    // Given the previous test-db.js works, integration style is fine.
+
+    heartbeat: function (name, role, pid, status) {
+        this.heartbeats.push({ name, role, pid, status });
+    },
+
+    getUnread: function (recipient) {
+        // Return dummy messages if needed
+        return [];
+    },
+
+    markRead: function (ids) {
+        this.readMarkers.push(...ids);
+    }
 };
 
 try {
     // 1. Initialization
     const agentName = 'TestUnitAgent';
     const agentRole = 'Tester';
-    const agent = new Agent(agentName, agentRole, path.join(__dirname, 'tmp-scope'));
+    const agentScope = path.join(__dirname, 'tmp-scope');
+
+    // Inject mockBus
+    const agent = new Agent(agentName, agentRole, agentScope, mockBus);
 
     assert.strictEqual(agent.name, agentName);
     assert.strictEqual(agent.role, agentRole);
-    assert.strictEqual(agent.scope, path.join(__dirname, 'tmp-scope'));
+    assert.strictEqual(agent.scope, agentScope);
+    assert.strictEqual(agent.bus, mockBus);
 
     // 2. Boot (Ensure folder creation)
     if (fs.existsSync(agent.scope)) fs.rmdirSync(agent.scope);
 
-    // We mock the boot's heartbeat to avoid noise/errors if DB isn't perfect
-    // But actually Agent.js imports bus directly. 
-    // Let's just check if `boot` calls `initializeScope` which creates the dir.
-
-    // Hack: Overwrite the bus call in boot if possible, or just catch error?
-    // Agent.js:
-    // boot() {
-    //   this.initializeScope();
-    //   ...
-    //   bus.heartbeat(...)
-    // }
-
-    // We can try running it. If DB is live (which it is), it should be fine.
-
-    // Mock setInterval to avoid hanging
+    // Mock setInterval to prevent hanging
     const originalSetInterval = global.setInterval;
-    global.setInterval = (fn, ms) => { return { unref: () => { } }; }; // No-op
+    // We store the callback to manually trigger if needed, or just ignore.
+    global.setInterval = (fn, ms) => {
+        return { unref: () => { } };
+    };
 
     agent.boot();
 
-    assert.strictEqual(agent.status, 'IDLE');
+    // Verify Heartbeat called on boot
+    const initialHeartbeat = mockBus.heartbeats.find(h => h.status === 'IDLE');
+    assert.ok(initialHeartbeat, 'Initial IDLE heartbeat should be sent');
+    assert.strictEqual(initialHeartbeat.name, agentName);
 
-    // Access internal log
-    // Agent doesn't expose log array, but writes to console. 
-    // We assume if no crash, it works.
+    // Check status
+    assert.strictEqual(agent.status, 'IDLE');
 
     // Restore
     global.setInterval = originalSetInterval;
+
+    // Cleanup
     if (fs.existsSync(agent.scope)) fs.rmdirSync(agent.scope);
 
     console.log('✅ lib/Agent.js Tests Passed!');
