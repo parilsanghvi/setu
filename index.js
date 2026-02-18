@@ -22,7 +22,7 @@ if (process.env.ALLOWED_ORIGINS) {
 }
 
 // 👑 SUTRADHAR: The Orchestrator (formerly Narad)
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 const app = express();
 const server = http.createServer(app);
 
@@ -493,6 +493,15 @@ function startSystemLoops() {
 
         io.emit('chat_message', msg);
         lastMessageId = msg.id;
+
+        // ⚡ OPTIMIZATION: Push Notification via IPC (Avoid N+1 Polling)
+        if (msg.recipient === 'ALL') {
+          Object.values(RUNNING_PROCESSES).forEach(proc => {
+            try { proc.send({ type: 'new_message' }); } catch (e) { }
+          });
+        } else if (RUNNING_PROCESSES[msg.recipient]) {
+          try { RUNNING_PROCESSES[msg.recipient].send({ type: 'new_message' }); } catch (e) { }
+        }
       });
     }
 
