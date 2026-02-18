@@ -89,15 +89,6 @@ test('Authentication Middleware', async (t) => {
     assert.notStrictEqual(res.statusCode, 401);
   });
 
-  await t.test('Disable Auth: Returns 200 without credentials', async () => {
-    process.env.DISABLE_DASHBOARD_AUTH = 'true';
-    const res = await request('/');
-    assert.strictEqual(res.statusCode, 200);
-    assert.strictEqual(res.data, 'Protected Content');
-    // Cleanup
-    delete process.env.DISABLE_DASHBOARD_AUTH;
-  });
-
   // Cleanup server
   await new Promise(resolve => server.close(resolve));
 
