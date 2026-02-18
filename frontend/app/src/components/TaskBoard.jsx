@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import Modal from './Modal';
 import ScreenshotGallery from './ScreenshotGallery';
 import styles from './TaskBoard.module.scss';
@@ -29,11 +29,28 @@ const TaskBoard = ({ tasks }) => {
         }
     };
 
-    const cols = { TODO: [], IN_PROGRESS: [], DONE: [] };
-    tasks.forEach(t => {
-        const status = t.status === 'TODO' || t.status === 'PROPOSED' ? 'TODO' : t.status;
-        if (cols[status]) cols[status].push(t);
-    });
+    const cols = useMemo(() => {
+        const columns = { TODO: [], IN_PROGRESS: [], DONE: [] };
+        tasks.forEach(t => {
+            const status = t.status === 'TODO' || t.status === 'PROPOSED' ? 'TODO' : t.status;
+
+            let displayTitle = t.title;
+            if (!displayTitle) {
+                try {
+                    const spec = JSON.parse(t.spec || '{}');
+                    displayTitle = spec.task;
+                } catch (e) {
+                    // Fallback to undefined or handle error if needed
+                    console.error('Failed to parse task spec:', e);
+                }
+            }
+
+            if (columns[status]) {
+                columns[status].push({ ...t, displayTitle });
+            }
+        });
+        return columns;
+    }, [tasks]);
 
     return (
         <div className={styles.container}>
@@ -82,7 +99,7 @@ const TaskBoard = ({ tasks }) => {
                                     className={styles.taskCard}
                                 >
                                     <div className={styles.taskId}>{t.id}</div>
-                                    <div className={styles.taskTitle}>{t.title || JSON.parse(t.spec || '{}').task}</div>
+                                    <div className={styles.taskTitle}>{t.displayTitle}</div>
                                     <div className={styles.taskFooter}>
                                         <span>{t.owner || 'Unassigned'}</span>
                                         <span className={styles.viewLink}>View 📸</span>
