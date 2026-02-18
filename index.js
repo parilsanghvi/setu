@@ -456,7 +456,7 @@ function startSystemLoops() {
     const now = Date.now();
     // Throttle to every 2 seconds unless a critical event happened
     if (resurrectionOccurred || (now - lastAgentBroadcast > 2000)) {
-      const currentAgents = bus.db.prepare('SELECT * FROM agents ORDER BY name').all();
+      const currentAgents = bus.getAgents();
       const currentAgentsJson = JSON.stringify(currentAgents);
       if (currentAgentsJson !== lastAgentsJson) {
         io.emit('agents_update', currentAgents);
@@ -466,15 +466,15 @@ function startSystemLoops() {
     }
 
     // B. Tasks Broadcast (only if changed)
-    const taskMeta = bus.db.prepare('SELECT MAX(updated_at) as t, COUNT(*) as c FROM tasks').get();
+    const taskMeta = bus.getTaskMeta();
     if (!taskMeta || taskMeta.t !== lastTasksState.t || taskMeta.c !== lastTasksState.c) {
-      const currentTasks = bus.db.prepare('SELECT * FROM tasks').all();
+      const currentTasks = bus.getTasks();
       io.emit('tasks_update', currentTasks);
       lastTasksState = taskMeta || { t: 0, c: 0 };
     }
 
     // C. Message Polling (The Pulse)
-    const newMessages = bus.db.prepare('SELECT * FROM messages WHERE id > ? ORDER BY id ASC').all(lastMessageId);
+    const newMessages = bus.getNewMessages(lastMessageId);
 
     if (newMessages.length > 0) {
       newMessages.forEach(msg => {
