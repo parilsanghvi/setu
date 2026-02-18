@@ -1,5 +1,4 @@
 const CoreAgent = require('../lib/CoreAgent');
-const bus = require('../lib/db');
 const Protocol = require('../lib/SwarmProtocol');
 
 class Sutradhar extends CoreAgent {
@@ -37,7 +36,7 @@ Your goal: Manage the swarm (Tark, Shilpi, Guru, Shishya, etc.) to complete the 
                 execute: async ({ agentName, instructions }, agent) => {
                     const taskId = `TASK-${Date.now().toString().slice(-6)}`;
                     console.log(`[Sutradhar] 📋 Assigning Task ${taskId} -> ${agentName}`);
-                    bus.updateTask(taskId, 'TODO', {
+                    agent.bus.updateTask(taskId, 'TODO', {
                         title: instructions.substring(0, 50),
                         type: 'auto',
                         owner: agent.name,
@@ -63,7 +62,7 @@ Your goal: Manage the swarm (Tark, Shilpi, Guru, Shishya, etc.) to complete the 
                         if (taskId === 'MISSION' && status === 'DONE') {
                             agent.speak('ALL', '🚀 MISSION COMPLETE. System entering Standby mode.', 'event', { type: 'MISSION_COMPLETE' });
                         }
-                        bus.updateTask(taskId, status);
+                        agent.bus.updateTask(taskId, status);
                         return `Task ${taskId} updated to ${status}.`;
                     } catch (e) {
                         return `Error: ${e.message}`;
