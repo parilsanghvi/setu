@@ -360,12 +360,37 @@ io.on('connection', (socket) => {
 
   // Send recent logs from setu.log if exists
   const logFile = path.join(__dirname, 'setu.log');
-  if (fs.existsSync(logFile)) {
+  // Optimization: Async Tail Read to prevent blocking Event Loop
+  (async () => {
     try {
-      const logs = fs.readFileSync(logFile, 'utf8').split('\n').filter(l => l.trim()).slice(-50);
-      socket.emit('log_history', logs);
-    } catch (e) { }
-  }
+      const stats = await fs.promises.stat(logFile).catch(() => null);
+      if (!stats) return;
+
+      const bufferSize = 16 * 1024; // 16KB
+      const start = Math.max(0, stats.size - bufferSize);
+      const length = stats.size - start;
+
+      if (length <= 0) return;
+
+      const fileHandle = await fs.promises.open(logFile, 'r');
+      try {
+        const buffer = Buffer.alloc(length);
+        await fileHandle.read(buffer, 0, length, start);
+        const content = buffer.toString('utf8');
+
+        let lines = content.split('\n');
+        // Drop potential partial line at start if we are reading tail
+        if (start > 0) lines.shift();
+
+        const logs = lines.filter(l => l.trim()).slice(-50);
+        socket.emit('log_history', logs);
+      } finally {
+        await fileHandle.close();
+      }
+    } catch (e) {
+      // Ignore errors
+    }
+  })();
 
   // Send Chat History (STRUCTURED)
   try {
