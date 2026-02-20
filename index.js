@@ -280,12 +280,14 @@ function spawnAgent(name, role) {
     env: { ...process.env, LOG_LEVEL: LOG_LEVEL }
   });
 
+  const agentLogRegex = new RegExp(`^\\[${name}\\]\\s*`);
+
   // Pipe Agent Logs to Main Console & Dashboard
   child.stdout.on('data', (data) => {
     const lines = data.toString().split('\n').filter(l => l.trim());
     lines.forEach(l => {
       // Hide internal agent logging if it already contains the agent name to avoid double prefix
-      const cleanLine = l.replace(new RegExp(`^\\[${name}\\]\\s*`), '');
+      const cleanLine = l.replace(agentLogRegex, '');
       log(`[${name}] ${cleanLine}`);
     });
   });
@@ -293,7 +295,7 @@ function spawnAgent(name, role) {
   child.stderr.on('data', (data) => {
     const lines = data.toString().split('\n').filter(l => l.trim());
     lines.forEach(l => {
-      const cleanLine = l.replace(new RegExp(`^\\[${name}\\]\\s*`), '');
+      const cleanLine = l.replace(agentLogRegex, '');
       log(`[${name}] ❌ ${cleanLine}`, 'error');
     });
   });
