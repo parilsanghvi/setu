@@ -158,6 +158,11 @@ app.post('/api/agents/:name/interrupt', (req, res) => {
   const process = RUNNING_PROCESSES[name];
   if (!process) return res.status(404).json({ error: `Agent ${name} not running` });
 
+  // Security: Ensure process is valid (prevent prototype pollution crash)
+  if (typeof process.send !== 'function') {
+    return res.status(500).json({ error: `Invalid process state for ${name}` });
+  }
+
   log(`🛑 Sending STOP signal to ${name}...`);
   process.send({ type: 'control', command: 'STOP' });
   res.json({ status: 'sent', signal: 'STOP' });
@@ -171,6 +176,11 @@ app.post('/api/agents/:name/redirect', (req, res) => {
 
   const process = RUNNING_PROCESSES[name];
   if (!process) return res.status(404).json({ error: `Agent ${name} not running` });
+
+  // Security: Ensure process is valid (prevent prototype pollution crash)
+  if (typeof process.send !== 'function') {
+    return res.status(500).json({ error: `Invalid process state for ${name}` });
+  }
 
   log(`🔀 Sending REDIRECT signal to ${name}...`);
   process.send({ type: 'control', command: 'REDIRECT', payload: prompt });
@@ -237,8 +247,8 @@ const AGENT_MAP = {
   'Shishya': './agents/Shishya.js'
 };
 
-const RUNNING_PROCESSES = {}; // { "Tark": <ChildProcess> }
-const SPAWN_TIMES = {}; // { "Tark": <Timestamp> }
+const RUNNING_PROCESSES = Object.create(null); // { "Tark": <ChildProcess> }
+const SPAWN_TIMES = Object.create(null); // { "Tark": <Timestamp> }
 const LOG_LEVEL = process.env.LOG_LEVEL || 'info';
 let lastMessageId = 0;
 
@@ -267,7 +277,7 @@ function debug(msg) {
 // 1. Spawn an Agent
 function spawnAgent(name, role) {
   const scriptPath = AGENT_MAP[role];
-  if (!scriptPath) {
+  if (!scriptPath || typeof scriptPath !== 'string') {
     log(`❌ Unknown Role: ${role} for Agent: ${name}`);
     return;
   }
