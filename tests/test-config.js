@@ -83,6 +83,19 @@ test('Config: Unknown provider fallback', (t) => {
     assert.ok(warnings.some(w => w.includes("Unknown LLM_PROVIDER 'unknown-provider'")));
 });
 
+test('Config: Custom provider', (t) => {
+    clearEnv();
+    process.env.LLM_PROVIDER = 'custom';
+
+    Config.validate();
+
+    assert.strictEqual(Config.provider, 'custom');
+
+    // Ensure no warning about unknown provider was logged
+    const unknownProviderWarnings = warnings.filter(w => w.includes("Unknown LLM_PROVIDER"));
+    assert.strictEqual(unknownProviderWarnings.length, 0, `Expected 0 unknown provider warnings, got ${unknownProviderWarnings.length}: ${JSON.stringify(unknownProviderWarnings)}`);
+});
+
 test('Config: Dual model configuration - explicitly set', (t) => {
     clearEnv();
     process.env.LLM_PROVIDER = 'openai';
