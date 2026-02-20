@@ -190,6 +190,40 @@ test('Camera: close() cleans up', async (t) => {
     assert.ok(mocks.calls.find(c => c.method === 'browser.close'), 'Should call browser.close()');
 });
 
+test('Camera: snap() prevents path traversal', async (t) => {
+    mocks.calls = [];
+    if (!Camera.browser) await Camera.init();
+
+    const taskId = 'test-task';
+    const url = 'http://example.com';
+    const stepName = 'test-step';
+    const maliciousFile = 'subdir/../../etc/passwd';
+
+    const result = await Camera.snap(taskId, url, stepName, maliciousFile);
+
+    assert.ok(result);
+    // Path should NOT contain ".."
+    // It should be /screenshots/test-task/etc/passwd/test-step-...
+    // The traversal attempts to go up two levels from 'subdir', so it lands at 'etc/passwd' relative to task root.
+
+    // Check mkdir calls
+    const mkdirCalls = mocks.calls.filter(c => c.method === 'mkdirSync');
+
+    const expectedDirPart = path.join(taskId, 'etc', 'passwd');
+    const unsafePart = path.join('..', 'etc', 'passwd');
+
+    // Assert that NO mkdir call contains traversal
+    const hasTraversal = mkdirCalls.some(c => c.args[0].includes(unsafePart));
+    assert.strictEqual(hasTraversal, false, 'Should not attempt to create directory outside of task dir');
+
+    // Assert that the created directory is safe
+    const safeCall = mkdirCalls.find(c => c.args[0].includes(expectedDirPart));
+    assert.ok(safeCall, 'Should create safe directory path');
+
+    // Assert result path is safe
+    assert.strictEqual(result.includes('..'), false, 'Result path should not contain ..');
+});
+
 // Cleanup
 test('Cleanup Mocks', () => {
     Module.prototype.require = originalRequire;
