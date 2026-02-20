@@ -11,7 +11,7 @@ const mockBus = {
         // console.log(`[MockDB] Heartbeat: ${name} -> ${status}`);
     },
     getUnread: () => [],
-    markRead: () => {},
+    markRead: () => { },
     send: (sender, recipient, content) => {
         // console.log(`[MockDB] Send: ${sender} -> ${recipient}: ${content}`);
     },
@@ -22,11 +22,11 @@ const mockLLM = {
         // Default implementation, will be overridden in test
         return "Mock Response";
     },
-    registerProvider: () => {},
-    getProvider: () => {},
+    registerProvider: () => { },
+    getProvider: () => { },
 };
 
-class MockZodType {}
+class MockZodType { }
 
 Module.prototype.require = function (id) {
     // Mock DB
@@ -37,16 +37,20 @@ Module.prototype.require = function (id) {
     if (id.endsWith('/lib/LLM') || id === './LLM' || id.endsWith('/lib/LLM.js')) {
         return mockLLM;
     }
+    // Mock Config
+    if (id.endsWith('/lib/Config') || id === './Config' || id.endsWith('/lib/Config.js')) {
+        return { contextCompactionThreshold: 200000 };
+    }
     // Mock SkillLoader
-    if (id.endsWith('/lib/SkillLoader') || id === './SkillLoader') {
+    if (id.endsWith('/lib/SkillLoader') || id === './SkillLoader' || id.endsWith('/lib/SkillLoader.js')) {
         return { load: () => new Map() };
     }
     // Mock Zod (minimal implementation)
     if (id === 'zod') {
         return {
             z: {
-                object: () => ({ parse: () => {} }),
-                string: () => ({ min: () => ({ max: () => {} }) }), // Add string for drishti-v2 if needed
+                object: () => ({ parse: () => { } }),
+                string: () => ({ min: () => ({ max: () => { } }) }), // Add string for drishti-v2 if needed
                 ZodType: MockZodType
             }
         };
@@ -74,7 +78,7 @@ class TestAgent extends CoreAgent {
     // Override executeTool to avoid filesystem reads/writes if not needed
     async executeTool(toolCall) {
         if (toolCall.name === 'echo') {
-             return `ECHO: ${toolCall.args.msg}`;
+            return `ECHO: ${toolCall.args.msg}`;
         }
         return super.executeTool(toolCall);
     }

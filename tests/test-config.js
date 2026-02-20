@@ -56,6 +56,7 @@ test('Config: Default values', (t) => {
     assert.strictEqual(Config.logLevel, 'info');
     assert.strictEqual(Config.expensiveModelProvider, 'openai');
     assert.strictEqual(Config.cheapModelProvider, 'openai');
+    assert.strictEqual(Config.contextCompactionThreshold, 200000);
 });
 
 test('Config: Environment variables', (t) => {
@@ -64,6 +65,7 @@ test('Config: Environment variables', (t) => {
     process.env.ANTHROPIC_API_KEY = 'sk-ant-123';
     process.env.LOG_LEVEL = 'debug';
     process.env.DOCKER_PATH = '/usr/local/bin/docker';
+    process.env.CONTEXT_COMPACTION_THRESHOLD = '150000';
 
     Config.validate();
 
@@ -71,6 +73,7 @@ test('Config: Environment variables', (t) => {
     assert.strictEqual(Config.anthropicApiKey, 'sk-ant-123');
     assert.strictEqual(Config.logLevel, 'debug');
     assert.strictEqual(Config.dockerPath, '/usr/local/bin/docker');
+    assert.strictEqual(Config.contextCompactionThreshold, 150000);
 });
 
 test('Config: Unknown provider fallback', (t) => {
