@@ -10,6 +10,10 @@ const readline = require('readline');
 const fs = require('fs');
 const authMiddleware = require('./lib/middleware/auth');
 
+// High-performance write stream for logging (Initialized early to avoid TDZ)
+const logStream = fs.createWriteStream(path.join(__dirname, 'setu.log'), { flags: 'a' });
+logStream.on('error', (err) => console.error('LOG STREAM ERROR:', err));
+
 const ALLOWED_ORIGINS = [
   "http://localhost:3000",
   "http://127.0.0.1:3000",
@@ -260,9 +264,7 @@ function log(msg, level = 'info') {
   const logMsg = `[SUTRADHAR] ${msg}`;
 
   // Write to setu.log (primary log destination)
-  try {
-    fs.appendFileSync(path.join(__dirname, 'setu.log'), logMsg + '\n');
-  } catch (e) { }
+  logStream.write(logMsg + '\n');
 
   // Broadcast to dashboard via socket
   io.emit('log', logMsg);
@@ -625,7 +627,9 @@ function shutdown() {
 
   server.close(() => {
     log('🌍 HTTP Server closed.');
-    process.exit(0);
+    logStream.end(() => {
+      process.exit(0);
+    });
   });
 
   // Force exit if hanging
