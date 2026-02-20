@@ -156,7 +156,11 @@ app.post('/api/chat', (req, res) => {
 app.post('/api/agents/:name/interrupt', (req, res) => {
   const { name } = req.params;
   const process = RUNNING_PROCESSES[name];
-  if (!process) return res.status(404).json({ error: `Agent ${name} not running` });
+
+  // Security: Check for prototype pollution or invalid process object
+  if (!process || typeof process.send !== 'function') {
+    return res.status(404).json({ error: `Agent ${name} not running` });
+  }
 
   log(`🛑 Sending STOP signal to ${name}...`);
   process.send({ type: 'control', command: 'STOP' });
@@ -170,7 +174,11 @@ app.post('/api/agents/:name/redirect', (req, res) => {
   if (!prompt) return res.status(400).json({ error: 'Prompt required for redirect' });
 
   const process = RUNNING_PROCESSES[name];
-  if (!process) return res.status(404).json({ error: `Agent ${name} not running` });
+
+  // Security: Check for prototype pollution or invalid process object
+  if (!process || typeof process.send !== 'function') {
+    return res.status(404).json({ error: `Agent ${name} not running` });
+  }
 
   log(`🔀 Sending REDIRECT signal to ${name}...`);
   process.send({ type: 'control', command: 'REDIRECT', payload: prompt });
@@ -237,7 +245,8 @@ const AGENT_MAP = {
   'Shishya': './agents/Shishya.js'
 };
 
-const RUNNING_PROCESSES = {}; // { "Tark": <ChildProcess> }
+// Security: Use null-prototype object to prevent prototype pollution
+const RUNNING_PROCESSES = Object.create(null); // { "Tark": <ChildProcess> }
 const SPAWN_TIMES = {}; // { "Tark": <Timestamp> }
 const LOG_LEVEL = process.env.LOG_LEVEL || 'info';
 let lastMessageId = 0;
