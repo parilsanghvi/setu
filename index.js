@@ -8,6 +8,7 @@ const helmet = require('helmet');
 const bus = require('./lib/db');
 const readline = require('readline');
 const fs = require('fs');
+const { readLastLines } = require('./lib/utils');
 const authMiddleware = require('./lib/middleware/auth');
 
 const ALLOWED_ORIGINS = [
@@ -361,12 +362,12 @@ io.on('connection', (socket) => {
 
   // Send recent logs from setu.log if exists
   const logFile = path.join(__dirname, 'setu.log');
-  if (fs.existsSync(logFile)) {
-    try {
-      const logs = fs.readFileSync(logFile, 'utf8').split('\n').filter(l => l.trim()).slice(-50);
-      socket.emit('log_history', logs);
-    } catch (e) { }
-  }
+  readLastLines(logFile, 50)
+    .then((lines) => {
+      const logs = lines.filter((l) => l.trim());
+      if (logs.length > 0) socket.emit('log_history', logs);
+    })
+    .catch(() => {});
 
   // Send Chat History (STRUCTURED)
   try {
