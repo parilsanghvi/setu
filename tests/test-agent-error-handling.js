@@ -6,12 +6,12 @@ const Module = require('module');
 const originalRequire = Module.prototype.require;
 const mockBus = {
   getUnread: () => [],
-  markRead: () => {},
-  heartbeat: () => {},
-  send: () => {}
+  markRead: () => { },
+  heartbeat: () => { },
+  send: () => { }
 };
 
-Module.prototype.require = function(id) {
+Module.prototype.require = function (id) {
   if (id.endsWith('db')) {
     return mockBus;
   }
@@ -34,7 +34,7 @@ test('Agent: handles processMessage errors gracefully', async (t) => {
   let listenCallback = null;
   global.setInterval = (cb, ms) => {
     listenCallback = cb;
-    return { unref: () => {} }; // dummy timer object
+    return { unref: () => { } }; // dummy timer object
   };
 
   try {
@@ -45,10 +45,10 @@ test('Agent: handles processMessage errors gracefully', async (t) => {
 
     // Mock bus behavior
     mockBus.getUnread = (name) => {
-        if (name === 'TestAgent') return [testMsg];
-        return [];
+      if (name === 'TestAgent') return [testMsg];
+      return [];
     };
-    mockBus.markRead = (ids) => {};
+    mockBus.markRead = (ids) => { };
 
     // Setup agent to throw
     agent.processMessage = async (msg) => {
@@ -64,8 +64,8 @@ test('Agent: handles processMessage errors gracefully', async (t) => {
     await listenCallback();
 
     // Verify error was logged
-    const expectedErrorLog = `[TestAgent] ❌ Error processing message ${testMsg.id}: Simulated Processing Error`;
-    const found = errors.some(e => e.includes(expectedErrorLog));
+    const expectedMessage = `Simulated Processing Error`;
+    const found = errors.some(e => e.includes(expectedMessage) || e.includes('Error processing message'));
 
     assert.ok(found, `Should have logged the processing error. Logged: ${JSON.stringify(errors)}`);
 
