@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { useSocket } from './hooks/useSocket';
 import AgentCard from './components/AgentCard';
 import TaskBoard from './components/TaskBoard';
@@ -8,7 +8,7 @@ import styles from './App.module.scss';
 import './index.scss';
 
 const App = () => {
-  const { agents, tasks, logs, isConnected } = useSocket();
+  const { agents, tasks, logs } = useSocket();
 
   const activeAgentsCount = agents.filter(a => a.status !== 'OFFLINE').length;
 
