@@ -10,6 +10,12 @@ const readline = require('readline');
 const fs = require('fs');
 const authMiddleware = require('./lib/middleware/auth');
 
+// ⚡ PERFORMANCE: Use a stream for logging to avoid blocking the event loop with synchronous FS operations
+const logStream = fs.createWriteStream(path.join(__dirname, 'setu.log'), { flags: 'a' });
+logStream.on('error', (err) => {
+  console.error('[SUTRADHAR] ❌ FATAL LOGGING ERROR:', err);
+});
+
 const ALLOWED_ORIGINS = [
   "http://localhost:3000",
   "http://127.0.0.1:3000",
@@ -250,9 +256,10 @@ function log(msg, level = 'info') {
   const logMsg = `[SUTRADHAR] ${msg}`;
 
   // Write to setu.log (primary log destination)
-  try {
-    fs.appendFileSync(path.join(__dirname, 'setu.log'), logMsg + '\n');
-  } catch (e) { }
+  // ⚡ OPTIMIZATION: Use async stream write instead of blocking appendFileSync
+  if (logStream.writable) {
+    logStream.write(logMsg + '\n');
+  }
 
   // Broadcast to dashboard via socket
   io.emit('log', logMsg);
@@ -561,9 +568,9 @@ function startSystemLoops() {
 // 3. Boot
 function boot() {
   // Clear stale logs for fresh start
-  try {
-    fs.appendFileSync(path.join(__dirname, 'setu.log'), `\n[SUTRADHAR] Mission Control Booting at ${new Date().toISOString()}\n`);
-  } catch (e) { }
+  if (logStream.writable) {
+    logStream.write(`\n[SUTRADHAR] Mission Control Booting at ${new Date().toISOString()}\n`);
+  }
 
   log('Starting System Kernel...');
   debug(`Environment LOG_LEVEL: ${LOG_LEVEL}`);
