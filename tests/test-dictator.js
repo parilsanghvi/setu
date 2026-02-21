@@ -1,6 +1,16 @@
 const bus = require('../lib/db');
 const contractor = require('../lib/Contractor');
 const BackendLead = require('../agents/Tark');
+const LLM = require('../lib/LLM');
+
+// Mock LLM to return a veto 
+LLM.generate = async (system, messages) => {
+    const prompt = Array.isArray(messages) ? messages[messages.length - 1].content : messages;
+    if (prompt && prompt.includes('console.log')) {
+        return "I veto this because of console.log";
+    }
+    return "Approved";
+};
 
 async function testDictator() {
     console.log('--- 🔨 Testing The Dictator Model ---');

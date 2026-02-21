@@ -8,7 +8,12 @@ const helmet = require('helmet');
 const bus = require('./lib/db');
 const readline = require('readline');
 const fs = require('fs');
+const { readLastLines } = require('./lib/utils');
 const authMiddleware = require('./lib/middleware/auth');
+
+// High-performance write stream for logging (Initialized early to avoid TDZ)
+const logStream = fs.createWriteStream(path.join(__dirname, 'setu.log'), { flags: 'a' });
+logStream.on('error', (err) => console.error('LOG STREAM ERROR:', err));
 
 const ALLOWED_ORIGINS = [
   "http://localhost:3000",
@@ -148,6 +153,11 @@ app.post('/api/chat', (req, res) => {
   const { agent, message } = req.body;
   if (!agent || !message) return res.status(400).json({ error: 'Agent and Message required' });
 
+  // Security: Input Length Validation
+  if (message.length > MAX_MESSAGE_LENGTH) {
+    return res.status(400).json({ error: `Message too long (max ${MAX_MESSAGE_LENGTH} chars)` });
+  }
+
   bus.send('User', agent, message, 'chat', { via: 'gui' });
   res.json({ status: 'sent', to: agent });
 });
@@ -157,6 +167,11 @@ app.post('/api/agents/:name/interrupt', (req, res) => {
   const { name } = req.params;
   const process = RUNNING_PROCESSES[name];
   if (!process) return res.status(404).json({ error: `Agent ${name} not running` });
+
+  // Security: Ensure process is valid (prevent prototype pollution crash)
+  if (typeof process.send !== 'function') {
+    return res.status(500).json({ error: `Invalid process state for ${name}` });
+  }
 
   log(`🛑 Sending STOP signal to ${name}...`);
   process.send({ type: 'control', command: 'STOP' });
@@ -169,8 +184,17 @@ app.post('/api/agents/:name/redirect', (req, res) => {
   const { prompt } = req.body;
   if (!prompt) return res.status(400).json({ error: 'Prompt required for redirect' });
 
+  if (prompt.length > MAX_PROMPT_LENGTH) {
+    return res.status(400).json({ error: `Prompt too long (max ${MAX_PROMPT_LENGTH} chars)` });
+  }
+
   const process = RUNNING_PROCESSES[name];
   if (!process) return res.status(404).json({ error: `Agent ${name} not running` });
+
+  // Security: Ensure process is valid (prevent prototype pollution crash)
+  if (typeof process.send !== 'function') {
+    return res.status(500).json({ error: `Invalid process state for ${name}` });
+  }
 
   log(`🔀 Sending REDIRECT signal to ${name}...`);
   process.send({ type: 'control', command: 'REDIRECT', payload: prompt });
@@ -237,10 +261,14 @@ const AGENT_MAP = {
   'Shishya': './agents/Shishya.js'
 };
 
-const RUNNING_PROCESSES = {}; // { "Tark": <ChildProcess> }
-const SPAWN_TIMES = {}; // { "Tark": <Timestamp> }
+const RUNNING_PROCESSES = Object.create(null); // { "Tark": <ChildProcess> }
+const SPAWN_TIMES = Object.create(null); // { "Tark": <Timestamp> }
 const LOG_LEVEL = process.env.LOG_LEVEL || 'info';
 let lastMessageId = 0;
+
+// Security: Input Validation Limits
+const MAX_MESSAGE_LENGTH = 10000; // 10KB
+const MAX_PROMPT_LENGTH = 20000; // 20KB
 
 // Broadcast logs to connected clients & write to file
 function log(msg, level = 'info') {
@@ -250,9 +278,7 @@ function log(msg, level = 'info') {
   const logMsg = `[SUTRADHAR] ${msg}`;
 
   // Write to setu.log (primary log destination)
-  try {
-    fs.appendFileSync(path.join(__dirname, 'setu.log'), logMsg + '\n');
-  } catch (e) { }
+  logStream.write(logMsg + '\n');
 
   // Broadcast to dashboard via socket
   io.emit('log', logMsg);
@@ -267,7 +293,7 @@ function debug(msg) {
 // 1. Spawn an Agent
 function spawnAgent(name, role) {
   const scriptPath = AGENT_MAP[role];
-  if (!scriptPath) {
+  if (!scriptPath || typeof scriptPath !== 'string') {
     log(`❌ Unknown Role: ${role} for Agent: ${name}`);
     return;
   }
@@ -280,12 +306,14 @@ function spawnAgent(name, role) {
     env: { ...process.env, LOG_LEVEL: LOG_LEVEL }
   });
 
+  const agentLogRegex = new RegExp(`^\\[${name}\\]\\s*`);
+
   // Pipe Agent Logs to Main Console & Dashboard
   child.stdout.on('data', (data) => {
     const lines = data.toString().split('\n').filter(l => l.trim());
     lines.forEach(l => {
       // Hide internal agent logging if it already contains the agent name to avoid double prefix
-      const cleanLine = l.replace(new RegExp(`^\\[${name}\\]\\s*`), '');
+      const cleanLine = l.replace(agentLogRegex, '');
       log(`[${name}] ${cleanLine}`);
     });
   });
@@ -293,7 +321,7 @@ function spawnAgent(name, role) {
   child.stderr.on('data', (data) => {
     const lines = data.toString().split('\n').filter(l => l.trim());
     lines.forEach(l => {
-      const cleanLine = l.replace(new RegExp(`^\\[${name}\\]\\s*`), '');
+      const cleanLine = l.replace(agentLogRegex, '');
       log(`[${name}] ❌ ${cleanLine}`, 'error');
     });
   });
@@ -361,12 +389,12 @@ io.on('connection', (socket) => {
 
   // Send recent logs from setu.log if exists
   const logFile = path.join(__dirname, 'setu.log');
-  if (fs.existsSync(logFile)) {
-    try {
-      const logs = fs.readFileSync(logFile, 'utf8').split('\n').filter(l => l.trim()).slice(-50);
-      socket.emit('log_history', logs);
-    } catch (e) { }
-  }
+  readLastLines(logFile, 50)
+    .then((lines) => {
+      const logs = lines.filter((l) => l.trim());
+      if (logs.length > 0) socket.emit('log_history', logs);
+    })
+    .catch(() => {});
 
   // Send Chat History (STRUCTURED)
   try {
@@ -615,7 +643,9 @@ function shutdown() {
 
   server.close(() => {
     log('🌍 HTTP Server closed.');
-    process.exit(0);
+    logStream.end(() => {
+      process.exit(0);
+    });
   });
 
   // Force exit if hanging

@@ -43,11 +43,11 @@ fs.watchFile = (filename, options, listener) => {
 
 // Mock setInterval to prevent background tasks
 global.setInterval = (callback, delay) => {
-    return { unref: () => {} };
+    return { unref: () => { } };
 };
 
-// Disable Authentication for Testing
-process.env.DISABLE_DASHBOARD_AUTH = 'true';
+// Disable Authentication for Testing (or set password)
+process.env.DASHBOARD_PASS = 'secret';
 
 // Now require the server
 const DashboardServer = require('../lib/server');
@@ -63,7 +63,15 @@ test('Security: /api/tasks/:id/screenshots Path Traversal Protection', async (t)
     // Helper for requests
     const request = (path) => {
         return new Promise((resolve, reject) => {
-            const req = http.get(`http://localhost:${PORT}${path}`, (res) => {
+            const req = http.get({
+                hostname: 'localhost',
+                port: PORT,
+                path: path,
+                headers: {
+                    'Authorization': 'Basic YWRtaW46c2VjcmV0',
+                    'Connection': 'close'
+                }
+            }, (res) => {
                 let data = '';
                 res.on('data', chunk => data += chunk);
                 res.on('end', () => resolve({ statusCode: res.statusCode, headers: res.headers, data }));
@@ -151,5 +159,6 @@ test('Security: /api/tasks/:id/screenshots Path Traversal Protection', async (t)
     fs.readdirSync = originalReaddirSync;
     fs.watchFile = originalWatchFile;
     global.setInterval = originalSetInterval;
-    delete process.env.DISABLE_DASHBOARD_AUTH;
+    delete process.env.DASHBOARD_PASS;
+    setTimeout(() => { process.exit(0); }, 500);
 });
