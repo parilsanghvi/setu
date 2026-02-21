@@ -6,25 +6,29 @@ const child_process = require('child_process');
 
 // Mock dependencies
 const originalRequire = Module.prototype.require;
-Module.prototype.require = function(id) {
+Module.prototype.require = function (id) {
     if (id === '../Config') {
         return {
             googleClientId: 'mock-client-id',
-            googleClientSecret: 'mock-client-secret'
+            googleClientSecret: 'mock-client-secret',
+            googleRedirectUri: 'http://localhost:51121/oauth-callback',
+            googleAuthUrl: 'https://accounts.google.com/o/oauth2/v2/auth',
+            googleTokenUrl: 'https://oauth2.googleapis.com/token',
+            googleScopes: ['email', 'profile']
         };
     }
     return originalRequire.apply(this, arguments);
 };
 
 const originalSpawn = child_process.spawn;
-child_process.spawn = () => ({ unref: () => {} });
+child_process.spawn = () => ({ unref: () => { } });
 
 // Mock http.Server.prototype.listen
 const originalListen = http.Server.prototype.listen;
 let listenArgs = null;
 
 // We need to patch it before requiring GoogleAuth just in case (though GoogleAuth doesn't create server at top level)
-http.Server.prototype.listen = function(...args) {
+http.Server.prototype.listen = function (...args) {
     listenArgs = args;
     const cb = args[args.length - 1];
     if (typeof cb === 'function') cb();
@@ -37,7 +41,7 @@ const googleAuth = require('../lib/auth/google');
 test('GoogleAuth binds to localhost', async (t) => {
     // Calling login() should trigger server.listen
     // We don't await it because it returns a promise that never resolves in this mock setup
-    googleAuth.login().catch(() => {});
+    googleAuth.login().catch(() => { });
 
     assert.ok(listenArgs, 'server.listen should have been called');
 

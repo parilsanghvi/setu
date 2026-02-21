@@ -53,6 +53,11 @@ const cases = [
         name: 'Multiline JSON in Text',
         input: 'Here is the object:\n{\n  "id": 123,\n  "data": "foo"\n}\nThanks.',
         expected: { id: 123, data: "foo" }
+    },
+    {
+        name: 'Multiple Code Blocks (JS first, then JSON)',
+        input: 'Here is some JS code:\n```javascript\nconst x = {a:1};\n```\nAnd here is JSON:\n```json\n{"valid": "json"}\n```',
+        expected: { valid: "json" }
     }
 ];
 
