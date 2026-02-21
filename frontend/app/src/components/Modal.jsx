@@ -3,25 +3,32 @@ import styles from './Modal.module.scss';
 
 const Modal = ({ children, onClose, title = "Modal" }) => {
     const modalRef = useRef(null);
+    const onCloseRef = useRef(onClose);
+
+    // Keep onCloseRef up to date to avoid stale closures in the event listener
+    useEffect(() => {
+        onCloseRef.current = onClose;
+    }, [onClose]);
 
     useEffect(() => {
         const handleKeyDown = (e) => {
             if (e.key === 'Escape') {
-                onClose();
+                if (onCloseRef.current) {
+                    onCloseRef.current();
+                }
             }
         };
 
-        document.addEventListener('keydown', handleKeyDown);
-
-        // Focus the modal content on mount for screen readers
+        // Focus the modal content when it mounts (run once)
         if (modalRef.current) {
             modalRef.current.focus();
         }
 
+        document.addEventListener('keydown', handleKeyDown);
         return () => {
             document.removeEventListener('keydown', handleKeyDown);
         };
-    }, [onClose]);
+    }, []); // Empty dependency array ensures this runs only once on mount
 
     return (
         <div className={styles.overlay} onClick={onClose}>

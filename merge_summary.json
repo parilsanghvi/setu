@@ -1,0 +1,129 @@
+{
+  "merged": [],
+  "failed": [
+    {
+      "number": 109,
+      "title": "🧪 Verify task escalation logic in lib/db.js"
+    },
+    {
+      "number": 108,
+      "title": "Add unit tests for ModelConfig"
+    },
+    {
+      "number": 107,
+      "title": "⚡ Optimize initial log loading on socket connection"
+    },
+    {
+      "number": 106,
+      "title": "🧪 Add unit tests for Anthropic LLM provider"
+    },
+    {
+      "number": 105,
+      "title": "⚡ Make drishti-v2 tools non-blocking using async exec"
+    },
+    {
+      "number": 104,
+      "title": "Add tests for auth middleware malformed header edge cases"
+    },
+    {
+      "number": 103,
+      "title": "🧪 Add AuthStore save failure test"
+    },
+    {
+      "number": 102,
+      "title": "Make context compaction threshold configurable"
+    },
+    {
+      "number": 101,
+      "title": "test: add CoreAgent.compactContext unit tests"
+    },
+    {
+      "number": 100,
+      "title": "🧹 Deduplicate PKCE Generation Logic"
+    },
+    {
+      "number": 99,
+      "title": "🔒 Fix insecure local server binding in deprecated Google Auth extension"
+    },
+    {
+      "number": 98,
+      "title": "Tests: Add coverage for CoreAgent control signals"
+    },
+    {
+      "number": 97,
+      "title": "Refactor Pariksha to use Logger"
+    },
+    {
+      "number": 96,
+      "title": "🔒 Fix information disclosure in dashboard API"
+    },
+    {
+      "number": 95,
+      "title": "🧹 Use structured Logger in DashboardServer"
+    },
+    {
+      "number": 94,
+      "title": "⚡ Optimize agent log processing in index.js"
+    },
+    {
+      "number": 93,
+      "title": "test: add unit tests for ProviderFactory"
+    },
+    {
+      "number": 92,
+      "title": "Replace console.log with Logger in Google Auth"
+    },
+    {
+      "number": 91,
+      "title": "Externalize Google Cloud Project ID"
+    },
+    {
+      "number": 90,
+      "title": "🧹 Remove Deprecated Google Auth Extension"
+    },
+    {
+      "number": 89,
+      "title": "Fix JsonParser multiple code blocks handling"
+    },
+    {
+      "number": 88,
+      "title": "🧹 Extract Hardcoded Google Auth URLs to Config"
+    },
+    {
+      "number": 87,
+      "title": "🔒 Fix Insecure Local Server Binding in GoogleAuth"
+    },
+    {
+      "number": 86,
+      "title": "test(config): add verification for custom LLM provider"
+    },
+    {
+      "number": 85,
+      "title": "🧪 Add unit tests for BaseProvider.getMockResponse"
+    },
+    {
+      "number": 84,
+      "title": "🎨 Palette: Enhance Modal Accessibility (Focus & Keyboard)"
+    },
+    {
+      "number": 83,
+      "title": "🛡️ Sentinel: [HIGH] Add input length validation to API"
+    },
+    {
+      "number": 82,
+      "title": "⚡ Bolt: Cache Prepared Statements in Bus"
+    },
+    {
+      "number": 81,
+      "title": "🎨 Palette: Accessible Modal Navigation"
+    },
+    {
+      "number": 80,
+      "title": "⚡ Bolt: Cache prepared statements to optimize DB performance"
+    },
+    {
+      "number": 79,
+      "title": "🛡️ Sentinel: [CRITICAL] Fix unauthenticated Socket.IO access"
+    }
+  ]
+}

@@ -37,6 +37,10 @@ Module.prototype.require = function (id) {
     if (id.endsWith('/lib/LLM') || id === './LLM' || id.endsWith('/lib/LLM.js')) {
         return mockLLM;
     }
+    // Mock SkillLoader
+    if (id.endsWith('/lib/SkillLoader') || id === './SkillLoader') {
+        return { load: () => new Map() };
+    }
     // Mock Zod (minimal implementation)
     if (id === 'zod') {
         return {

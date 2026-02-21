@@ -3,6 +3,7 @@ const assert = require('assert');
 const DashboardServer = require('../lib/server');
 
 console.log('🧪 Testing /api/tasks endpoint...');
+process.env.DASHBOARD_PASS = 'secret';
 
 const PORT = 4002;
 const server = new DashboardServer(PORT);
@@ -29,7 +30,9 @@ const options = {
     method: 'POST',
     headers: {
         'Content-Type': 'application/json',
-        'Content-Length': Buffer.byteLength(postData)
+        'Content-Length': Buffer.byteLength(postData),
+        'Authorization': 'Basic YWRtaW46c2VjcmV0',
+        'Connection': 'close'
     }
 };
 

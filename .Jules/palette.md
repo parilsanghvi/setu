@@ -5,3 +5,7 @@
 ## 2026-02-17 - [UX: Modal Keyboard Navigation]
 **Learning:** Modals without keyboard support (Escape key) and proper ARIA roles create significant barriers for keyboard and screen reader users. The 'Escape' key is a universal expectation for closing dialogs.
 **Action:** Always implement 'Escape' key listener and focus management (focus trap or initial focus) for any modal or dialog component. Ensure role="dialog" and aria-modal="true" are present.
+
+## 2026-02-19 - [A11y: Modal Accessibility Patterns]
+**Learning:** The Modal component was missing critical accessibility features: it didn't close on Escape, didn't manage focus, and lacked ARIA roles. This traps keyboard users and confuses screen readers.
+**Action:** Always implement `useEffect` for Escape key handling, trap or manage focus on mount, and add `role="dialog"` + `aria-modal="true"` to all modal implementations.
