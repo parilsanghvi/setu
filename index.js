@@ -54,6 +54,10 @@ const io = new Server(server, {
   }
 });
 
+// 🛡️ Security: Socket Authentication
+const socketAuth = require('./lib/middleware/socketAuth');
+io.use(socketAuth);
+
 // --- DASHBOARD API ROUTES ---
 
 // API: Stats
