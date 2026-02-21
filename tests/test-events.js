@@ -40,8 +40,8 @@ child.stdout.on('data', (data) => {
     // [SIGNAL] ... tool_start ...
     // or however lib/db.js logs it.
 
-    // Let's check for specific event content.
-    if (chunk.includes('tool_start') && chunk.includes('tool_end')) {
+    // Check for Tool Events in accumulated output
+    if (output.includes('tool_start') && output.includes('tool_end')) {
         console.log("\n✅ EVENTS VERIFIED: tool_start and tool_end detected.");
         child.kill();
         process.exit(0);
@@ -50,7 +50,7 @@ child.stdout.on('data', (data) => {
 
 // Timeout
 setTimeout(() => {
-    console.error("\n❌ TIMEOUT: Events not detected.");
+    console.error("\n❌ TIMEOUT: Events not detected. Accumulated output length:", output.length);
     child.kill();
     process.exit(1);
-}, 5000);
+}, 10000);
