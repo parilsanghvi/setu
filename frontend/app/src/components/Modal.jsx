@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import styles from './Modal.module.scss';
 
-const Modal = ({ children, onClose }) => {
+const Modal = ({ children, onClose, title = "Modal" }) => {
     const modalRef = useRef(null);
     const onCloseRef = useRef(onClose);
 
@@ -37,6 +37,7 @@ const Modal = ({ children, onClose }) => {
                 onClick={(e) => e.stopPropagation()}
                 role="dialog"
                 aria-modal="true"
+                aria-label={title}
                 tabIndex="-1"
                 ref={modalRef}
             >

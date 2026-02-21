@@ -55,7 +55,10 @@ const TaskBoard = ({ tasks }) => {
     return (
         <div className={styles.container}>
             {selectedTask && (
-                <Modal onClose={() => setSelectedTask(null)}>
+                <Modal
+                    onClose={() => setSelectedTask(null)}
+                    title={selectedTask.title}
+                >
                     <div className={styles.modalContent}>
                         <h2 className={styles.modalTitle}>{selectedTask.title}</h2>
                         <div className={styles.meta}>ID: {selectedTask.id} | Owner: {selectedTask.owner}</div>
