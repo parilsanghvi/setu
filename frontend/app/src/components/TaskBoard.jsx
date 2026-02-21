@@ -84,6 +84,7 @@ const TaskBoard = ({ tasks }) => {
                         onClick={createTask}
                         disabled={isCreating}
                         className={styles.addButton}
+                        aria-label="Add new task"
                     >
                         {isCreating ? "..." : "ADD"}
                     </button>
@@ -98,7 +99,16 @@ const TaskBoard = ({ tasks }) => {
                             {items.map(t => (
                                 <div
                                     key={t.id}
+                                    role="button"
+                                    tabIndex={0}
                                     onClick={() => setSelectedTask(t)}
+                                    onKeyDown={(e) => {
+                                        if (e.key === 'Enter' || e.key === ' ') {
+                                            e.preventDefault();
+                                            setSelectedTask(t);
+                                        }
+                                    }}
+                                    aria-label={`View details for task: ${t.displayTitle}`}
                                     className={styles.taskCard}
                                 >
                                     <div className={styles.taskId}>{t.id}</div>
