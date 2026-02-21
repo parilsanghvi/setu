@@ -153,6 +153,11 @@ app.post('/api/chat', (req, res) => {
   const { agent, message } = req.body;
   if (!agent || !message) return res.status(400).json({ error: 'Agent and Message required' });
 
+  // Security: Input Length Validation
+  if (message.length > MAX_MESSAGE_LENGTH) {
+    return res.status(400).json({ error: `Message too long (max ${MAX_MESSAGE_LENGTH} chars)` });
+  }
+
   bus.send('User', agent, message, 'chat', { via: 'gui' });
   res.json({ status: 'sent', to: agent });
 });
@@ -178,6 +183,10 @@ app.post('/api/agents/:name/redirect', (req, res) => {
   const { name } = req.params;
   const { prompt } = req.body;
   if (!prompt) return res.status(400).json({ error: 'Prompt required for redirect' });
+
+  if (prompt.length > MAX_PROMPT_LENGTH) {
+    return res.status(400).json({ error: `Prompt too long (max ${MAX_PROMPT_LENGTH} chars)` });
+  }
 
   const process = RUNNING_PROCESSES[name];
   if (!process) return res.status(404).json({ error: `Agent ${name} not running` });
@@ -256,6 +265,10 @@ const RUNNING_PROCESSES = Object.create(null); // { "Tark": <ChildProcess> }
 const SPAWN_TIMES = Object.create(null); // { "Tark": <Timestamp> }
 const LOG_LEVEL = process.env.LOG_LEVEL || 'info';
 let lastMessageId = 0;
+
+// Security: Input Validation Limits
+const MAX_MESSAGE_LENGTH = 10000; // 10KB
+const MAX_PROMPT_LENGTH = 20000; // 20KB
 
 // Broadcast logs to connected clients & write to file
 function log(msg, level = 'info') {
