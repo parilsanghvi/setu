@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useSocket } from '../hooks/useSocket';
+import Spinner from './Spinner';
 import styles from './ChatBox.module.scss';
 
 const ChatBox = ({ agents }) => {
@@ -68,9 +69,9 @@ const ChatBox = ({ agents }) => {
                     type="submit"
                     className={styles.sendButton}
                     disabled={!msg.trim() || loading}
-                    aria-label="Send message"
+                    aria-label={loading ? "Sending message" : "Send message"}
                 >
-                    {loading ? "..." : "SEND"}
+                    {loading ? <Spinner /> : "SEND"}
                 </button>
             </form>
         </div>
