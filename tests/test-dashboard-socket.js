@@ -5,7 +5,7 @@ const http = require('http');
 
 // 1. Start the Dashboard Server
 const serverScript = path.join(__dirname, '../lib/server.js');
-const dashboard = spawn('node', [serverScript], { stdio: 'inherit' });
+const dashboard = spawn('node', [serverScript], { stdio: 'inherit', env: { ...process.env, DASHBOARD_PASS: 'secret' } });
 
 console.log('🚀 Starting Dashboard Server...');
 
@@ -33,7 +33,9 @@ setTimeout(() => {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'Content-Length': postData.length
+                'Content-Length': postData.length,
+                'Authorization': 'Basic YWRtaW46c2VjcmV0',
+                'Connection': 'close'
             }
         }, (res) => {
             console.log(`✅ API Response: ${res.statusCode}`);
