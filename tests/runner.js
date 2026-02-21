@@ -14,7 +14,7 @@ async function runTest(file) {
         const start = Date.now();
         const p = spawn('node', [path.join(testDir, file)], {
             stdio: 'inherit',
-            env: { ...process.env, LOG_LEVEL: 'error' } // Suppress logs during tests
+            env: { ...process.env, LOG_LEVEL: 'error', DASHBOARD_PASS: 'secret' } // Suppress logs during tests
         });
 
         p.on('exit', (code) => {
