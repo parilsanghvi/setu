@@ -35,6 +35,9 @@ class SteeringAgent extends CoreAgent {
 
 const bot = new SteeringAgent();
 
+bot.on('tool_start', () => console.log('[SIGNAL] tool_start'));
+bot.on('tool_end', () => console.log('[SIGNAL] tool_end'));
+
 // Start the loop
 console.log("[SteeringBot] Starting loop...");
 bot.processMessage({
