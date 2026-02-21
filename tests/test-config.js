@@ -118,6 +118,31 @@ test('Config: Dual model configuration - inherited values', (t) => {
     assert.strictEqual(Config.cheapModelApiKey, 'sk-openai');
 });
 
+test('Config: Google Auth Configuration', (t) => {
+    clearEnv();
+
+    // Test Defaults
+    Config.validate();
+    assert.strictEqual(Config.googleRedirectUri, "http://localhost:51121/oauth-callback");
+    assert.strictEqual(Config.googleAuthUrl, "https://accounts.google.com/o/oauth2/v2/auth");
+    assert.strictEqual(Config.googleDefaultProjectId, "rising-fact-p41fc");
+    assert.ok(Array.isArray(Config.googleScopes));
+    assert.ok(Config.googleScopes.includes("https://www.googleapis.com/auth/cloud-platform"));
+
+    // Test Overrides
+    process.env.GOOGLE_REDIRECT_URI = "http://example.com/callback";
+    process.env.GOOGLE_AUTH_URL = "https://example.com/auth";
+    process.env.GOOGLE_DEFAULT_PROJECT_ID = "custom-project";
+    process.env.GOOGLE_SCOPES = "scope1,scope2";
+
+    Config.validate();
+
+    assert.strictEqual(Config.googleRedirectUri, "http://example.com/callback");
+    assert.strictEqual(Config.googleAuthUrl, "https://example.com/auth");
+    assert.strictEqual(Config.googleDefaultProjectId, "custom-project");
+    assert.deepStrictEqual(Config.googleScopes, ["scope1", "scope2"]);
+});
+
 test('Config: API key missing warnings', (t) => {
     clearEnv();
     process.env.LLM_PROVIDER = 'openai';

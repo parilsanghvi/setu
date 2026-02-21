@@ -4,7 +4,7 @@ const path = require('path');
 
 // Mock dependencies
 const originalRequire = Module.prototype.require;
-Module.prototype.require = function(id) {
+Module.prototype.require = function (id) {
     if (id === './auth-store') {
         return {
             getProfile: (pid) => {
@@ -18,18 +18,21 @@ Module.prototype.require = function(id) {
                 }
                 return null;
             },
-            addProfile: () => {}
+            addProfile: () => { }
         };
     }
     if (id === '../Config') {
         return {
             googleClientId: 'dummy-client-id',
-            googleClientSecret: 'dummy-client-secret'
+            googleClientSecret: 'dummy-client-secret',
+            googleTokenUrl: 'https://oauth2.googleapis.com/token',
+            googleAuthUrl: 'https://accounts.google.com/o/oauth2/v2/auth',
+            googleRedirectUri: 'http://localhost:51121/oauth-callback'
         };
     }
     if (id === 'child_process') {
         return {
-            spawn: () => ({ unref: () => {} })
+            spawn: () => ({ unref: () => { } })
         };
     }
     return originalRequire.apply(this, arguments);
