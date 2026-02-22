@@ -1,8 +1,8 @@
 {
-  "repo": "app",
+  "repo": "Setu",
   "default_branch": "master",
   "head_commit": "840d691198ff3e23bf75aafb84385a9c374ecf29",
-  "generated_at": "2026-02-22T19:57:34.249Z",
+  "generated_at": "2026-02-22T20:10:34.973Z",
   "completeness_percent": 100,
   "owners_modules": {},
   "checks": {
