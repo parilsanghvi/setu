@@ -9,6 +9,14 @@ import './index.scss';
 
 const App = () => {
   const { agents, tasks, logs } = useSocket();
+  const [onboarding, setOnboarding] = React.useState(null);
+
+  React.useEffect(() => {
+    fetch('/api/onboarding')
+      .then(r => r.json())
+      .then(setOnboarding)
+      .catch(() => { });
+  }, []);
 
   const activeAgentsCount = agents.filter(a => a.status !== 'OFFLINE').length;
 
@@ -20,6 +28,18 @@ const App = () => {
         <div className={styles.stats}>
           {activeAgentsCount} <span className={styles.statsLabel}>Active Agents</span>
         </div>
+        {onboarding && (
+          <div style={{ marginTop: '10px', fontSize: '0.75rem', padding: '0.5rem', borderRadius: '0.25rem', border: '1px solid', textAlign: 'center', borderColor: onboarding.ok ? '#166534' : '#991b1b', color: onboarding.ok ? '#4ade80' : '#f87171', backgroundColor: onboarding.ok ? 'rgba(20, 83, 45, 0.2)' : 'rgba(127, 29, 29, 0.2)' }}>
+            <div><span style={{ fontWeight: 'bold' }}>Onboarding:</span> {onboarding.completeness}% {onboarding.stale ? '(STALE)' : ''}</div>
+            {!onboarding.ok && (
+              <>
+                <div style={{ marginTop: '0.25rem' }}>Missing: {onboarding.missing.length} artifact(s)</div>
+                <div style={{ marginTop: '0.25rem', fontWeight: 'bold', color: '#facc15' }}>Fix now: <code>setu onboarding run</code></div>
+              </>
+            )}
+            {onboarding.generatedAt && <div style={{ marginTop: '0.25rem', color: '#6b7280', opacity: 0.7 }}>Updated: {new Date(onboarding.generatedAt).toLocaleString()}</div>}
+          </div>
+        )}
       </div>
 
       {/* Agent List */}

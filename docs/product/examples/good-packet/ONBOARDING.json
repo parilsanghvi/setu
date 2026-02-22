@@ -1,0 +1,23 @@
+{
+    "repo": "parilsanghvi/setu",
+    "default_branch": "main",
+    "head_commit": "abcdef1234567890abcdef1234567890abcdef12",
+    "generated_at": "2026-02-22T10:00:00.000Z",
+    "completeness_percent": 100,
+    "artifacts_present": 250,
+    "artifacts_missing": 0,
+    "owners_modules": {
+        "src/onboarding": [
+            "alice",
+            "bob"
+        ],
+        "lib/telemetry": [
+            "charlie"
+        ]
+    },
+    "checks": {
+        "has_runbook": true,
+        "has_index": true,
+        "has_tree": true
+    }
+}
