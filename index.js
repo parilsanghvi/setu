@@ -489,10 +489,15 @@ function startSystemLoops() {
     // Throttle to every 2 seconds unless a critical event happened
     if (resurrectionOccurred || (now - lastAgentBroadcast > 2000)) {
       const currentAgents = bus.getAgents();
-      const currentAgentsJson = JSON.stringify(currentAgents);
-      if (currentAgentsJson !== lastAgentsJson) {
+
+      // ⚡ Optimization: Filter out high-frequency noise (heartbeats) from change detection
+      // The frontend only cares about status/role/pid changes, not the exact heartbeat timestamp.
+      const leanAgents = currentAgents.map(({ last_heartbeat, ...rest }) => rest);
+      const leanAgentsJson = JSON.stringify(leanAgents);
+
+      if (leanAgentsJson !== lastAgentsJson) {
         io.emit('agents_update', currentAgents);
-        lastAgentsJson = currentAgentsJson;
+        lastAgentsJson = leanAgentsJson;
       }
       lastAgentBroadcast = now;
     }

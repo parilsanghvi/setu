@@ -10,23 +10,31 @@ try {
   require('child_process').execSync('kill $(lsof -t -i :3000) 2>/dev/null || true');
 } catch (e) {}
 
+const DASHBOARD_PASS = 'testpass';
 console.log('🚀 Starting System Kernel (index.js)...');
 const kernel = spawn('node', ['index.js'], {
   stdio: 'pipe',
-  env: { ...process.env, LOG_LEVEL: 'silent' }
+  env: { ...process.env, LOG_LEVEL: 'silent', DASHBOARD_PASS }
 });
 
 // Manipulate DB to force updates
+let status = 'IDLE';
 setInterval(() => {
-  // Update heartbeat for 'Tark' every 500ms
+  // Toggle status to force an update (heartbeat-only updates are now optimized away)
+  status = status === 'IDLE' ? 'BUSY' : 'IDLE';
   // This would trigger an update every 500ms if NO throttling existed.
   // With throttling (2000ms), we should see updates every 2000ms.
-  db.heartbeat('Tark', 'Tark', 1234, 'IDLE');
-}, 500);
+  db.heartbeat('Tark', 'Tark', 1234, status);
+}, 600);
 
 setTimeout(() => {
   console.log('🔌 Connecting to Kernel...');
-  const socket = io('http://localhost:3000');
+  const auth = Buffer.from(`admin:${DASHBOARD_PASS}`).toString('base64');
+  const socket = io('http://localhost:3000', {
+    extraHeaders: {
+      Authorization: `Basic ${auth}`
+    }
+  });
 
   let updates = [];
   const MAX_UPDATES = 4;
