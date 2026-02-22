@@ -205,7 +205,8 @@ switch (cmd) {
     if (subCmd === 'status') {
       const isTrend = args.includes('--trend');
       if (isTrend) {
-        const logPath = path.join(process.cwd(), '.setu', 'onboarding-history.jsonl');
+        const { getSetuPath } = require('../lib/onboarding/paths');
+        const logPath = getSetuPath('onboarding-history.jsonl');
         const isJson = args.includes('--json');
 
         if (!fs.existsSync(logPath)) {
@@ -270,9 +271,26 @@ switch (cmd) {
       runGenerator({ dryRun, onlyMissing });
       process.exit(0);
     } else if (subCmd === 'doctor') {
+      const isHelp = args.includes('--help') || args.includes('-h');
+      if (isHelp) {
+        log('🩺 Setu Onboarding Doctor Usage:');
+        console.log('  setu onboarding doctor --diff         : Run drift validations against target branch.');
+        console.log('  setu onboarding doctor --trend        : View recent drift history telemetry.');
+        console.log('  setu onboarding doctor --autofix-plan : Generate JSON remediation commands.');
+        console.log('  setu onboarding doctor --digest-weekly: Preview or trigger the weekly email metrics.');
+        console.log('\n  Flags:');
+        console.log('  --strict-diff  : Will explicitly fail if a 0-file diff occurs in PR context.');
+        console.log('  --base <ref>   : Override fallback branch target (e.g. --base origin/main).');
+        console.log('  --json         : Output responses purely as parseable JSON.');
+        console.log('  --show-ignored : Print explicitly excluded files during diff scans.');
+        console.log('  --owners-debug : Print rule engine evaluation trace for file ownership.');
+        process.exit(0);
+      }
+
       const isTrend = args.includes('--trend');
       if (isTrend) {
-        const logPath = path.join(process.cwd(), '.setu', 'drift-history.jsonl');
+        const { getSetuPath } = require('../lib/onboarding/paths');
+        const logPath = getSetuPath('drift-history.jsonl');
         const isJson = args.includes('--json');
 
         if (!fs.existsSync(logPath)) {
@@ -388,8 +406,8 @@ switch (cmd) {
           commands_to_run: commands
         };
 
-        const outPath = path.join(process.cwd(), '.setu', 'autofix-plan.json');
-        if (!fs.existsSync(path.dirname(outPath))) fs.mkdirSync(path.dirname(outPath), { recursive: true });
+        const { getSetuPath } = require('../lib/onboarding/paths');
+        const outPath = getSetuPath('autofix-plan.json');
         fs.writeFileSync(outPath, JSON.stringify(payload, null, 2));
 
         if (args.includes('--json')) {
@@ -405,7 +423,8 @@ switch (cmd) {
 
       const isDigest = args.includes('--digest-weekly');
       if (isDigest) {
-        const logPath = path.join(process.cwd(), '.setu', 'drift-history.jsonl');
+        const { getSetuPath } = require('../lib/onboarding/paths');
+        const logPath = getSetuPath('drift-history.jsonl');
         const isJson = args.includes('--json');
 
         if (!fs.existsSync(logPath)) {

@@ -8,8 +8,9 @@ console.log(JSON.stringify(status, null, 2));
 
 const fs = require('fs');
 const path = require('path');
+const { getSetuPath } = require('../lib/onboarding/paths');
 
-const logPath = path.join(process.cwd(), '.setu', 'onboarding-history.jsonl');
+const logPath = getSetuPath('onboarding-history.jsonl');
 
 try {
   const { getActiveProfile } = require('../lib/onboarding/governance-profiles');

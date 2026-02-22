@@ -22,6 +22,7 @@ Run:
 ```bash
 setu onboarding status
 ```
+*Note: Both `bin/setu task` and REST `/api/tasks` will enforce a hard rejection (403) if onboarding is incomplete.*
 
 Expected output:
 - JSON with artifact status,

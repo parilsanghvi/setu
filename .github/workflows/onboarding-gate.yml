@@ -57,7 +57,7 @@ jobs:
           else
             node bin/setu onboarding doctor --diff --strict-diff --json > drift.json
           fi
-          EXIT_CODE=$?
+          echo "DRIFT_EXIT_CODE=$?" >> $GITHUB_ENV
           
           node scripts/drift-step-summary.js
           
@@ -72,7 +72,7 @@ jobs:
       - name: Enforce Governance Failure 
         if: github.event_name == 'pull_request'
         run: |
-          if [ $EXIT_CODE -ne 0 ]; then
+          if [ "${{ env.DRIFT_EXIT_CODE }}" -ne 0 ]; then
             echo "::error::Docs Drift Detected! Review the PR comment or run 'setu onboarding doctor --diff' locally to fix."
             exit 1
           fi
