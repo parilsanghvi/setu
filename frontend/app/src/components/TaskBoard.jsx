@@ -4,7 +4,7 @@ import ScreenshotGallery from './ScreenshotGallery';
 import Spinner from './Spinner';
 import styles from './TaskBoard.module.scss';
 
-const TaskBoard = ({ tasks }) => {
+const TaskBoard = React.memo(({ tasks }) => {
     const [newTask, setNewTask] = useState("");
     const [selectedTask, setSelectedTask] = useState(null);
     const [isCreating, setIsCreating] = useState(false);
@@ -126,6 +126,6 @@ const TaskBoard = ({ tasks }) => {
             </div>
         </div>
     );
-};
+});
 
 export default TaskBoard;

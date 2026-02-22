@@ -1,10 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { useSocket } from '../hooks/useSocket';
 import Spinner from './Spinner';
 import styles from './ChatBox.module.scss';
 
-const ChatBox = ({ agents }) => {
-    const { logs } = useSocket();
+const ChatBox = React.memo(({ agents, logs }) => {
     const [msg, setMsg] = useState("");
     const [target, setTarget] = useState("Sutradhar");
     const [loading, setLoading] = useState(false);
@@ -77,6 +75,6 @@ const ChatBox = ({ agents }) => {
             </form>
         </div>
     );
-};
+});
 
 export default ChatBox;

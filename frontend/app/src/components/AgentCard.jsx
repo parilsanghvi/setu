@@ -2,7 +2,7 @@ import React from 'react';
 import classNames from 'classnames';
 import styles from './AgentCard.module.scss';
 
-const AgentCard = ({ agent }) => {
+const AgentCard = React.memo(({ agent }) => {
     const isOffline = agent.status === 'OFFLINE';
 
     const cardClass = classNames(styles.card, {
@@ -26,6 +26,6 @@ const AgentCard = ({ agent }) => {
             </div>
         </div>
     );
-};
+});
 
 export default AgentCard;
