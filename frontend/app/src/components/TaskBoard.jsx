@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import Modal from './Modal';
 import ScreenshotGallery from './ScreenshotGallery';
+import Spinner from './Spinner';
 import styles from './TaskBoard.module.scss';
 
 const TaskBoard = ({ tasks }) => {
@@ -84,9 +85,9 @@ const TaskBoard = ({ tasks }) => {
                         onClick={createTask}
                         disabled={isCreating}
                         className={styles.addButton}
-                        aria-label="Add new task"
+                        aria-label={isCreating ? "Creating task" : "Add new task"}
                     >
-                        {isCreating ? "..." : "ADD"}
+                        {isCreating ? <Spinner /> : "ADD"}
                     </button>
                 </div>
             </div>
