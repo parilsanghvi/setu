@@ -110,11 +110,13 @@ app.get('/api/agents', (req, res) => {
 // API: Create Task
 app.post('/api/tasks', (req, res) => {
   const { getOnboardingStatus } = require('./lib/onboarding/status');
-  const stat = getOnboardingStatus();
+  const stat = getOnboardingStatus({ fast: true });
   if (!stat.ok) {
     return res.status(403).json({
-      error: 'Onboarding Incomplete. You must achieve 100% completeness before mutating tasks.',
-      details: stat.errors
+      error: 'Hard Gate Failure: Onboarding Incomplete',
+      missing: stat.missing,
+      details: stat.errors,
+      remediation: 'Run "setu onboarding run --only-missing" via CLI'
     });
   }
   const { title, type } = req.body;
@@ -277,6 +279,66 @@ app.get('/api/sessions/:filename', async (req, res) => {
 });
 
 // --- END DASHBOARD API ROUTES ---
+
+// --- TREND API ROUTES (Unified with lib/server.js) ---
+const { getSetuPath } = require('./lib/onboarding/paths');
+
+app.get('/api/onboarding-trend', (req, res) => {
+  try {
+    const logPath = getSetuPath('onboarding-history.jsonl');
+    if (!fs.existsSync(logPath)) {
+      return res.json({ runs: [], error: 'No history found' });
+    }
+    const lines = fs.readFileSync(logPath, 'utf8').split('\n').filter(Boolean);
+    const allRuns = lines.map(l => { try { return JSON.parse(l); } catch (e) { return null; } }).filter(Boolean);
+    res.json({ runs: allRuns.slice(-20) });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
+app.get('/api/drift-trend', (req, res) => {
+  try {
+    const logPath = getSetuPath('drift-history.jsonl');
+    if (!fs.existsSync(logPath)) {
+      return res.json({ total_runs: 0, fail_rate: 0, drift_percent: 0, top_missing: 'N/A' });
+    }
+    const lines = fs.readFileSync(logPath, 'utf8').split('\n').filter(Boolean);
+    const allRuns = lines.map(l => { try { return JSON.parse(l); } catch (e) { return null; } }).filter(Boolean);
+    if (allRuns.length === 0) return res.json({ total_runs: 0, fail_rate: 0, drift_percent: 0, top_missing: 'N/A' });
+
+    const last20 = allRuns.slice(-20);
+    const fails = last20.filter(r => !r.ok).length;
+    const failRate = ((fails / last20.length) * 100).toFixed(1);
+    const avgDrift = (last20.reduce((acc, r) => acc + r.drift_percent, 0) / last20.length).toFixed(1);
+
+    const missingFreq = {};
+    last20.forEach(r => { if (r.missing_docs) r.missing_docs.forEach(d => missingFreq[d] = (missingFreq[d] || 0) + 1); });
+    const top = Object.entries(missingFreq).sort((a, b) => b[1] - a[1])[0];
+    const topMissing = top ? top[0].replace('docs/files/', '') : 'None';
+
+    const lastRun = last20[last20.length - 1];
+    const unowned = (lastRun.ownership && lastRun.ownership.unowned_count) || 0;
+
+    const { getActiveProfile } = require('./lib/onboarding/governance-profiles');
+    const activeProfile = getActiveProfile();
+
+    res.json({
+      total_runs: allRuns.length,
+      fail_rate: parseFloat(failRate),
+      drift_percent: parseFloat(avgDrift),
+      top_missing: topMissing,
+      last_status: lastRun.ok ? '✅ Pass' : '🛑 Fail',
+      unowned_count: unowned,
+      profile: activeProfile.name.toUpperCase(),
+      strict_diff: activeProfile.config.strict_diff
+    });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
+// --- END TREND API ROUTES ---
 
 const AGENT_MAP = {
   // Sanskrit Personas

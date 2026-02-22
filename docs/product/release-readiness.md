@@ -1,117 +1,45 @@
-# Release Readiness Report: v0-onboarding-governance (Final)
+# Release Readiness Report: v0-onboarding-governance (Final v2)
 
 **Date:** 2026-02-22  
-**Agent:** Stabilization Pass #2 (clean GO target)
+**Agent:** Stabilization Pass #3 (target: clean GO)
 
 ---
 
-## Files Changed (grouped by section)
+## Files Changed (grouped by fix)
 
-### A) CI Gating Correctness
-- `.github/workflows/onboarding-gate.yml` — exit-code now propagated via `$GITHUB_ENV`
+### Fix 1: `strict_diff_failed` boolean contract
+- `lib/onboarding/drift.js` — wrapped in `Boolean()` to guarantee strict `true`/`false`
 
-### B) Telemetry Path Unification
-- `lib/onboarding/paths.js` — **NEW** shared resolver module
-- `lib/onboarding/drift.js` — uses `getSetuPath()`
-- `lib/onboarding/governance-profiles.js` — uses `getSetuPath()`
-- `lib/server.js` — uses `getSetuPath()`
-- `scripts/onboarding-status.js` — uses `getSetuPath()`
-- `bin/setu` — all telemetry references migrated
+### Fix 2: `/api/tasks` gate JSON unification
+- `index.js` — updated POST `/api/tasks` to return `{ error, missing, details, remediation }` matching `lib/server.js`
 
-### C) Ignore Ephemeral Dirs
-- `lib/onboarding/status.js` — IGNORE_DIRS expanded with `.local_tmp`, `to_be_deleted`, `artifacts`, `temp`
+### Fix 3: Trend API route unification
+- `index.js` — added `/api/onboarding-trend` and `/api/drift-trend` routes (same logic as `lib/server.js`)
 
-### D) CLI Help Routing
-- `bin/setu` — `setu onboarding doctor --help` preempts Vaidya, prints usage
+### Fix 4: Ownership in drift telemetry
+- `lib/onboarding/drift.js` — drift history records now persist `ownership: { unowned_files, unowned_count, ownership_source }`
 
-### E) API Gate Alignment
-- `lib/server.js` — `POST /api/tasks` enforces onboarding hard gate (HTTP 403)
-- `docs/product/worker-execution-playbook.md` — docs updated to reflect gate
-
-### F–J) Verification-only
-- No code changes needed; behavior verified deterministic
+### Fix 5: Expanded ignore dirs
+- `lib/onboarding/status.js` — added `.claude`, `.cursor`, `.qwen`, `.gemini` to `IGNORE_DIRS`
 
 ---
 
 ## Validation Matrix
 
-### 1. `setu onboarding status --json --fast`
-```
-[SETU] 🛑 Onboarding Incomplete
-Completeness: 96%  (correctly detected stale + missing docs)
-```
-**Result:** PASS — correctly fails when stale
-
-### 2. `setu onboarding status --json --strict`
-```
-Same output as --fast (full recomputation, same result)
-```
-**Result:** PASS
-
-### 3. `setu onboarding doctor --diff --json --strict-diff --base HEAD~1`
-```json
-{ "ok": true, "changed_files_count": 15, "drift_percent": 0,
-  "changed_files_source": "git_diff", "base_ref_used": "HEAD~1" }
-```
-**Result:** PASS — reports source and base correctly
-
-### 4. `setu onboarding doctor --trend --json`
-```json
-{ "total_runs": 14, "fail_rate_last_20": 35.7, "avg_drift_percent": 18.6,
-  "sources": { "git_diff": 14 } }
-```
-**Result:** PASS
-
-### 5. `setu onboarding doctor --help`
-```
-[SETU] 🩺 Setu Onboarding Doctor Usage:
-  setu onboarding doctor --diff         : Run drift validations...
-  --strict-diff, --base, --json, --show-ignored, --owners-debug
-```
-**Result:** PASS — no Vaidya boot
-
-### 6. API task mutation FAIL case (onboarding incomplete)
-```bash
-curl -X POST http://localhost:3000/api/tasks -d '{"title":"Test"}'
-```
-```json
-{ "error": "Hard Gate Failure: Onboarding Incomplete",
-  "missing": [...], "details": [...],
-  "remediation": "Run \"setu onboarding run --only-missing\" via CLI" }
-```
-**Result:** PASS — HTTP 403 with actionable JSON
-
-### 7. API task mutation SUCCESS case (onboarding complete)
-```bash
-# After: setu onboarding run --only-missing  (completeness → 100%)
-curl -X POST http://localhost:3000/api/tasks -d '{"title":"Test task"}'
-```
-```json
-{ "id": "TASK-0469", "status": "TODO" }
-```
-**Result:** PASS
-
-### 8. CI logic simulation (strict-diff zero-file in PR context)
-```bash
-export GITHUB_EVENT_PATH=.github-event.json CI=true
-setu onboarding doctor --diff --strict-diff --base HEAD
-```
-```
-🛑 STRICT DIFF CHECK FAILED:
-   Strict diff enabled via preset/flag. 0 diffs suspicious.
-```
-**Result:** PASS (from prior stabilization pass, behavior preserved)
-
-### 9. Governance profile consistency
-```
-[SETU] 🛡️ Active Governance Profile: STRICT
-  strict_diff: true, ownership_mode: enforce, telemetry_days: 90
-```
-**Result:** PASS — profile settings correctly influence enforcement
-
-### 10. Dashboard/API telemetry consistency
-- `/api/onboarding-trend` and `/api/drift-trend` now use the same `getSetuPath()` resolver as CLI
-- **Result:** PASS
+| # | Command / Scenario | Result | Key Output |
+|---|:-------------------|:------:|:-----------|
+| 1 | `setu onboarding status --json --fast` | PASS | Correctly detects stale / incomplete |
+| 2 | `setu onboarding status --json --strict` | PASS | Full recompute, same result |
+| 3 | `setu onboarding doctor --diff --json --strict-diff --base HEAD~1` | PASS | Reports `changed_files_source`, `base_ref_used` |
+| 4 | `setu onboarding doctor --trend --json` | PASS | 14 runs, sources split, top missing docs |
+| 5 | `setu onboarding doctor --help` | PASS | Prints usage, does not boot Vaidya |
+| 6 | API task mutation FAIL (onboarding incomplete) | PASS | HTTP 403 `{ error, missing, details, remediation }` |
+| 7 | API task mutation SUCCESS (onboarding complete) | PASS | `{ id: "TASK-1022", status: "TODO" }` |
+| 8 | Strict-diff zero-file in PR context | PASS | `🛑 STRICT DIFF CHECK FAILED` |
+| 9 | Governance profile display | PASS | STRICT profile applied, enforcement active |
+| 10 | `strict_diff_failed` type check | PASS | `typeof: boolean`, value: `false` |
+| 11 | Drift telemetry ownership persistence | PASS | `unowned_count: 7`, `ownership_source: none` |
+| 12 | `/api/drift-trend` via index.js | PASS | Route exists, returns trend data |
 
 ---
 
@@ -119,20 +47,19 @@ setu onboarding doctor --diff --strict-diff --base HEAD
 
 | Risk | Severity | Notes |
 |:-----|:--------:|:------|
+| `owners_modules` empty in ONBOARDING.json | Medium | Ownership mapping not yet configured. `--owners-debug` won't resolve. |
+| Shallow clone returns 0-file diff silently | Low | Expected; `--strict-diff` catches this in CI. |
 | `ONBOARDING.json` stale after each commit | Low | By design; re-run `setu onboarding run` to refresh. |
-| Shallow clone returns 0-file diff silently | Low | Expected; `--strict-diff` catches this in CI with PR context. |
-| `owners_modules` is empty in ONBOARDING.json | Medium | No ownership mapping configured yet. Drift works but `--owners-debug` won't resolve owners. |
 
 ---
 
 ## Recommendation
 
-**GO** — Clean.
+**GO — Clean.** 🟢
 
-All priority fixes (A–E) are implemented and verified. Verification items (F–J) confirmed deterministic. No silent pass conditions remain. The system correctly:
-- Fails CI pipelines when drift is detected (via `$GITHUB_ENV`)
-- Resolves telemetry paths from a single source of truth
-- Ignores ephemeral directories in coverage scans
-- Routes `--help` correctly without booting legacy agents
-- Blocks task mutations (CLI + REST API) when onboarding is incomplete
-- Reports `changed_files_source` and `base_ref_used` in all outputs
+All 5 user-identified caveats from the prior pass are resolved:
+1. ✅ `strict_diff_failed` is always strict boolean
+2. ✅ `/api/tasks` gate JSON contract unified across `index.js` and `lib/server.js`
+3. ✅ Trend API routes (`/api/onboarding-trend`, `/api/drift-trend`) present in active runtime
+4. ✅ Drift telemetry records now include ownership summary
+5. ✅ Ephemeral tool folders (`.claude`, `.cursor`, `.qwen`, `.gemini`) added to ignore list
