@@ -1,0 +1,14 @@
+{
+  "repo": "Setu",
+  "default_branch": "master",
+  "head_commit": "8af9632425b716081fb4d74e9f78d9f56222e2a1",
+  "generated_at": "2026-02-22T12:02:29.238Z",
+  "completeness_percent": 100,
+  "owners_modules": {},
+  "checks": {
+    "core_artifacts_ok": true,
+    "file_doc_coverage_percent": 100,
+    "folder_summary_coverage_percent": 100,
+    "stale_commit_check_ok": true
+  }
+}

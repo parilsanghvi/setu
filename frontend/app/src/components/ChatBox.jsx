@@ -29,6 +29,7 @@ const ChatBox = ({ agents }) => {
             await fetch('/api/chat', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
                 body: JSON.stringify({ agent: target, message: msg })
             });
             setMsg("");

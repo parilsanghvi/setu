@@ -351,14 +351,46 @@
             );
         };
 
+        const TelemetryTrend = ({ trend }) => {
+            if (!trend) return <div class="card h-full p-2 flex justify-center items-center text-gray-500 text-xs shadow-none">Waiting for drift telemetry...</div>;
+            return (
+                <div class="card h-full flex flex-col bg-gray-900 overflow-hidden">
+                    <div class="p-2 border-b border-gray-700 font-bold text-yellow-500 text-[10px] md:text-xs flex justify-between">
+                        <span>DRIFT TELEMETRY</span>
+                        <div class="flex gap-2 items-center">
+                            {trend.profile && <span class="bg-gray-800 border border-gray-600 px-1 rounded text-white text-[9px]">{trend.profile}</span>}
+                            <span>{trend.last_status}</span>
+                        </div>
+                    </div>
+                    <div class="flex-1 p-2 md:p-3 text-[10px] md:text-xs space-y-1 md:space-y-2 text-gray-300 overflow-y-auto">
+                        <div class="flex justify-between"><span>Total Runs:</span> <span class="text-white font-bold">{trend.total_runs}</span></div>
+                        <div class="flex justify-between"><span>Fail Rate (20):</span> <span class="text-white font-bold">{trend.fail_rate}%</span></div>
+                        <div class="flex justify-between"><span>Avg Drift:</span> <span class="text-white font-bold">{trend.drift_percent}%</span></div>
+                        <div class="flex justify-between"><span>Unowned Files:</span> <span class="text-red-400 font-bold">{trend.unowned_count}</span></div>
+                        <div class="mt-2 pt-2 border-t border-gray-700">
+                            <span class="text-gray-500 block mb-1">Top Missing:</span>
+                            <span class="text-blue-300 truncate block w-full" title={trend.top_missing}>📄 {trend.top_missing}</span>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
         const App = () => {
             const [agents, setAgents] = useState([]);
             const [tasks, setTasks] = useState([]);
             const [logs, setLogs] = useState([]);
             const [activity, setActivity] = useState([]);
             const [showHistory, setShowHistory] = useState(false);
+            const [onboarding, setOnboarding] = useState(null);
+            const [onboardingTrend, setOnboardingTrend] = useState(null);
+            const [trend, setTrend] = useState(null);
 
             useEffect(() => {
+                fetch('/api/onboarding').then(r => r.json()).then(setOnboarding).catch(() => { });
+                fetch('/api/onboarding-trend').then(r => r.json()).then(setOnboardingTrend).catch(() => { });
+                fetch('/api/drift-trend').then(r => r.json()).then(setTrend).catch(() => { });
+
                 socket.on('log', msg => setLogs(p => [...p, msg].slice(-100)));
                 socket.on('log_history', hist => setLogs(hist));
                 socket.on('agents_update', data => setAgents(data));
@@ -379,7 +411,36 @@
                     <div class="col-span-1 row-span-1 card p-4 flex flex-col justify-center items-center relative">
                         <button onClick={() => setShowHistory(true)} class="absolute top-2 right-2 text-xs bg-gray-700 hover:bg-gray-600 px-2 py-1 rounded text-white">⏳ Time Travel</button>
                         <h1 class="text-2xl font-bold text-blue-500 mb-2">Setu <span class="text-xs text-gray-500">v2.1</span></h1>
-                        <div class="text-4xl font-bold text-white">{agents.filter(a => a.status !== 'OFFLINE').length} <span class="text-sm text-gray-500 font-normal">Active Agents</span></div>
+                        <div class="text-2xl font-bold text-white mb-2">{agents.filter(a => a.status !== 'OFFLINE').length} <span class="text-sm text-gray-500 font-normal">Active Agents</span></div>
+
+                        {onboarding && (
+                            <div class={`text-xs p-2 rounded border w-full text-center flex flex-col ${onboarding.ok ? 'border-green-800 text-green-400 bg-green-900/20' : 'border-red-800 text-red-400 bg-red-900/20'}`}>
+                                <div class="flex justify-between items-center px-1">
+                                    <span class="font-bold">Onboarding Score:</span>
+                                    <span>{onboarding.completeness}% {onboarding.stale ? '(STALE)' : ''}</span>
+                                </div>
+
+                                {onboardingTrend && onboardingTrend.runs && onboardingTrend.runs.length > 2 && (
+                                    <div class="h-8 mt-2 w-full flex items-end justify-between border-t border-gray-700 pt-1 gap-1">
+                                        {onboardingTrend.runs.slice(-20).map((r, i) => (
+                                            <div
+                                                key={i}
+                                                title={`${r.timestamp.split('T')[0]}: ${r.completeness}%`}
+                                                class={`w-full rounded-t-sm transition-all duration-300 ${r.completeness === 100 ? 'bg-green-500' : 'bg-red-500'}`}
+                                                style={{ height: `${Math.max(10, r.completeness)}%` }}
+                                            ></div>
+                                        ))}
+                                    </div>
+                                )}
+
+                                {!onboarding.ok && (
+                                    <div class="mt-2 border-t border-red-800/50 pt-2">
+                                        <div>Missing: {onboarding.missing.length} artifact(s)</div>
+                                        <div class="mt-1 font-bold text-yellow-400">Fix now: <code class="bg-gray-900 px-1 rounded">setu onboarding run</code></div>
+                                    </div>
+                                )}
+                            </div>
+                        )}
                     </div>
 
                     {/* Agent List */}
@@ -387,9 +448,6 @@
                         <div class="text-xs font-bold text-gray-500 mb-2 text-center">FLEET</div>
                         {agents.map(a => <AgentCard key={a.name} agent={a} />)}
                     </div>
-
-                    {/* ... rest of layout ... */}
-                    {/* We need to re-render the rest of the layout as we replaced the App component */}
 
                     <div class="col-span-2 row-span-2">
                         <TaskBoard tasks={tasks} />
@@ -403,8 +461,12 @@
                         <ActivityFeed logs={activity} />
                     </div>
 
-                    <div class="col-span-2 row-span-1">
+                    <div class="col-span-1 row-span-1">
                         <ChatBox agents={agents} />
+                    </div>
+
+                    <div class="col-span-1 row-span-1">
+                        <TelemetryTrend trend={trend} />
                     </div>
                 </div>
             );

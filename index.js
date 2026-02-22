@@ -1,3 +1,4 @@
+require('dotenv').config();
 const { fork } = require('child_process');
 const path = require('path');
 const http = require('http');
@@ -60,6 +61,17 @@ io.use(socketAuth);
 
 // --- DASHBOARD API ROUTES ---
 
+// API: Onboarding Status
+app.get('/api/onboarding', (req, res) => {
+  try {
+    const { getOnboardingStatus } = require('./lib/onboarding/status');
+    const status = getOnboardingStatus();
+    res.json(status);
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
 // API: Stats
 app.get('/api/stats', (req, res) => {
   try {
@@ -97,6 +109,14 @@ app.get('/api/agents', (req, res) => {
 
 // API: Create Task
 app.post('/api/tasks', (req, res) => {
+  const { getOnboardingStatus } = require('./lib/onboarding/status');
+  const stat = getOnboardingStatus();
+  if (!stat.ok) {
+    return res.status(403).json({
+      error: 'Onboarding Incomplete. You must achieve 100% completeness before mutating tasks.',
+      details: stat.errors
+    });
+  }
   const { title, type } = req.body;
 
   if (!title || typeof title !== 'string' || title.trim().length === 0) {
@@ -124,10 +144,10 @@ app.post('/api/tasks', (req, res) => {
 app.get('/api/tasks/:id/screenshots', (req, res) => {
   const taskId = req.params.id;
 
-    // Security: Validate taskId to prevent Path Traversal
-    if (!/^[a-zA-Z0-9-_]+$/.test(taskId)) {
-      return res.status(400).json({ error: 'Invalid Task ID format' });
-    }
+  // Security: Validate taskId to prevent Path Traversal
+  if (!/^[a-zA-Z0-9-_]+$/.test(taskId)) {
+    return res.status(400).json({ error: 'Invalid Task ID format' });
+  }
   const baseDir = path.join(__dirname, 'frontend/dashboard/screenshots');
   const screenshotDir = path.join(baseDir, taskId);
 
@@ -155,6 +175,7 @@ app.get('/api/tasks/:id/screenshots', (req, res) => {
 // API: Chat with Agent
 app.post('/api/chat', (req, res) => {
   const { agent, message } = req.body;
+  log(`[API] /api/chat hit with agent: ${agent}, message: ${message.substring(0, 20)}`);
   if (!agent || !message) return res.status(400).json({ error: 'Agent and Message required' });
 
   // Security: Input Length Validation
@@ -162,8 +183,14 @@ app.post('/api/chat', (req, res) => {
     return res.status(400).json({ error: `Message too long (max ${MAX_MESSAGE_LENGTH} chars)` });
   }
 
-  bus.send('User', agent, message, 'chat', { via: 'gui' });
-  res.json({ status: 'sent', to: agent });
+  try {
+    bus.send('User', agent, message, 'chat', { via: 'gui' });
+    log(`[API] Successfully dispatched chat to bus`);
+    res.json({ status: 'sent', to: agent });
+  } catch (err) {
+    log(`[API] Error dispatching chat to bus: ${err.message}`, 'error');
+    res.status(500).json({ error: err.message });
+  }
 });
 
 // API: Interrupt Agent
@@ -336,7 +363,7 @@ function spawnAgent(name, role) {
   child.on('exit', (code) => {
     log(`⚠️ Agent ${name} exited with code ${code}`);
     delete RUNNING_PROCESSES[name];
-    
+
     // Broadcast Crash Event for Guru (Death Learning)
     bus.send('System', 'ALL', `Agent ${name} crashed`, 'event', {
       type: 'AGENT_CRASH',
@@ -398,7 +425,7 @@ io.on('connection', (socket) => {
       const logs = lines.filter((l) => l.trim());
       if (logs.length > 0) socket.emit('log_history', logs);
     })
-    .catch(() => {});
+    .catch(() => { });
 
   // Send Chat History (STRUCTURED)
   try {
@@ -435,7 +462,7 @@ io.on('connection', (socket) => {
 function startSystemLoops() {
   let lastTasksState = { t: 0, c: 0 };
   let lastAgentsJson = '';
-  let lastAgentBroadcast = 0;
+  let lastAgentBroadcast = Date.now();
 
   // Initialize lastMessageId to the latest message to avoid re-broadcasting old history on boot
   // Or should we? Maybe recent history is good.
@@ -449,6 +476,21 @@ function startSystemLoops() {
 
   setInterval(() => {
     // debug('--- System Loop Pulse ---');
+    // 0. Initial Signal for Unread Messages (Only on first run or periodically)
+    // Actually, the resurrection loop handles spawning. 
+    // Let's just ensure unread messages are signaled once agents are up.
+    if (Date.now() - lastAgentBroadcast < 2000) { // Using this as a proxy for "just started or resurrected"
+      const unread = bus.db.prepare("SELECT recipient FROM messages WHERE read_at IS NULL GROUP BY recipient").all();
+      unread.forEach(u => {
+        if (u.recipient === 'ALL') {
+          Object.values(RUNNING_PROCESSES).forEach(proc => {
+            try { proc.send({ type: 'new_message' }); } catch (e) { }
+          });
+        } else if (RUNNING_PROCESSES[u.recipient]) {
+          try { RUNNING_PROCESSES[u.recipient].send({ type: 'new_message' }); } catch (e) { }
+        }
+      });
+    }
     // A. Resurrection Logic (Optimized: Targeted Query)
     const deadAgents = bus.getDeadAgents(30);
     let resurrectionOccurred = false;
@@ -524,7 +566,8 @@ function startSystemLoops() {
         } catch (e) { }
 
         if (['chat', 'status', 'tool_start', 'tool_end', 'thought_start', 'thought_end', 'context_compact_start', 'context_compact_end'].includes(msg.type) || msg.recipient === 'ALL') {
-          log(`[${msg.type.toUpperCase()}] [${msg.sender}] ${msg.content.substring(0, 100)}...`);
+          const truncatedContent = msg.content.length > 100 ? msg.content.substring(0, 100) + '...' : msg.content;
+          log(`[${msg.type.toUpperCase()}] [${msg.sender}] ${truncatedContent}`);
         }
 
         // Sutradhar is now an agent, so we don't handle it here manually.
@@ -587,8 +630,8 @@ function startSystemLoops() {
             }
           }
         });
-        watcher.on('error', () => {});
-      } catch (e) {}
+        watcher.on('error', () => { });
+      } catch (e) { }
     };
 
     watchLog();
@@ -622,8 +665,8 @@ function boot() {
   ];
 
   seedAgents.forEach(a => {
-    bus.heartbeat(a.name, a.role, null, 'OFFLINE');
-    log(`✨ Seeded Agent: ${a.name} (${a.role})`);
+    log(`✨ Seeding & Spawning Agent: ${a.name} (${a.role})`);
+    spawnAgent(a.name, a.role);
   });
 
   // Start Loops (Resurrection will pick up the seeded agents)

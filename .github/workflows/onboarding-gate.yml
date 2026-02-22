@@ -1,0 +1,79 @@
+name: Onboarding Gate
+
+on:
+  push:
+    branches:
+      - '**'
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  check-onboarding:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: npm ci || npm install
+
+      - name: Check Onboarding Completeness
+        id: onboard_check
+        run: |
+          set +e
+          node scripts/onboarding-status.js > status.json
+          EXIT_CODE=$?
+          
+          # Write summary
+          echo "### Onboarding Status" >> $GITHUB_STEP_SUMMARY
+          echo '```json' >> $GITHUB_STEP_SUMMARY
+          cat status.json >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          
+          # Optional PR Comment annotation logic (requires valid GITHUB_TOKEN)
+          
+          if [ $EXIT_CODE -ne 0 ]; then
+            echo "::error::Onboarding Incomplete. Run 'setu onboarding run' locally."
+            exit 1
+          fi
+
+      - name: Check Docs Drift (PR Preflight)
+        if: github.event_name == 'pull_request'
+        run: |
+          set +e
+          # Ensure target branch is available for diff
+          git fetch origin ${{ github.base_ref }}:${{ github.base_ref }} || true
+          
+          if [ -n "${{ github.base_ref }}" ]; then
+            node bin/setu onboarding doctor --diff --strict-diff --base origin/${{ github.base_ref }} --json > drift.json
+          else
+            node bin/setu onboarding doctor --diff --strict-diff --json > drift.json
+          fi
+          EXIT_CODE=$?
+          
+          node scripts/drift-step-summary.js
+          
+      - name: Generate PR Comment
+        if: github.event_name == 'pull_request'
+        uses: peter-evans/create-or-update-comment@v4
+        with:
+          issue-number: ${{ github.event.pull_request.number }}
+          body-path: artifacts/drift-report.md
+          edit-mode: replace
+          
+      - name: Enforce Governance Failure 
+        if: github.event_name == 'pull_request'
+        run: |
+          if [ $EXIT_CODE -ne 0 ]; then
+            echo "::error::Docs Drift Detected! Review the PR comment or run 'setu onboarding doctor --diff' locally to fix."
+            exit 1
+          fi
+

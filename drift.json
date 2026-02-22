@@ -1,0 +1,15 @@
+{
+  "base_ref_used": "origin/master",
+  "changed_files": [],
+  "ignored_files": [],
+  "required_docs": [],
+  "existing_docs": [],
+  "missing_docs": [],
+  "ownership": {
+    "by_file": {},
+    "by_owner": {},
+    "unowned_files": []
+  },
+  "drift_percent": 0,
+  "ok": true
+}
