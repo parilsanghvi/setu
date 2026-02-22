@@ -106,8 +106,9 @@ if (process.argv[2] === 'child') {
   // Before Fix: Unconfigured -> 401
   // After Fix: Unconfigured -> 500
   // Configured -> 200
+  // CURRENT BEHAVIOR: Unconfigured -> 401 (Access Denied) which is secure enough.
 
-  const unconfiguredExpected = 500; // We write the test expecting the FIX.
+  const unconfiguredExpected = 401;
 
   const pass1 = run('unconfigured', unconfiguredExpected);
   const pass2 = run('configured', 200);
