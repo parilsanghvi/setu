@@ -12,3 +12,8 @@
 **Vulnerability:** Socket.IO connections were completely unauthenticated, allowing anyone with network access to monitor real-time system logs, chat messages, and agent activities.
 **Learning:** Middleware applied to Express apps (`app.use`) does not automatically protect Socket.IO namespaces when attached to the same HTTP server. Socket.IO requires its own middleware (`io.use`) to validate handshake data.
 **Prevention:** Always explicitly attach authentication middleware to Socket.IO instances using `io.use()`, verifying headers or query parameters from the handshake.
+
+## 2024-05-24 - Information Leakage in API Error Handling
+**Vulnerability:** API endpoints in `lib/server.js` were catching errors and returning `e.message` directly to the client in a 500 response.
+**Learning:** This pattern existed because rapid prototyping often prioritizes debugging convenience over security, leaking internal details like file paths or database schemas in production.
+**Prevention:** Use a generic error message (e.g., "Internal Server Error") for 500 responses and log specific details internally using a secure logger.
