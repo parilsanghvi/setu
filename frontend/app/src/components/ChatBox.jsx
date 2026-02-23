@@ -1,10 +1,8 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { useSocket } from '../hooks/useSocket';
+import React, { useState, useRef, useEffect, useMemo } from 'react';
 import Spinner from './Spinner';
 import styles from './ChatBox.module.scss';
 
-const ChatBox = ({ agents }) => {
-    const { logs } = useSocket();
+const ChatBox = ({ agents, logs }) => {
     const [msg, setMsg] = useState("");
     const [target, setTarget] = useState("Sutradhar");
     const [loading, setLoading] = useState(false);
@@ -13,7 +11,11 @@ const ChatBox = ({ agents }) => {
     // Filter logs for chat messages or show all?
     // For now, let's show all system logs + chat to give "The Matrix" feel
     // OR filter for [CHAT] prefix we added in useSocket
-    const chatHistory = logs.filter(l => typeof l === 'string' && l.startsWith('[CHAT]'));
+    // Memoized to prevent re-filtering on every keystroke
+    const chatHistory = useMemo(() =>
+        logs.filter(l => typeof l === 'string' && l.startsWith('[CHAT]')),
+        [logs]
+    );
 
     useEffect(() => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
