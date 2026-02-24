@@ -9,3 +9,7 @@
 ## 2026-02-19 - [A11y: Modal Accessibility Patterns]
 **Learning:** The Modal component was missing critical accessibility features: it didn't close on Escape, didn't manage focus, and lacked ARIA roles. This traps keyboard users and confuses screen readers.
 **Action:** Always implement `useEffect` for Escape key handling, trap or manage focus on mount, and add `role="dialog"` + `aria-modal="true"` to all modal implementations.
+
+## 2026-02-20 - [UX: Friendly Status Labels]
+**Learning:** Displaying raw database enum values (e.g., "TODO", "IN_PROGRESS") directly in the UI creates a technical, unpolished feel and reduces readability.
+**Action:** Always map internal status codes/enums to human-readable, sentence-case strings (e.g., "To Do", "In Progress") in the presentation layer.
