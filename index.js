@@ -652,52 +652,6 @@ function startSystemLoops() {
     // E. Sutradhar is now a separate process, so no kernel heartbeat for it.
 
   }, 1000); // Check every 1s (High frequency for responsiveness)
-
-  // D. Log File Watcher (Stream setu.log to GUI)
-  const logFile = path.join(__dirname, 'setu.log');
-  if (fs.existsSync(logFile)) {
-    let lastSize = fs.statSync(logFile).size;
-    let debounceTimer = null;
-
-    const checkUpdates = () => {
-      fs.stat(logFile, (err, stats) => {
-        if (err) return;
-        if (stats.size > lastSize) {
-          const stream = fs.createReadStream(logFile, { start: lastSize, end: stats.size - 1 });
-          stream.on('data', (chunk) => {
-            io.emit('log', chunk.toString());
-          });
-          lastSize = stats.size;
-        } else if (stats.size < lastSize) {
-          lastSize = stats.size;
-        }
-      });
-    };
-
-    const watchLog = () => {
-      try {
-        const watcher = fs.watch(logFile, (eventType) => {
-          if (eventType === 'rename') {
-            watcher.close();
-            if (fs.existsSync(logFile)) {
-              watchLog();
-              checkUpdates();
-            }
-          } else if (eventType === 'change') {
-            if (!debounceTimer) {
-              debounceTimer = setTimeout(() => {
-                debounceTimer = null;
-                checkUpdates();
-              }, 500);
-            }
-          }
-        });
-        watcher.on('error', () => { });
-      } catch (e) { }
-    };
-
-    watchLog();
-  }
 }
 
 // 3. Boot
