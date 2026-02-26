@@ -12,9 +12,9 @@ const LogViewer = ({ logs }) => {
         <div className={styles.container}>
             <div className={styles.header}>KERNEL LOGS</div>
             <div className={styles.logList}>
-                {logs.map((log, i) => (
-                    <div key={i} className={styles.logEntry}>
-                        {log}
+                {logs.map((log) => (
+                    <div key={log.id} className={styles.logEntry}>
+                        {log.content}
                     </div>
                 ))}
                 <div ref={bottomRef} />
