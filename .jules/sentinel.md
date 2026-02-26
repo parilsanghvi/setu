@@ -12,3 +12,8 @@
 **Vulnerability:** Socket.IO connections were completely unauthenticated, allowing anyone with network access to monitor real-time system logs, chat messages, and agent activities.
 **Learning:** Middleware applied to Express apps (`app.use`) does not automatically protect Socket.IO namespaces when attached to the same HTTP server. Socket.IO requires its own middleware (`io.use`) to validate handshake data.
 **Prevention:** Always explicitly attach authentication middleware to Socket.IO instances using `io.use()`, verifying headers or query parameters from the handshake.
+
+## 2026-02-26 - [High] Reflected XSS in Google Auth Callback
+**Vulnerability:** The local `http.createServer` instance used for the Google OAuth callback returned `text/html` responses containing unescaped user input (the `error` query parameter), allowing Reflected XSS.
+**Learning:** Even short-lived local servers used for auth callbacks must treat all input as untrusted. Serving HTML error pages with user input requires rigorous escaping or, simpler, using `text/plain`.
+**Prevention:** When returning simple status messages or errors, prefer `Content-Type: text/plain` to avoid accidental HTML rendering of malicious payloads.
