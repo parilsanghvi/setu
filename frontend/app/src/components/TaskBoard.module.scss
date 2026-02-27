@@ -166,3 +166,16 @@
         text-decoration: underline;
     }
 }
+
+.emptyState {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    border: 2px dashed #374151; // border-gray-700
+    border-radius: 0.25rem;
+    color: #6b7280; // text-gray-500
+    font-size: 0.75rem;
+    text-align: center;
+    background-color: rgba(31, 41, 55, 0.3); // transparent gray-800
+}
