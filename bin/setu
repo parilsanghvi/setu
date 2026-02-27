@@ -270,11 +270,152 @@ switch (cmd) {
 
       runGenerator({ dryRun, onlyMissing });
       process.exit(0);
+    } else if (subCmd === 'enrich') {
+      const { enrichAll } = require('../lib/onboarding/doc-enricher');
+      const LLM = require('../lib/LLM');
+
+      const isDryRun = args.includes('--dry-run');
+      const isForce = args.includes('--force');
+      const isOnlyMissing = args.includes('--only-missing');
+      const isChanged = args.includes('--changed');
+
+      const fileIdx = args.indexOf('--file');
+      const folderIdx = args.indexOf('--folder');
+      const concIdx = args.indexOf('--max-concurrency');
+
+      const singleFile = fileIdx !== -1 ? args[fileIdx + 1] : null;
+      const singleFolder = folderIdx !== -1 ? args[folderIdx + 1] : null;
+      const maxConcurrency = concIdx !== -1 ? parseInt(args[concIdx + 1]) || 2 : 2;
+
+      log('🧠 Starting Documentation Enrichment...');
+
+      enrichAll({
+        repoRoot: path.resolve(__dirname, '..'),
+        llm: LLM,
+        dryRun: isDryRun,
+        force: isForce,
+        onlyMissing: isOnlyMissing,
+        maxConcurrency,
+        singleFile,
+        singleFolder,
+        changedOnly: isChanged || (!singleFile && !singleFolder && !isForce && !isOnlyMissing),
+      }).then(results => {
+        if (args.includes('--json')) {
+          console.log(JSON.stringify(results, null, 2));
+        } else {
+          log(`\n📊 Summary: ✅ ${results.enriched} enriched | ⏭️ ${results.skipped} skipped | ❌ ${results.failed} failed`);
+          if (results.low_confidence.length > 0) {
+            log(`⚠️  ${results.low_confidence.length} low-quality docs need attention`);
+          }
+        }
+
+        // Write quality history snapshot (Workstream 8)
+        try {
+          const { getSetuPath } = require('../lib/onboarding/paths');
+          const { getRepoQuality } = require('../lib/onboarding/status');
+          const qualityReport = getRepoQuality();
+          const historyPath = getSetuPath('doc-quality-history.jsonl');
+          const snapshot = {
+            timestamp: new Date().toISOString(),
+            avg_quality: qualityReport.avg_quality,
+            p50_quality: qualityReport.p50_quality,
+            p95_quality: qualityReport.p95_quality,
+            placeholder_rate: qualityReport.placeholder_rate,
+            total_docs: qualityReport.total_docs,
+            populated_docs: qualityReport.populated_docs,
+            enriched_this_run: results.enriched,
+          };
+          fs.mkdirSync(path.dirname(historyPath), { recursive: true });
+          fs.appendFileSync(historyPath, JSON.stringify(snapshot) + '\n');
+        } catch (_) { }
+
+        process.exit(results.failed > 0 ? 1 : 0);
+      }).catch(err => {
+        console.error(`[DOC-ENRICHER] Fatal error: ${err.message}`);
+        process.exit(1);
+      });
+    } else if (subCmd === 'quality') {
+      const { getRepoQuality } = require('../lib/onboarding/status');
+      const isJson = args.includes('--json');
+      const isTrend = args.includes('--trend');
+
+      if (isTrend) {
+        const { getSetuPath } = require('../lib/onboarding/paths');
+        const historyPath = getSetuPath('doc-quality-history.jsonl');
+
+        if (!fs.existsSync(historyPath)) {
+          if (isJson) console.log(JSON.stringify({ error: 'No quality history found' }));
+          else log('No quality history found. Run "setu onboarding enrich" first.');
+          process.exit(0);
+        }
+
+        try {
+          const lines = fs.readFileSync(historyPath, 'utf8').split('\n').filter(Boolean);
+          const allRuns = lines.map(l => { try { return JSON.parse(l); } catch (_) { return null; } }).filter(Boolean);
+          const recent = allRuns.slice(-20);
+
+          if (isJson) {
+            console.log(JSON.stringify({ total_runs: allRuns.length, runs: recent }, null, 2));
+          } else {
+            log('📈 Documentation Quality Trend (-20)');
+            recent.forEach(r => {
+              const bar = '█'.repeat(Math.round(r.avg_quality / 5)).padEnd(20, '░');
+              const icon = r.placeholder_rate === 0 ? '✅' : '⚠️ ';
+              console.log(`   ${r.timestamp.split('T')[0]} | ${icon} | Avg: ${r.avg_quality}% [${bar}] | Placeholders: ${r.placeholder_rate}%`);
+            });
+          }
+        } catch (e) {
+          if (isJson) console.log(JSON.stringify({ error: 'Parse failed' }));
+          else log('🛑 Failed to parse quality history.');
+        }
+        process.exit(0);
+      }
+
+      const report = getRepoQuality();
+
+      if (isJson) {
+        // Omit individual scores for JSON brevity; include summary
+        const summary = {
+          total_docs: report.total_docs,
+          populated_docs: report.populated_docs,
+          placeholder_docs: report.placeholder_docs,
+          placeholder_rate: report.placeholder_rate,
+          avg_quality: report.avg_quality,
+          p50_quality: report.p50_quality,
+          p95_quality: report.p95_quality,
+          low_quality_count: report.low_quality_files.length,
+          low_quality_files: report.low_quality_files.map(f => ({ path: f.path, score: f.total_score, issues: f.issues })),
+        };
+        console.log(JSON.stringify(summary, null, 2));
+      } else {
+        log('📊 Documentation Quality Report');
+        console.log(`   Total Docs:     ${report.total_docs}`);
+        console.log(`   Populated:      ${report.populated_docs}`);
+        console.log(`   Placeholders:   ${report.placeholder_docs} (${report.placeholder_rate}%)`);
+        console.log(`   Avg Quality:    ${report.avg_quality}%`);
+        console.log(`   p50 Quality:    ${report.p50_quality}%`);
+        console.log(`   p95 Quality:    ${report.p95_quality}%`);
+
+        if (report.low_quality_files.length > 0) {
+          console.log(`\n   ⚠️  Low Quality Docs (${report.low_quality_files.length}):`);
+          report.low_quality_files.forEach(f => {
+            console.log(`   - ${f.path} (score: ${f.total_score}) — ${f.issues.join('; ')}`);
+          });
+        }
+
+        if (report.placeholder_rate > 0) {
+          console.log('\n   🔧 TO FIX:');
+          console.log('   Run: "setu onboarding enrich --only-missing"');
+        }
+      }
+      process.exit(0);
     } else if (subCmd === 'doctor') {
       const isHelp = args.includes('--help') || args.includes('-h');
       if (isHelp) {
         log('🩺 Setu Onboarding Doctor Usage:');
         console.log('  setu onboarding doctor --diff         : Run drift validations against target branch.');
+        console.log('  setu onboarding doctor --links        : Validate all internal doc links.');
+        console.log('  setu onboarding doctor --links --fix  : Auto-repair common broken link patterns.');
         console.log('  setu onboarding doctor --trend        : View recent drift history telemetry.');
         console.log('  setu onboarding doctor --autofix-plan : Generate JSON remediation commands.');
         console.log('  setu onboarding doctor --digest-weekly: Preview or trigger the weekly email metrics.');
@@ -285,6 +426,85 @@ switch (cmd) {
         console.log('  --show-ignored : Print explicitly excluded files during diff scans.');
         console.log('  --owners-debug : Print rule engine evaluation trace for file ownership.');
         process.exit(0);
+      }
+
+      const isLinks = args.includes('--links');
+      if (isLinks) {
+        const { validateAllLinks } = require('../lib/onboarding/doc-links');
+        const isJson = args.includes('--json');
+        const isFix = args.includes('--fix');
+        const repoRoot = path.resolve(__dirname, '..');
+
+        if (isFix) {
+          // Auto-fix mode
+          const docsDir = path.join(repoRoot, 'docs');
+          let fixed = 0, touched = 0;
+
+          function fixDir(dir) {
+            const entries = fs.readdirSync(dir, { withFileTypes: true });
+            for (const entry of entries) {
+              const full = path.join(dir, entry.name);
+              if (entry.isDirectory()) { fixDir(full); continue; }
+              if (!entry.name.endsWith('.md')) continue;
+              let content = fs.readFileSync(full, 'utf8');
+              let changed = false;
+              const original = content;
+              // Strip github.com URLs
+              content = content.replace(/\[([^\]]*)\]\(https?:\/\/github\.com[^)]*\)/g, '`$1`');
+              // Strip (link to ...) placeholders
+              content = content.replace(/\[([^\]]*)\]\(link to [^)]+\)/gi, '`$1`');
+              // Strip empty links
+              content = content.replace(/\[([^\]]*)\]\(\s*\)/g, '`$1`');
+              // Fix missing extensions in /files/ links
+              content = content.replace(/\(([^)]*\/files\/[^)]*?)\.md\)/g, (m, prefix) => {
+                if (/\.(js|jsx|ts|tsx|json|yml|yaml|css|html|py|sh|mjs|cjs)$/i.test(prefix)) return m;
+                return `(${prefix}.js.md)`;
+              });
+              if (content !== original) { fs.writeFileSync(full, content); fixed++; touched++; changed = true; }
+            }
+          }
+          fixDir(docsDir);
+
+          if (isJson) console.log(JSON.stringify({ fixed, files_touched: touched }));
+          else log(`[DOC-LINKS] Fixed ${fixed} files with broken link patterns.`);
+
+          // Re-validate after fix
+          const report = validateAllLinks(repoRoot);
+          if (!isJson) {
+            console.log(`   After fix: ${report.valid_links}/${report.total_links} valid, ${report.broken_links} broken`);
+          }
+          process.exit(report.ok ? 0 : 1);
+        }
+
+        const report = validateAllLinks(repoRoot);
+
+        if (isJson) {
+          console.log(JSON.stringify({
+            ok: report.ok,
+            total_files: report.total_files,
+            total_links: report.total_links,
+            valid_links: report.valid_links,
+            broken_links: report.broken_links,
+            github_blob_links: report.github_blob_links,
+            empty_links: report.empty_links,
+            files_with_issues: report.files_with_broken.length,
+            top_broken_patterns: report.top_broken_patterns,
+          }, null, 2));
+        } else {
+          log('🔗 Documentation Link Validation');
+          console.log(`   Total files: ${report.total_files} | Links: ${report.total_links}`);
+          console.log(`   ✅ Valid: ${report.valid_links} | ❌ Broken: ${report.broken_links} | 🔗 GitHub: ${report.github_blob_links} | ⚪ Empty: ${report.empty_links}`);
+          if (report.files_with_broken.length > 0) {
+            console.log(`\n   Files affected: ${report.files_with_broken.length}`);
+            report.broken_details.slice(0, 5).forEach(d => {
+              console.log(`   - ${d.file}:${d.line} [${d.label}](${d.href})`);
+            });
+          }
+          if (!report.ok) {
+            console.log('\n   🔧 Run: setu onboarding doctor --links --fix');
+          }
+        }
+        process.exit(report.ok ? 0 : 1);
       }
 
       const isTrend = args.includes('--trend');
@@ -607,10 +827,18 @@ switch (cmd) {
         doc.on('exit', (code) => process.exit(code));
       }
     } else {
-      log('Usage: setu onboarding [run|status|doctor] [--dry-run] [--only-missing]');
+      log('Usage: setu onboarding [run|status|enrich|quality|doctor] [--dry-run] [--only-missing]');
+      log('');
+      log('  run       Scaffold placeholder doc stubs for all files/folders');
+      log('  status    Check onboarding completeness');
+      log('  enrich    Generate rich docs via LLM (two-pass: facts + LLM)');
+      log('  quality   View documentation quality report');
+      log('  doctor    Run drift, trend, autofix, and digest commands');
     }
     break;
 
   default:
     console.log('Usage: setu [start|stop|status|onboarding|chat|task|dashboard|ignite]');
+    console.log('  onboarding enrich   — Generate rich docs via LLM');
+    console.log('  onboarding quality  — View documentation quality report');
 }
