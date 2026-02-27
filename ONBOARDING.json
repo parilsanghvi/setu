@@ -1,14 +1,14 @@
 {
-  "repo": "Setu",
+  "repo": "app",
   "default_branch": "master",
-  "head_commit": "840d691198ff3e23bf75aafb84385a9c374ecf29",
-  "generated_at": "2026-02-22T15:52:03.695Z",
-  "completeness_percent": 2,
+  "head_commit": "9c25b3510fcb1b577a5c733e4b4c5a0de94516aa",
+  "generated_at": "2026-02-27T20:42:11.192Z",
+  "completeness_percent": 99,
   "owners_modules": {},
   "checks": {
     "core_artifacts_ok": true,
-    "file_doc_coverage_percent": 0,
-    "folder_summary_coverage_percent": 0,
+    "file_doc_coverage_percent": 99,
+    "folder_summary_coverage_percent": 100,
     "stale_commit_check_ok": true
   }
 }
