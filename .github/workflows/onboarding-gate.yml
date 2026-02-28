@@ -42,11 +42,65 @@ jobs:
           cat status.json >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
           
-          # Optional PR Comment annotation logic (requires valid GITHUB_TOKEN)
-          
           if [ $EXIT_CODE -ne 0 ]; then
             echo "::error::Onboarding Incomplete. Run 'setu onboarding run' locally."
             exit 1
+          fi
+
+      - name: Check Documentation Quality
+        id: quality_check
+        run: |
+          set +e
+          node bin/setu onboarding quality --json > quality.json
+          
+          PLACEHOLDER_RATE=$(node -e "const q=require('./quality.json'); console.log(q.placeholder_rate || 0)")
+          AVG_QUALITY=$(node -e "const q=require('./quality.json'); console.log(q.avg_quality || 0)")
+          LOW_QUALITY=$(node -e "const q=require('./quality.json'); console.log(q.low_quality_count || 0)")
+          
+          echo "### Documentation Quality" >> $GITHUB_STEP_SUMMARY
+          echo "| Metric | Value |" >> $GITHUB_STEP_SUMMARY
+          echo "|--------|-------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Placeholder Rate | ${PLACEHOLDER_RATE}% |" >> $GITHUB_STEP_SUMMARY
+          echo "| Avg Quality | ${AVG_QUALITY}% |" >> $GITHUB_STEP_SUMMARY
+          echo "| Low Quality Docs | ${LOW_QUALITY} |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo '```json' >> $GITHUB_STEP_SUMMARY
+          cat quality.json >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          
+          # Configurable quality threshold (default 80)
+          MIN_QUALITY=${SETU_MIN_DOC_QUALITY:-80}
+          
+          if [ "$PLACEHOLDER_RATE" != "0" ]; then
+            echo "::warning::Placeholder documentation detected (${PLACEHOLDER_RATE}% of docs are placeholders). Run 'setu onboarding enrich --only-missing'."
+          fi
+          
+          # Store for later gate enforcement
+          echo "PLACEHOLDER_RATE=${PLACEHOLDER_RATE}" >> $GITHUB_ENV
+          echo "AVG_QUALITY=${AVG_QUALITY}" >> $GITHUB_ENV
+
+      - name: Check Doc Links
+        run: |
+          node scripts/check-doc-links.js --json > link-report.json
+          BROKEN=$(node -e "console.log(JSON.parse(require('fs').readFileSync('link-report.json','utf8')).broken_links)")
+          TOTAL=$(node -e "console.log(JSON.parse(require('fs').readFileSync('link-report.json','utf8')).total_links)")
+          VALID=$(node -e "console.log(JSON.parse(require('fs').readFileSync('link-report.json','utf8')).valid_links)")
+          GITHUB_BLOB=$(node -e "console.log(JSON.parse(require('fs').readFileSync('link-report.json','utf8')).github_blob_links)")
+          
+          echo "### Documentation Links" >> $GITHUB_STEP_SUMMARY
+          echo "| Metric | Value |" >> $GITHUB_STEP_SUMMARY
+          echo "|--------|-------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Total Links | ${TOTAL} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Valid | ${VALID} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Broken | ${BROKEN} |" >> $GITHUB_STEP_SUMMARY
+          echo "| GitHub Blob URLs | ${GITHUB_BLOB} |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          if [ "$BROKEN" != "0" ] || [ "$GITHUB_BLOB" != "0" ]; then
+            echo "::error::${BROKEN} broken doc links and ${GITHUB_BLOB} GitHub blob URLs found. Run 'setu onboarding doctor --links' locally."
+            echo "LINKS_OK=false" >> $GITHUB_ENV
+          else
+            echo "LINKS_OK=true" >> $GITHUB_ENV
           fi
 
       - name: Check Docs Drift (PR Preflight)
@@ -76,8 +130,16 @@ jobs:
       - name: Enforce Governance Failure 
         if: github.event_name == 'pull_request'
         run: |
+          FAILED=false
           if [ "${{ env.DRIFT_EXIT_CODE }}" -ne 0 ]; then
             echo "::error::Docs Drift Detected! Review the PR comment or run 'setu onboarding doctor --diff' locally to fix."
+            FAILED=true
+          fi
+          if [ "${{ env.LINKS_OK }}" = "false" ]; then
+            echo "::error::Broken doc links detected! Run 'setu onboarding doctor --links' locally to diagnose."
+            FAILED=true
+          fi
+          if [ "$FAILED" = "true" ]; then
             exit 1
           fi
 
