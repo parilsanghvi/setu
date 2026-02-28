@@ -1,3 +1,4 @@
+<!-- PLACEHOLDER -->
 # Folder Summary: skills/backend-migration
 
 **Purpose:** [Describe what this folder contains and its role]

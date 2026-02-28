@@ -1,3 +1,4 @@
+<!-- PLACEHOLDER -->
 # Folder Summary: backend
 
 **Purpose:** [Describe what this folder contains and its role]

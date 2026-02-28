@@ -12,3 +12,8 @@
 **Vulnerability:** Socket.IO connections were completely unauthenticated, allowing anyone with network access to monitor real-time system logs, chat messages, and agent activities.
 **Learning:** Middleware applied to Express apps (`app.use`) does not automatically protect Socket.IO namespaces when attached to the same HTTP server. Socket.IO requires its own middleware (`io.use`) to validate handshake data.
 **Prevention:** Always explicitly attach authentication middleware to Socket.IO instances using `io.use()`, verifying headers or query parameters from the handshake.
+
+## 2026-02-25 - [Critical] Path Traversal in CoreAgent File Operations
+**Vulnerability:** `CoreAgent.readFile` and `writeFile` directly used user-provided file paths with `fs.promises`, allowing access to arbitrary files outside the agent's scope via absolute paths or `..` sequences.
+**Learning:** Even if `scope` is passed to the constructor, it must be actively enforced during file operations using `path.resolve` and strict `startsWith` validation. `path.join` alone is insufficient if the input is absolute.
+**Prevention:** Implement a dedicated `_resolvePath` method that resolves against the scope and throws if the result escapes the scope. Use this method for all filesystem access.

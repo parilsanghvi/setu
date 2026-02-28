@@ -12,7 +12,7 @@ const ChatBox = ({ agents, logs }) => {
     // For now, let's show all system logs + chat to give "The Matrix" feel
     // OR filter for [CHAT] prefix we added in useSocket
     const chatHistory = useMemo(() =>
-        logs.filter(l => typeof l === 'string' && l.startsWith('[CHAT]')),
+        logs.filter(l => typeof l.content === 'string' && l.content.startsWith('[CHAT]')),
         [logs]
     );
 
@@ -43,9 +43,9 @@ const ChatBox = ({ agents, logs }) => {
         <div className={styles.container}>
             <div className={styles.header}>COMMS</div>
             <div className={styles.messageList}>
-                {chatHistory.map((h, i) => (
-                    <div key={i} className={styles.logEntry}>
-                        {h}
+                {chatHistory.map((h) => (
+                    <div key={h.id} className={styles.logEntry}>
+                        {h.content}
                     </div>
                 ))}
                 <div ref={messagesEndRef} />
