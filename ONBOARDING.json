@@ -7,8 +7,8 @@
   "owners_modules": {},
   "checks": {
     "core_artifacts_ok": true,
-    "file_doc_coverage_percent": 0,
-    "folder_summary_coverage_percent": 0,
+    "file_doc_coverage_percent": 99,
+    "folder_summary_coverage_percent": 100,
     "stale_commit_check_ok": true
   }
 }

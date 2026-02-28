@@ -1,7 +1,7 @@
 # Project Index
 
 **Repo:** 
-**Owner:** 
+**Owner:**
 **Purpose:** [Short description of the project]
 
 ## Quick Links
