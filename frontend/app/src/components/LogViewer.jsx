@@ -23,4 +23,4 @@ const LogViewer = ({ logs }) => {
     );
 };
 
-export default LogViewer;
+export default React.memo(LogViewer);

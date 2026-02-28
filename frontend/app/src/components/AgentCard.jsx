@@ -28,4 +28,4 @@ const AgentCard = ({ agent }) => {
     );
 };
 
-export default AgentCard;
+export default React.memo(AgentCard);

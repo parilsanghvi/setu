@@ -39,4 +39,4 @@ const OnboardingStatus = ({ data }) => {
     );
 };
 
-export default OnboardingStatus;
+export default React.memo(OnboardingStatus);

@@ -19,7 +19,9 @@ const App = () => {
       .catch(() => { });
   }, []);
 
-  const activeAgentsCount = agents.filter(a => a.status !== 'OFFLINE').length;
+  const activeAgentsCount = React.useMemo(() => {
+    return agents.filter(a => a.status !== 'OFFLINE').length;
+  }, [agents]);
 
   return (
     <div className={styles.grid}>
