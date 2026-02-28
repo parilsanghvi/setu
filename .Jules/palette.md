@@ -9,3 +9,7 @@
 ## 2026-02-19 - [A11y: Modal Accessibility Patterns]
 **Learning:** The Modal component was missing critical accessibility features: it didn't close on Escape, didn't manage focus, and lacked ARIA roles. This traps keyboard users and confuses screen readers.
 **Action:** Always implement `useEffect` for Escape key handling, trap or manage focus on mount, and add `role="dialog"` + `aria-modal="true"` to all modal implementations.
+
+## 2026-02-23 - [A11y: Status Indicators]
+**Learning:** The Onboarding widget relied solely on color (red/green borders) to convey status, making it inaccessible to colorblind users and screen readers. Status messages should always combine color with text and icons, and use semantic roles like `role="status"`.
+**Action:** Always include explicit text labels or aria-labels alongside color indicators, and use semantic HTML elements for status updates.
