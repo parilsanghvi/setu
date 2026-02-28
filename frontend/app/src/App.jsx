@@ -4,6 +4,7 @@ import AgentCard from './components/AgentCard';
 import TaskBoard from './components/TaskBoard';
 import LogViewer from './components/LogViewer';
 import ChatBox from './components/ChatBox';
+import OnboardingStatus from './components/OnboardingStatus';
 import styles from './App.module.scss';
 import './index.scss';
 
@@ -28,18 +29,7 @@ const App = () => {
         <div className={styles.stats}>
           {activeAgentsCount} <span className={styles.statsLabel}>Active Agents</span>
         </div>
-        {onboarding && (
-          <div style={{ marginTop: '10px', fontSize: '0.75rem', padding: '0.5rem', borderRadius: '0.25rem', border: '1px solid', textAlign: 'center', borderColor: onboarding.ok ? '#166534' : '#991b1b', color: onboarding.ok ? '#4ade80' : '#f87171', backgroundColor: onboarding.ok ? 'rgba(20, 83, 45, 0.2)' : 'rgba(127, 29, 29, 0.2)' }}>
-            <div><span style={{ fontWeight: 'bold' }}>Onboarding:</span> {onboarding.completeness}% {onboarding.stale ? '(STALE)' : ''}</div>
-            {!onboarding.ok && (
-              <>
-                <div style={{ marginTop: '0.25rem' }}>Missing: {onboarding.missing.length} artifact(s)</div>
-                <div style={{ marginTop: '0.25rem', fontWeight: 'bold', color: '#facc15' }}>Fix now: <code>setu onboarding run</code></div>
-              </>
-            )}
-            {onboarding.generatedAt && <div style={{ marginTop: '0.25rem', color: '#6b7280', opacity: 0.7 }}>Updated: {new Date(onboarding.generatedAt).toLocaleString()}</div>}
-          </div>
-        )}
+        <OnboardingStatus data={onboarding} />
       </div>
 
       {/* Agent List */}
@@ -62,7 +52,7 @@ const App = () => {
 
       {/* Chat */}
       <div className={styles.chat}>
-        <ChatBox agents={agents} />
+        <ChatBox agents={agents} logs={logs} />
       </div>
     </div>
   );

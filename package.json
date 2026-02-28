@@ -28,5 +28,10 @@
   },
   "devDependencies": {
     "socket.io-client": "^4.8.3"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "better-sqlite3"
+    ]
   }
 }
