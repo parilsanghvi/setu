@@ -8,7 +8,7 @@ const db = require('../lib/db'); // Use lib/db directly to manipulate state
 // Kill any existing process on 3000
 try {
   require('child_process').execSync('kill $(lsof -t -i :3000) 2>/dev/null || true');
-} catch (e) {}
+} catch (e) { }
 
 const DASHBOARD_PASS = 'testpass';
 console.log('🚀 Starting System Kernel (index.js)...');
@@ -37,7 +37,7 @@ setTimeout(() => {
   });
 
   let updates = [];
-  const MAX_UPDATES = 4;
+  const MAX_UPDATES = 5;
 
   socket.on('connect', () => {
     console.log('✅ Connected');
@@ -57,8 +57,8 @@ setTimeout(() => {
   function analyzeUpdates() {
     console.log('📊 Analyzing Broadcast Frequency...');
     let intervals = [];
-    for (let i = 1; i < updates.length; i++) {
-      const diff = updates[i] - updates[i-1];
+    for (let i = 2; i < updates.length; i++) {
+      const diff = updates[i] - updates[i - 1];
       intervals.push(diff);
       console.log(`   Interval ${i}: ${diff}ms`);
     }

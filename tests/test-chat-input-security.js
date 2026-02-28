@@ -11,22 +11,22 @@ const mockBus = {
       run: () => ({ lastInsertRowid: 1 })
     })
   },
-  send: () => {},
-  on: () => {},
-  heartbeat: () => {},
+  send: () => { },
+  on: () => { },
+  heartbeat: () => { },
   getDeadAgents: () => [],
-  updateTask: () => {}
+  updateTask: () => { }
 };
 
 const mocks = {
   'express': Object.assign(() => {
-    const app = function(req, res, next) {};
-    app.use = () => {};
+    const app = function (req, res, next) { };
+    app.use = () => { };
     app.get = (path, handler) => { app.routes['GET ' + path] = handler; };
     app.post = (path, handler) => { app.routes['POST ' + path] = handler; };
     app.routes = {};
-    app.listen = (port, host, cb) => { if(cb) cb(); };
-    app.static = () => {};
+    app.listen = (port, host, cb) => { if (cb) cb(); };
+    app.static = () => { };
     return app;
   }, {
     json: () => (req, res, next) => next(),
@@ -35,14 +35,14 @@ const mocks = {
   'http': {
     createServer: (app) => ({ listen: app.listen, close: (cb) => cb && cb() })
   },
-  'socket.io': { Server: class { on() {} emit() {} } },
+  'socket.io': { Server: class { on() { } emit() { } use() { } } },
   'cors': () => (req, res, next) => next(),
   'helmet': () => (req, res, next) => next(),
-  'better-sqlite3': function() {
-      return mockBus.db;
+  'better-sqlite3': function () {
+    return mockBus.db;
   },
   'child_process': {
-    fork: () => ({ stdout: { on: () => {} }, stderr: { on: () => {} }, on: () => {}, kill: () => {} })
+    fork: () => ({ stdout: { on: () => { } }, stderr: { on: () => { } }, on: () => { }, kill: () => { } })
   }
 };
 
@@ -55,7 +55,7 @@ mocks['express'] = Object.assign(() => {
 }, originalExpress);
 
 
-Module.prototype.require = function(id) {
+Module.prototype.require = function (id) {
   if (mocks[id]) return mocks[id];
 
   if (id === './lib/db' || id.endsWith('/lib/db')) {
@@ -103,12 +103,12 @@ console.log('🧪 Testing POST /api/chat payload size...');
   };
 
   try {
-      handler(req, res);
-      console.log(`   Small payload status: ${status}`);
-      if (status !== 200 && status !== undefined) {
-          console.error('   ❌ Expected 200 for small payload');
-      }
-  } catch(e) { console.error(e); }
+    handler(req, res);
+    console.log(`   Small payload status: ${status}`);
+    if (status !== 200 && status !== undefined) {
+      console.error('   ❌ Expected 200 for small payload');
+    }
+  } catch (e) { console.error(e); }
 }
 
 // Test 2: Large payload (should fail 400 or 413)
@@ -123,17 +123,17 @@ console.log('🧪 Testing POST /api/chat payload size...');
   };
 
   try {
-      handler(req, res);
-      console.log(`   Large payload status: ${status}`);
+    handler(req, res);
+    console.log(`   Large payload status: ${status}`);
 
-      if (status === 200) {
-        console.log('⚠️  Vulnerability CONFIRMED: Large message accepted (Status 200).');
-      } else if (status === 400 || status === 413) {
-        console.log('✅  Fix CONFIRMED: Large message rejected.');
-      } else {
-        console.log(`❓  Unexpected status: ${status}`);
-      }
-  } catch(e) { console.error(e); }
+    if (status === 200) {
+      console.log('⚠️  Vulnerability CONFIRMED: Large message accepted (Status 200).');
+    } else if (status === 400 || status === 413) {
+      console.log('✅  Fix CONFIRMED: Large message rejected.');
+    } else {
+      console.log(`❓  Unexpected status: ${status}`);
+    }
+  } catch (e) { console.error(e); }
 }
 
 console.log('🏁 Verification complete.');

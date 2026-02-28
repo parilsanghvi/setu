@@ -1,5 +1,6 @@
 const test = require('node:test');
 const assert = require('node:assert');
+process.env.NODE_ENV = 'test';
 const authMiddleware = require('../lib/middleware/auth');
 
 // Note: This test assumes that `authMiddleware` exports `_getMapSize`, `_resetMap`, and `_runCleanup`
@@ -42,8 +43,8 @@ test('Auth Middleware - Rate Limit Cleanup', async (t) => {
 
     // IP1 fails 5 times (gets blocked)
     for (let i = 0; i < 5; i++) {
-        const { req, res, next } = createMock(ip1);
-        authMiddleware(req, res, next);
+      const { req, res, next } = createMock(ip1);
+      authMiddleware(req, res, next);
     }
 
     // IP2 fails 1 time (not blocked yet)
