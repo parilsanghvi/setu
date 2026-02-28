@@ -653,51 +653,10 @@ function startSystemLoops() {
 
   }, 1000); // Check every 1s (High frequency for responsiveness)
 
-  // D. Log File Watcher (Stream setu.log to GUI)
-  const logFile = path.join(__dirname, 'setu.log');
-  if (fs.existsSync(logFile)) {
-    let lastSize = fs.statSync(logFile).size;
-    let debounceTimer = null;
-
-    const checkUpdates = () => {
-      fs.stat(logFile, (err, stats) => {
-        if (err) return;
-        if (stats.size > lastSize) {
-          const stream = fs.createReadStream(logFile, { start: lastSize, end: stats.size - 1 });
-          stream.on('data', (chunk) => {
-            io.emit('log', chunk.toString());
-          });
-          lastSize = stats.size;
-        } else if (stats.size < lastSize) {
-          lastSize = stats.size;
-        }
-      });
-    };
-
-    const watchLog = () => {
-      try {
-        const watcher = fs.watch(logFile, (eventType) => {
-          if (eventType === 'rename') {
-            watcher.close();
-            if (fs.existsSync(logFile)) {
-              watchLog();
-              checkUpdates();
-            }
-          } else if (eventType === 'change') {
-            if (!debounceTimer) {
-              debounceTimer = setTimeout(() => {
-                debounceTimer = null;
-                checkUpdates();
-              }, 500);
-            }
-          }
-        });
-        watcher.on('error', () => { });
-      } catch (e) { }
-    };
-
-    watchLog();
-  }
+  // D. Log File Watcher REMOVED
+  // Reason: The `log()` function already broadcasts logs via Socket.IO immediately.
+  // Watching the file caused duplicate log emissions (one from `log()`, one from `fs.watch`).
+  // External tools can still tail `setu.log` if needed.
 }
 
 // 3. Boot
