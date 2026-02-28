@@ -2,12 +2,12 @@
   "repo": "app",
   "default_branch": "master",
   "head_commit": "840d691198ff3e23bf75aafb84385a9c374ecf29",
-  "generated_at": "2026-02-26T20:16:37.914Z",
+  "generated_at": "2026-02-27T20:42:11.192Z",
   "completeness_percent": 100,
   "owners_modules": {},
   "checks": {
     "core_artifacts_ok": true,
-    "file_doc_coverage_percent": 100,
+    "file_doc_coverage_percent": 99,
     "folder_summary_coverage_percent": 100,
     "stale_commit_check_ok": true
   }

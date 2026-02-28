@@ -17,3 +17,8 @@
 **Vulnerability:** The local `http.createServer` instance used for the Google OAuth callback returned `text/html` responses containing unescaped user input (the `error` query parameter), allowing Reflected XSS.
 **Learning:** Even short-lived local servers used for auth callbacks must treat all input as untrusted. Serving HTML error pages with user input requires rigorous escaping or, simpler, using `text/plain`.
 **Prevention:** When returning simple status messages or errors, prefer `Content-Type: text/plain` to avoid accidental HTML rendering of malicious payloads.
+
+## 2026-02-25 - [Critical] Path Traversal in CoreAgent File Operations
+**Vulnerability:** `CoreAgent.readFile` and `writeFile` directly used user-provided file paths with `fs.promises`, allowing access to arbitrary files outside the agent's scope via absolute paths or `..` sequences.
+**Learning:** Even if `scope` is passed to the constructor, it must be actively enforced during file operations using `path.resolve` and strict `startsWith` validation. `path.join` alone is insufficient if the input is absolute.
+**Prevention:** Implement a dedicated `_resolvePath` method that resolves against the scope and throws if the result escapes the scope. Use this method for all filesystem access.

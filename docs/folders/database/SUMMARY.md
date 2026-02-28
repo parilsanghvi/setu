@@ -1,3 +1,4 @@
+<!-- PLACEHOLDER -->
 # Folder Summary: database
 
 **Purpose:** [Describe what this folder contains and its role]

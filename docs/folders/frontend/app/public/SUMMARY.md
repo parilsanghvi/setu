@@ -1,3 +1,4 @@
+<!-- PLACEHOLDER -->
 # Folder Summary: frontend/app/public
 
 **Purpose:** [Describe what this folder contains and its role]
