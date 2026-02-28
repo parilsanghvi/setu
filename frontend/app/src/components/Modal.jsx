@@ -19,14 +19,22 @@ const Modal = ({ children, onClose, title = "Modal" }) => {
             }
         };
 
+        // Capture the previously active element to restore focus when modal closes
+        const previousActiveElement = document.activeElement;
+
         // Focus the modal content when it mounts (run once)
         if (modalRef.current) {
             modalRef.current.focus();
         }
 
         document.addEventListener('keydown', handleKeyDown);
+
         return () => {
             document.removeEventListener('keydown', handleKeyDown);
+            // Restore focus to the previously active element
+            if (previousActiveElement && typeof previousActiveElement.focus === 'function') {
+                previousActiveElement.focus();
+            }
         };
     }, []); // Empty dependency array ensures this runs only once on mount
 
