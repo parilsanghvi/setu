@@ -97,29 +97,35 @@ const TaskBoard = ({ tasks }) => {
                     <div key={status} className={styles.column}>
                         <div className={styles.columnHeader}>{status}</div>
                         <div className={styles.taskList}>
-                            {items.map(t => (
-                                <div
-                                    key={t.id}
-                                    role="button"
-                                    tabIndex={0}
-                                    onClick={() => setSelectedTask(t)}
-                                    onKeyDown={(e) => {
-                                        if (e.key === 'Enter' || e.key === ' ') {
-                                            e.preventDefault();
-                                            setSelectedTask(t);
-                                        }
-                                    }}
-                                    aria-label={`View details for task: ${t.displayTitle}`}
-                                    className={styles.taskCard}
-                                >
-                                    <div className={styles.taskId}>{t.id}</div>
-                                    <div className={styles.taskTitle}>{t.displayTitle}</div>
-                                    <div className={styles.taskFooter}>
-                                        <span>{t.owner || 'Unassigned'}</span>
-                                        <span className={styles.viewLink}>View 📸</span>
-                                    </div>
+                            {items.length === 0 ? (
+                                <div className={styles.emptyState}>
+                                    No tasks
                                 </div>
-                            ))}
+                            ) : (
+                                items.map(t => (
+                                    <div
+                                        key={t.id}
+                                        role="button"
+                                        tabIndex={0}
+                                        onClick={() => setSelectedTask(t)}
+                                        onKeyDown={(e) => {
+                                            if (e.key === 'Enter' || e.key === ' ') {
+                                                e.preventDefault();
+                                                setSelectedTask(t);
+                                            }
+                                        }}
+                                        aria-label={`View details for task: ${t.displayTitle}`}
+                                        className={styles.taskCard}
+                                    >
+                                        <div className={styles.taskId}>{t.id}</div>
+                                        <div className={styles.taskTitle}>{t.displayTitle}</div>
+                                        <div className={styles.taskFooter}>
+                                            <span>{t.owner || 'Unassigned'}</span>
+                                            <span className={styles.viewLink}>View 📸</span>
+                                        </div>
+                                    </div>
+                                ))
+                            )}
                         </div>
                     </div>
                 ))}
