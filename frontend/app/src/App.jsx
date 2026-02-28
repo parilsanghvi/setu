@@ -52,7 +52,7 @@ const App = () => {
 
       {/* Chat */}
       <div className={styles.chat}>
-        <ChatBox agents={agents} />
+        <ChatBox agents={agents} logs={logs} />
       </div>
     </div>
   );
