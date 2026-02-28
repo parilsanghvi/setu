@@ -1,3 +1,4 @@
+<!-- PLACEHOLDER -->
 # Folder Summary: skills/drishti
 
 **Purpose:** [Describe what this folder contains and its role]

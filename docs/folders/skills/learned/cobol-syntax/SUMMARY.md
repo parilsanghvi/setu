@@ -1,3 +1,4 @@
+<!-- PLACEHOLDER -->
 # Folder Summary: skills/learned/cobol-syntax
 
 **Purpose:** [Describe what this folder contains and its role]
