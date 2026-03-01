@@ -52,6 +52,13 @@ Module.prototype.require = function (id) {
             }
         };
     }
+    // Mock dotenv
+    if (id === 'dotenv') {
+        return { config: () => ({}) };
+    }
+    if (id === 'fs') {
+        return { ...require('node:fs'), existsSync: () => false };
+    }
     return originalRequire.apply(this, arguments);
 };
 
@@ -193,6 +200,46 @@ async function runTest() {
 
     } catch (e) {
         assert(false, `Method should catch error internally, but threw: ${e.message}`);
+    }
+
+    // --- Test 4: LLM Error Without Message Property ---
+    console.log("\n▶️  Test 4: Compaction Error Handling - LLM Throws Non-Error");
+    bot.context = [...initialMessages]; // Reset context
+    bot.mockTokenCount = 250000; // Above 200k
+    bot.loggedErrors = [];
+
+    mockLLM.generate = async () => {
+        throw "String Error"; // Throws a string directly
+    };
+
+    try {
+        await bot.compactContext();
+        assert(bot.context.length === 20, "Context length should remain 20 on string error");
+        assert(bot.loggedErrors.length > 0, "String error should be logged");
+        assert(bot.loggedErrors[0].msg.includes("Compaction failed"), "Log message should mention failure even for string errors");
+    } catch (e) {
+        assert(false, `Method should catch string error internally, but threw: ${e.message || e}`);
+    }
+
+    // --- Test 5: LLM Returns Null/Empty ---
+    console.log("\n▶️  Test 5: Compaction Edge Cases - LLM Returns Null/Empty");
+    bot.context = [...initialMessages]; // Reset context
+    bot.mockTokenCount = 250000; // Above 200k
+    bot.loggedErrors = [];
+
+    mockLLM.generate = async () => {
+        return null;
+    };
+
+    try {
+        await bot.compactContext();
+        // Expect context length: 1 (summary) + 10 (kept) = 11
+        assert(bot.context.length === 11, `Context length should be 11 even on null return (Got ${bot.context.length})`);
+        const firstMsg = bot.context[0];
+        assert(firstMsg.role === 'system', "First message role should be 'system'");
+        assert(firstMsg.content === "[MEMORY SUMMARY]: null", "Null summary should be stringified");
+    } catch (e) {
+        assert(false, `Method should not throw on null summary, but threw: ${e.message}`);
     }
 
     // --- Final Summary ---
