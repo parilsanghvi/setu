@@ -12,3 +12,15 @@
 - Mocks `dotenv` (via `Module.prototype.require` interception) to satisfy `lib/Config.js` dependencies.
 - Starts the `GoogleAuth` local HTTP server on port 51121.
 - Exits the process with code 0 (success) or 1 (failure).
+
+## Purpose
+Tests the Google Auth OAuth callback endpoint to ensure it properly handles input containing malicious scripts and prevents Cross-Site Scripting (XSS).
+
+## Exports
+- None
+
+## Dependencies
+- None
+
+## Side Effects
+- None
