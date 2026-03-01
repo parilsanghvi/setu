@@ -1,9 +1,5 @@
-# File: tests/test-server-error-handling.js
-
-**Purpose:** [What does this file do?]
-
-**Key Exports/Entrypoints:**
-- [List functions/classes export]
-
-**Side Effects:**
-- [E.g., modifies DB, writes files, sets globals]
+---
+title: test-server-error-handling.js
+description: Integration tests verifying that the server correctly masks internal errors.
+---
+# test-server-error-handling.js
