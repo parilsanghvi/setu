@@ -1,9 +1,15 @@
-# File: tests/verify-path-traversal.js
+# tests/verify-path-traversal.js
 
-**Purpose:** [What does this file do?]
+Security verification test. Ensures the `CoreAgent` path resolution safely prevents directory traversal outside of the agent's defined scope (e.g., using `..` or absolute paths).
 
-**Key Exports/Entrypoints:**
-- [List functions/classes export]
+## Purpose
+This ensures `..` pathing is blocked correctly inside the agent.
 
-**Side Effects:**
-- [E.g., modifies DB, writes files, sets globals]
+## Exports
+None.
+
+## Dependencies
+Requires CoreAgent.
+
+## Side Effects
+None.
