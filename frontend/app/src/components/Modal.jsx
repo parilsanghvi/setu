@@ -11,6 +11,8 @@ const Modal = ({ children, onClose, title = "Modal" }) => {
     }, [onClose]);
 
     useEffect(() => {
+        const previousActiveElement = document.activeElement;
+
         const handleKeyDown = (e) => {
             if (e.key === 'Escape') {
                 if (onCloseRef.current) {
@@ -27,6 +29,9 @@ const Modal = ({ children, onClose, title = "Modal" }) => {
         document.addEventListener('keydown', handleKeyDown);
         return () => {
             document.removeEventListener('keydown', handleKeyDown);
+            if (previousActiveElement && typeof previousActiveElement.focus === 'function') {
+                previousActiveElement.focus();
+            }
         };
     }, []); // Empty dependency array ensures this runs only once on mount
 
