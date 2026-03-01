@@ -8,10 +8,12 @@ Verifies that the CoreAgent effectively mitigates path traversal attacks by reje
 ## Purpose
 This security test ensures that the `CoreAgent` module cannot be tricked into accessing, modifying, or deleting files outside its expected scope using `../` syntax or absolute paths.
 
-## Key Components
-- Defines a set of malicious path payloads such as `../../etc/passwd`.
-- Attempts to call `readFile` and `writeFile` with these payloads.
-- Asserts that these calls are consistently rejected with appropriate error boundaries.
+## Exports
+No exports; this is an automated verification script.
 
-## Important Notes
-The `_resolvePath` method in `CoreAgent` relies on this test. If the underlying path validation changes, ensure that this test is fully executed and passes.
+## Dependencies
+- `lib/CoreAgent.js` to run the test.
+- Standard test runner utilities.
+
+## Side Effects
+- Sets up test directories and sandbox boundaries and tears them down.

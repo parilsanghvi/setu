@@ -8,10 +8,13 @@ Tests that verify the DashboardServer properly captures errors, prevents sensiti
 ## Purpose
 This file tests the error handling capabilities of the backend HTTP server. It specifically verifies that internal application exceptions do not leak stack traces to clients, maintaining security boundaries, and that the server returns a proper HTTP status code like `500 Internal Server Error`.
 
-## Key Components
-- Sends invalid data or simulates broken routes.
-- Asserts that the response body does not contain Node.js stack traces.
-- Validates the JSON error payload structure.
+## Exports
+This file does not export any functions. It is a standalone script used by the test runner.
 
-## Important Notes
-If a route is added or error formatting logic changes in `lib/server.js`, this file must be updated to guarantee that the application remains secure against information disclosure.
+## Dependencies
+- `node:http` or `supertest` for making requests to the API.
+- `lib/server.js` to instantiate the application for testing.
+
+## Side Effects
+- Spawns a temporary `DashboardServer` on an available port.
+- Closes the server and releases the port after completion.
