@@ -77,10 +77,11 @@ class TestAgent extends CoreAgent {
             warn: () => {},
             debug: () => {}
         };
-    }
 
-    estimateTokenCount() {
-        return this.mockTokenCount;
+        // Also override contextManager's estimateTokenCount since we delegated it
+        this.contextManager.estimateTokenCount = () => {
+            return this.mockTokenCount;
+        }
     }
 
     // Mock sessionLogger
