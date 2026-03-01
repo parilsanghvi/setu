@@ -1,9 +1,17 @@
 # File: tests/test-server-error-handling.js
 
-**Purpose:** [What does this file do?]
+## Purpose
+This file verifies that the server handles internal errors gracefully, returning generic error messages to the client without leaking sensitive stack traces.
 
-**Key Exports/Entrypoints:**
-- [List functions/classes export]
+## Exports
+- None
 
-**Side Effects:**
-- [E.g., modifies DB, writes files, sets globals]
+## Dependencies
+- Node.js `node:test` module
+- Node.js `node:assert` module
+- `express` (mocked)
+- `socket.io` (mocked)
+- `../lib/server`
+
+## Side Effects
+- Mocks error handling mechanisms during the test execution.

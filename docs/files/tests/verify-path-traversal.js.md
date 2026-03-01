@@ -1,9 +1,15 @@
 # File: tests/verify-path-traversal.js
 
-**Purpose:** [What does this file do?]
+## Purpose
+This script validates that the `CoreAgent` component correctly isolates file system access and prevents path traversal vulnerabilities.
 
-**Key Exports/Entrypoints:**
-- [List functions/classes export]
+## Exports
+- None
 
-**Side Effects:**
-- [E.g., modifies DB, writes files, sets globals]
+## Dependencies
+- Node.js `node:test` module
+- Node.js `node:assert` module
+- `../lib/CoreAgent`
+
+## Side Effects
+- Attempts to read and write files outside of the allowed scope to confirm that the security mechanisms block the operations.
