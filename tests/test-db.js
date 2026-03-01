@@ -136,3 +136,47 @@ test('Bus: Task Update', (t) => {
     task = bus.db.prepare('SELECT * FROM tasks WHERE id = ?').get(taskId);
     assert.strictEqual(task.status, 'DONE');
 });
+
+test('Bus: getTasks', (t) => {
+    // Ensure clean state before testing
+    bus.db.prepare('DELETE FROM tasks').run();
+
+    // Add a couple of tasks
+    bus.updateTask('TASK-1', 'TODO', { title: 'Task 1', owner: 'A' });
+    bus.updateTask('TASK-2', 'DONE', { title: 'Task 2', owner: 'B' });
+
+    const tasks = bus.getTasks();
+    assert.strictEqual(tasks.length, 2, 'Should return all tasks');
+
+    // Sort tasks by ID to ensure deterministic assertions
+    tasks.sort((a, b) => a.id.localeCompare(b.id));
+
+    assert.strictEqual(tasks[0].id, 'TASK-1');
+    assert.strictEqual(tasks[0].status, 'TODO');
+
+    assert.strictEqual(tasks[1].id, 'TASK-2');
+    assert.strictEqual(tasks[1].status, 'DONE');
+});
+
+test('Bus: getTaskMeta', (t) => {
+    // Ensure clean state before testing
+    bus.db.prepare('DELETE FROM tasks').run();
+
+    let meta = bus.getTaskMeta();
+    assert.strictEqual(meta.c, 0, 'Count should be 0 when no tasks exist');
+    assert.strictEqual(meta.t, null, 'Max updated_at should be null when no tasks exist');
+
+    // Add tasks
+    bus.updateTask('TASK-1', 'TODO', { title: 'Task 1' });
+
+    // Slight delay to ensure different updated_at timestamps if database allows precision,
+    // though sqlite strftime('%s') is seconds resolution, so we'll force it
+    bus.db.prepare('UPDATE tasks SET updated_at = ? WHERE id = ?').run(1000, 'TASK-1');
+
+    bus.updateTask('TASK-2', 'DONE', { title: 'Task 2' });
+    bus.db.prepare('UPDATE tasks SET updated_at = ? WHERE id = ?').run(2000, 'TASK-2');
+
+    meta = bus.getTaskMeta();
+    assert.strictEqual(meta.c, 2, 'Count should be 2');
+    assert.strictEqual(meta.t, 2000, 'Max updated_at should be the latest timestamp');
+});
