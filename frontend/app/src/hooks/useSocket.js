@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { io } from 'socket.io-client';
 import { updateLogs } from '../utils/logUtils';
 
@@ -14,9 +14,18 @@ export const useSocket = () => {
     const [agents, setAgents] = useState([]);
     const [tasks, setTasks] = useState([]);
     const [logs, setLogs] = useState([]);
+    const logIdRef = useRef(0);
 
     useEffect(() => {
         socket.connect();
+
+        function formatLog(content) {
+            logIdRef.current += 1;
+            return {
+                id: logIdRef.current,
+                content
+            };
+        }
 
         function onConnect() {
             setIsConnected(true);
@@ -29,11 +38,14 @@ export const useSocket = () => {
         }
 
         function onLog(msg) {
-            setLogs((prev) => updateLogs(prev, msg, MAX_LOGS));
+            setLogs((prev) => updateLogs(prev, formatLog(msg), MAX_LOGS));
         }
 
         function onLogHistory(hist) {
-            setLogs((prev) => updateLogs(prev, hist, MAX_LOGS));
+            // Bulk format history logs
+            // We need to increment the ref for each item
+            const formatted = hist.map(content => formatLog(content));
+            setLogs((prev) => updateLogs(prev, formatted, MAX_LOGS));
         }
 
         function onAgentsUpdate(data) {
@@ -48,12 +60,12 @@ export const useSocket = () => {
             // In a real app we might separate chat from logs, but for now
             // we treat chat messages as high-priority logs
             const logMsg = `[CHAT] ${msg.sender} -> ${msg.recipient}: ${msg.content}`;
-            setLogs((prev) => updateLogs(prev, logMsg, MAX_LOGS));
+            setLogs((prev) => updateLogs(prev, formatLog(logMsg), MAX_LOGS));
         }
 
         function onChatHistory(history) {
             // Convert structured history to log format
-            const formatted = history.map(msg => `[CHAT] ${msg.sender} -> ${msg.recipient}: ${msg.content}`);
+            const formatted = history.map(msg => formatLog(`[CHAT] ${msg.sender} -> ${msg.recipient}: ${msg.content}`));
             setLogs((prev) => updateLogs(prev, formatted, MAX_LOGS));
         }
 

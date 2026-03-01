@@ -95,4 +95,10 @@ class Shishya extends CoreAgent {
     }
 }
 
+if (require.main === module) {
+    const [, , name, role] = process.argv;
+    const agent = new Shishya(name || 'Shishya', role || 'Shishya');
+    agent.boot();
+}
+
 module.exports = Shishya;

@@ -4,13 +4,24 @@ import AgentCard from './components/AgentCard';
 import TaskBoard from './components/TaskBoard';
 import LogViewer from './components/LogViewer';
 import ChatBox from './components/ChatBox';
+import OnboardingStatus from './components/OnboardingStatus';
 import styles from './App.module.scss';
 import './index.scss';
 
 const App = () => {
   const { agents, tasks, logs } = useSocket();
+  const [onboarding, setOnboarding] = React.useState(null);
 
-  const activeAgentsCount = agents.filter(a => a.status !== 'OFFLINE').length;
+  React.useEffect(() => {
+    fetch('/api/onboarding')
+      .then(r => r.json())
+      .then(setOnboarding)
+      .catch(() => { });
+  }, []);
+
+  const activeAgentsCount = React.useMemo(() => {
+    return agents.filter(a => a.status !== 'OFFLINE').length;
+  }, [agents]);
 
   return (
     <div className={styles.grid}>
@@ -20,6 +31,7 @@ const App = () => {
         <div className={styles.stats}>
           {activeAgentsCount} <span className={styles.statsLabel}>Active Agents</span>
         </div>
+        <OnboardingStatus data={onboarding} />
       </div>
 
       {/* Agent List */}
@@ -42,7 +54,7 @@ const App = () => {
 
       {/* Chat */}
       <div className={styles.chat}>
-        <ChatBox agents={agents} />
+        <ChatBox agents={agents} logs={logs} />
       </div>
     </div>
   );

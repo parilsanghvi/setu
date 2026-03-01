@@ -1,3 +1,4 @@
+require('dotenv').config();
 const { fork } = require('child_process');
 const path = require('path');
 const http = require('http');
@@ -60,6 +61,17 @@ io.use(socketAuth);
 
 // --- DASHBOARD API ROUTES ---
 
+// API: Onboarding Status
+app.get('/api/onboarding', (req, res) => {
+  try {
+    const { getOnboardingStatus } = require('./lib/onboarding/status');
+    const status = getOnboardingStatus();
+    res.json(status);
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
 // API: Stats
 app.get('/api/stats', (req, res) => {
   try {
@@ -97,6 +109,16 @@ app.get('/api/agents', (req, res) => {
 
 // API: Create Task
 app.post('/api/tasks', (req, res) => {
+  const { getOnboardingStatus } = require('./lib/onboarding/status');
+  const stat = getOnboardingStatus({ fast: true });
+  if (!stat.ok) {
+    return res.status(403).json({
+      error: 'Hard Gate Failure: Onboarding Incomplete',
+      missing: stat.missing,
+      details: stat.errors,
+      remediation: 'Run "setu onboarding run --only-missing" via CLI'
+    });
+  }
   const { title, type } = req.body;
 
   if (!title || typeof title !== 'string' || title.trim().length === 0) {
@@ -124,10 +146,10 @@ app.post('/api/tasks', (req, res) => {
 app.get('/api/tasks/:id/screenshots', (req, res) => {
   const taskId = req.params.id;
 
-    // Security: Validate taskId to prevent Path Traversal
-    if (!/^[a-zA-Z0-9-_]+$/.test(taskId)) {
-      return res.status(400).json({ error: 'Invalid Task ID format' });
-    }
+  // Security: Validate taskId to prevent Path Traversal
+  if (!/^[a-zA-Z0-9-_]+$/.test(taskId)) {
+    return res.status(400).json({ error: 'Invalid Task ID format' });
+  }
   const baseDir = path.join(__dirname, 'frontend/dashboard/screenshots');
   const screenshotDir = path.join(baseDir, taskId);
 
@@ -155,6 +177,7 @@ app.get('/api/tasks/:id/screenshots', (req, res) => {
 // API: Chat with Agent
 app.post('/api/chat', (req, res) => {
   const { agent, message } = req.body;
+  log(`[API] /api/chat hit with agent: ${agent}, message: ${message.substring(0, 20)}`);
   if (!agent || !message) return res.status(400).json({ error: 'Agent and Message required' });
 
   // Security: Input Length Validation
@@ -162,8 +185,14 @@ app.post('/api/chat', (req, res) => {
     return res.status(400).json({ error: `Message too long (max ${MAX_MESSAGE_LENGTH} chars)` });
   }
 
-  bus.send('User', agent, message, 'chat', { via: 'gui' });
-  res.json({ status: 'sent', to: agent });
+  try {
+    bus.send('User', agent, message, 'chat', { via: 'gui' });
+    log(`[API] Successfully dispatched chat to bus`);
+    res.json({ status: 'sent', to: agent });
+  } catch (err) {
+    log(`[API] Error dispatching chat to bus: ${err.message}`, 'error');
+    res.status(500).json({ error: err.message });
+  }
 });
 
 // API: Interrupt Agent
@@ -251,6 +280,66 @@ app.get('/api/sessions/:filename', async (req, res) => {
 
 // --- END DASHBOARD API ROUTES ---
 
+// --- TREND API ROUTES (Unified with lib/server.js) ---
+const { getSetuPath } = require('./lib/onboarding/paths');
+
+app.get('/api/onboarding-trend', (req, res) => {
+  try {
+    const logPath = getSetuPath('onboarding-history.jsonl');
+    if (!fs.existsSync(logPath)) {
+      return res.json({ runs: [], error: 'No history found' });
+    }
+    const lines = fs.readFileSync(logPath, 'utf8').split('\n').filter(Boolean);
+    const allRuns = lines.map(l => { try { return JSON.parse(l); } catch (e) { return null; } }).filter(Boolean);
+    res.json({ runs: allRuns.slice(-20) });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
+app.get('/api/drift-trend', (req, res) => {
+  try {
+    const logPath = getSetuPath('drift-history.jsonl');
+    if (!fs.existsSync(logPath)) {
+      return res.json({ total_runs: 0, fail_rate: 0, drift_percent: 0, top_missing: 'N/A' });
+    }
+    const lines = fs.readFileSync(logPath, 'utf8').split('\n').filter(Boolean);
+    const allRuns = lines.map(l => { try { return JSON.parse(l); } catch (e) { return null; } }).filter(Boolean);
+    if (allRuns.length === 0) return res.json({ total_runs: 0, fail_rate: 0, drift_percent: 0, top_missing: 'N/A' });
+
+    const last20 = allRuns.slice(-20);
+    const fails = last20.filter(r => !r.ok).length;
+    const failRate = ((fails / last20.length) * 100).toFixed(1);
+    const avgDrift = (last20.reduce((acc, r) => acc + r.drift_percent, 0) / last20.length).toFixed(1);
+
+    const missingFreq = {};
+    last20.forEach(r => { if (r.missing_docs) r.missing_docs.forEach(d => missingFreq[d] = (missingFreq[d] || 0) + 1); });
+    const top = Object.entries(missingFreq).sort((a, b) => b[1] - a[1])[0];
+    const topMissing = top ? top[0].replace('docs/files/', '') : 'None';
+
+    const lastRun = last20[last20.length - 1];
+    const unowned = (lastRun.ownership && lastRun.ownership.unowned_count) || 0;
+
+    const { getActiveProfile } = require('./lib/onboarding/governance-profiles');
+    const activeProfile = getActiveProfile();
+
+    res.json({
+      total_runs: allRuns.length,
+      fail_rate: parseFloat(failRate),
+      drift_percent: parseFloat(avgDrift),
+      top_missing: topMissing,
+      last_status: lastRun.ok ? '✅ Pass' : '🛑 Fail',
+      unowned_count: unowned,
+      profile: activeProfile.name.toUpperCase(),
+      strict_diff: activeProfile.config.strict_diff
+    });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
+// --- END TREND API ROUTES ---
+
 const AGENT_MAP = {
   // Sanskrit Personas
   'Sutradhar': './agents/Sutradhar.js',
@@ -336,7 +425,7 @@ function spawnAgent(name, role) {
   child.on('exit', (code) => {
     log(`⚠️ Agent ${name} exited with code ${code}`);
     delete RUNNING_PROCESSES[name];
-    
+
     // Broadcast Crash Event for Guru (Death Learning)
     bus.send('System', 'ALL', `Agent ${name} crashed`, 'event', {
       type: 'AGENT_CRASH',
@@ -398,7 +487,7 @@ io.on('connection', (socket) => {
       const logs = lines.filter((l) => l.trim());
       if (logs.length > 0) socket.emit('log_history', logs);
     })
-    .catch(() => {});
+    .catch(() => { });
 
   // Send Chat History (STRUCTURED)
   try {
@@ -435,7 +524,7 @@ io.on('connection', (socket) => {
 function startSystemLoops() {
   let lastTasksState = { t: 0, c: 0 };
   let lastAgentsJson = '';
-  let lastAgentBroadcast = 0;
+  let lastAgentBroadcast = Date.now();
 
   // Initialize lastMessageId to the latest message to avoid re-broadcasting old history on boot
   // Or should we? Maybe recent history is good.
@@ -449,6 +538,21 @@ function startSystemLoops() {
 
   setInterval(() => {
     // debug('--- System Loop Pulse ---');
+    // 0. Initial Signal for Unread Messages (Only on first run or periodically)
+    // Actually, the resurrection loop handles spawning. 
+    // Let's just ensure unread messages are signaled once agents are up.
+    if (Date.now() - lastAgentBroadcast < 2000) { // Using this as a proxy for "just started or resurrected"
+      const unread = bus.db.prepare("SELECT recipient FROM messages WHERE read_at IS NULL GROUP BY recipient").all();
+      unread.forEach(u => {
+        if (u.recipient === 'ALL') {
+          Object.values(RUNNING_PROCESSES).forEach(proc => {
+            try { proc.send({ type: 'new_message' }); } catch (e) { }
+          });
+        } else if (RUNNING_PROCESSES[u.recipient]) {
+          try { RUNNING_PROCESSES[u.recipient].send({ type: 'new_message' }); } catch (e) { }
+        }
+      });
+    }
     // A. Resurrection Logic (Optimized: Targeted Query)
     const deadAgents = bus.getDeadAgents(30);
     let resurrectionOccurred = false;
@@ -524,7 +628,8 @@ function startSystemLoops() {
         } catch (e) { }
 
         if (['chat', 'status', 'tool_start', 'tool_end', 'thought_start', 'thought_end', 'context_compact_start', 'context_compact_end'].includes(msg.type) || msg.recipient === 'ALL') {
-          log(`[${msg.type.toUpperCase()}] [${msg.sender}] ${msg.content.substring(0, 100)}...`);
+          const truncatedContent = msg.content.length > 100 ? msg.content.substring(0, 100) + '...' : msg.content;
+          log(`[${msg.type.toUpperCase()}] [${msg.sender}] ${truncatedContent}`);
         }
 
         // Sutradhar is now an agent, so we don't handle it here manually.
@@ -548,51 +653,10 @@ function startSystemLoops() {
 
   }, 1000); // Check every 1s (High frequency for responsiveness)
 
-  // D. Log File Watcher (Stream setu.log to GUI)
-  const logFile = path.join(__dirname, 'setu.log');
-  if (fs.existsSync(logFile)) {
-    let lastSize = fs.statSync(logFile).size;
-    let debounceTimer = null;
-
-    const checkUpdates = () => {
-      fs.stat(logFile, (err, stats) => {
-        if (err) return;
-        if (stats.size > lastSize) {
-          const stream = fs.createReadStream(logFile, { start: lastSize, end: stats.size - 1 });
-          stream.on('data', (chunk) => {
-            io.emit('log', chunk.toString());
-          });
-          lastSize = stats.size;
-        } else if (stats.size < lastSize) {
-          lastSize = stats.size;
-        }
-      });
-    };
-
-    const watchLog = () => {
-      try {
-        const watcher = fs.watch(logFile, (eventType) => {
-          if (eventType === 'rename') {
-            watcher.close();
-            if (fs.existsSync(logFile)) {
-              watchLog();
-              checkUpdates();
-            }
-          } else if (eventType === 'change') {
-            if (!debounceTimer) {
-              debounceTimer = setTimeout(() => {
-                debounceTimer = null;
-                checkUpdates();
-              }, 500);
-            }
-          }
-        });
-        watcher.on('error', () => {});
-      } catch (e) {}
-    };
-
-    watchLog();
-  }
+  // D. Log File Watcher REMOVED
+  // Reason: The `log()` function already broadcasts logs via Socket.IO immediately.
+  // Watching the file caused duplicate log emissions (one from `log()`, one from `fs.watch`).
+  // External tools can still tail `setu.log` if needed.
 }
 
 // 3. Boot
@@ -622,8 +686,8 @@ function boot() {
   ];
 
   seedAgents.forEach(a => {
-    bus.heartbeat(a.name, a.role, null, 'OFFLINE');
-    log(`✨ Seeded Agent: ${a.name} (${a.role})`);
+    log(`✨ Seeding & Spawning Agent: ${a.name} (${a.role})`);
+    spawnAgent(a.name, a.role);
   });
 
   // Start Loops (Resurrection will pick up the seeded agents)

@@ -102,6 +102,17 @@ switch (cmd) {
     break;
 
   case 'task':
+    const { getOnboardingStatus } = require('../lib/onboarding/status');
+    const taskStat = getOnboardingStatus({ fast: true }); // Fast caching to keep hard-gate blazing fast
+    if (!taskStat.ok) {
+      log('🛑 Hard Gate Failure: Onboarding Incomplete');
+      log(`   Missing: ${taskStat.missing.join(', ')}`);
+      taskStat.errors.forEach(e => log(`- ${e}`));
+      log('\n🔧 TO FIX:');
+      log('   Run: "setu onboarding run"');
+      log('   Or:  "setu onboarding run --only-missing" (quick patch)');
+      process.exit(1);
+    }
     const [taskId, taskStatus, taskOwner] = args;
     if (!taskId || !taskStatus) {
       log('Usage: setu task <id> <status> [owner]');
@@ -114,10 +125,9 @@ switch (cmd) {
     break;
 
   case 'doctor':
-    console.log('calling doctor...');
-    // Spawn Vaidya as a separate process to ensure clean environment check
-    const doctor = require('child_process').spawn('node', [path.join(__dirname, '../agents/Vaidya.js')], { stdio: 'inherit' });
-    doctor.on('exit', (code) => process.exit(code));
+    log('⚠️ WARNING: "setu doctor" is deprecated. Please use "setu onboarding doctor" instead.');
+    const doctorLegacy = require('child_process').spawn('node', [path.join(__dirname, '../agents/Vaidya.js')], { stdio: 'inherit' });
+    doctorLegacy.on('exit', (code) => process.exit(code));
     break;
 
   case 'setup':
@@ -140,6 +150,37 @@ switch (cmd) {
     }
     break;
 
+  case 'governance':
+    const govSub = args[0];
+    const { getActiveProfile, setProfile, PRESETS } = require('../lib/onboarding/governance-profiles');
+
+    if (govSub === 'profile') {
+      const act = args[1];
+      if (act === 'show') {
+        const active = getActiveProfile();
+        log(`🛡️ Active Governance Profile: ${active.name.toUpperCase()}`);
+        console.log(JSON.stringify(active.config, null, 2));
+      } else if (act === 'set') {
+        const val = args[2];
+        try {
+          const fresh = setProfile(val);
+          log(`✅ Governance Profile set to: ${fresh.name.toUpperCase()}`);
+          console.log(`- Strict Diff: ${fresh.config.strict_diff ? 'ON' : 'OFF'}`);
+          console.log(`- Ownership Mode: ${fresh.config.ownership_mode}`);
+          console.log(`- Telemetry Retention: ${fresh.config.telemetry_days} days (max ${fresh.config.telemetry_max})`);
+        } catch (e) {
+          console.error(`🛑 ${e.message}`);
+        }
+      } else {
+        log('Usage: setu governance profile <show|set <name>>');
+        log(`Available presets: ${Object.keys(PRESETS).join(', ')}`);
+      }
+    } else {
+      log('Usage: setu governance profile <...>');
+    }
+    process.exit(0);
+    break;
+
   case 'ignite':
     log('🚀 IGNITING SETU MISSION CONTROL...');
     const ignite = spawn('node', [path.join(__dirname, '../scripts/ignite.js')], {
@@ -150,14 +191,654 @@ switch (cmd) {
     break;
 
   case 'adopt':
-    log('🚀 Adopting project...');
-    const adopt = spawn('node', [path.join(__dirname, 'setu-init.js')], {
+  case 'init':
+    log(`⚠️ WARNING: "setu ${cmd}" is deprecated. Please use "setu onboarding run" instead.`);
+    const adoptLegacy = spawn('node', [path.join(__dirname, 'setu-init.js')], {
       cwd: process.cwd(),
       stdio: 'inherit'
     });
-    adopt.on('exit', (code) => process.exit(code));
+    adoptLegacy.on('exit', (code) => process.exit(code));
+    break;
+
+  case 'onboarding':
+    const subCmd = args[0];
+    if (subCmd === 'status') {
+      const isTrend = args.includes('--trend');
+      if (isTrend) {
+        const { getSetuPath } = require('../lib/onboarding/paths');
+        const logPath = getSetuPath('onboarding-history.jsonl');
+        const isJson = args.includes('--json');
+
+        if (!fs.existsSync(logPath)) {
+          if (isJson) console.log(JSON.stringify({ error: 'No history found' }));
+          else log('   No history found. Run "setu onboarding status" first.');
+          process.exit(0);
+        }
+
+        try {
+          const lines = fs.readFileSync(logPath, 'utf8').split('\n').filter(Boolean);
+          const allRuns = lines.map(l => {
+            try { return JSON.parse(l); } catch (e) { return null; }
+          }).filter(Boolean);
+
+          if (isJson) {
+            console.log(JSON.stringify({ total_runs: allRuns.length, runs: allRuns.slice(-20) }, null, 2));
+            process.exit(0);
+          }
+
+          log('📈 Onboarding Completeness Trend (-20)');
+          const recent = allRuns.slice(-20);
+          recent.forEach(r => {
+            const icon = r.completeness === 100 ? '✅' : '⚠️ ';
+            const bar = '█'.repeat(Math.round(r.completeness / 5)).padEnd(20, '░');
+            console.log(`   ${r.timestamp.split('T')[0]} | ${icon} | ${r.completeness}% [${bar}]`);
+          });
+
+        } catch (e) {
+          if (isJson) console.log(JSON.stringify({ error: 'Parse Failed' }));
+          else log('🛑 Failed to parse telemetry.');
+        }
+        process.exit(0);
+      }
+
+      const { getOnboardingStatus: getStat } = require('../lib/onboarding/status');
+      const isFast = args.includes('--fast');
+      const stat = getStat({ fast: isFast }); // Strict by default unless --fast requested
+
+      // Auto-trigger telemetry logging workflow via child_process for accurate stats updates
+      const { spawnSync } = require('child_process');
+      spawnSync('node', [path.join(__dirname, '../scripts/onboarding-status.js')]);
+
+      if (!stat.ok) {
+        log('🛑 Onboarding Incomplete');
+        log(`Completeness: ${stat.completeness}%`);
+        if (stat.stale) log('⚠️ Status is STALE (head_commit mismatch)');
+        log(`Missing (${stat.missing.length}): ${stat.missing.join(', ')}`);
+        stat.errors.forEach(e => log(`- ${e}`));
+        log('\n🔧 TO FIX:');
+        log('   Run: "setu onboarding run"');
+        log('   Or:  "setu onboarding run --only-missing" (quick patch)');
+        process.exit(1);
+      } else {
+        log('✅ Onboarding Complete (100%)');
+        process.exit(0);
+      }
+    } else if (subCmd === 'run') {
+      const { runGenerator } = require('../lib/onboarding/generator');
+      const dryRun = args.includes('--dry-run');
+      const onlyMissing = args.includes('--only-missing');
+
+      runGenerator({ dryRun, onlyMissing });
+      process.exit(0);
+    } else if (subCmd === 'enrich') {
+      const { enrichAll } = require('../lib/onboarding/doc-enricher');
+      const LLM = require('../lib/LLM');
+
+      const isDryRun = args.includes('--dry-run');
+      const isForce = args.includes('--force');
+      const isOnlyMissing = args.includes('--only-missing');
+      const isChanged = args.includes('--changed');
+
+      const fileIdx = args.indexOf('--file');
+      const folderIdx = args.indexOf('--folder');
+      const concIdx = args.indexOf('--max-concurrency');
+
+      const singleFile = fileIdx !== -1 ? args[fileIdx + 1] : null;
+      const singleFolder = folderIdx !== -1 ? args[folderIdx + 1] : null;
+      const maxConcurrency = concIdx !== -1 ? parseInt(args[concIdx + 1]) || 2 : 2;
+
+      log('🧠 Starting Documentation Enrichment...');
+
+      enrichAll({
+        repoRoot: path.resolve(__dirname, '..'),
+        llm: LLM,
+        dryRun: isDryRun,
+        force: isForce,
+        onlyMissing: isOnlyMissing,
+        maxConcurrency,
+        singleFile,
+        singleFolder,
+        changedOnly: isChanged || (!singleFile && !singleFolder && !isForce && !isOnlyMissing),
+      }).then(results => {
+        if (args.includes('--json')) {
+          console.log(JSON.stringify(results, null, 2));
+        } else {
+          log(`\n📊 Summary: ✅ ${results.enriched} enriched | ⏭️ ${results.skipped} skipped | ❌ ${results.failed} failed`);
+          if (results.low_confidence.length > 0) {
+            log(`⚠️  ${results.low_confidence.length} low-quality docs need attention`);
+          }
+        }
+
+        // Write quality history snapshot (Workstream 8)
+        try {
+          const { getSetuPath } = require('../lib/onboarding/paths');
+          const { getRepoQuality } = require('../lib/onboarding/status');
+          const qualityReport = getRepoQuality();
+          const historyPath = getSetuPath('doc-quality-history.jsonl');
+          const snapshot = {
+            timestamp: new Date().toISOString(),
+            avg_quality: qualityReport.avg_quality,
+            p50_quality: qualityReport.p50_quality,
+            p95_quality: qualityReport.p95_quality,
+            placeholder_rate: qualityReport.placeholder_rate,
+            total_docs: qualityReport.total_docs,
+            populated_docs: qualityReport.populated_docs,
+            enriched_this_run: results.enriched,
+          };
+          fs.mkdirSync(path.dirname(historyPath), { recursive: true });
+          fs.appendFileSync(historyPath, JSON.stringify(snapshot) + '\n');
+        } catch (_) { }
+
+        process.exit(results.failed > 0 ? 1 : 0);
+      }).catch(err => {
+        console.error(`[DOC-ENRICHER] Fatal error: ${err.message}`);
+        process.exit(1);
+      });
+    } else if (subCmd === 'quality') {
+      const { getRepoQuality } = require('../lib/onboarding/status');
+      const isJson = args.includes('--json');
+      const isTrend = args.includes('--trend');
+
+      if (isTrend) {
+        const { getSetuPath } = require('../lib/onboarding/paths');
+        const historyPath = getSetuPath('doc-quality-history.jsonl');
+
+        if (!fs.existsSync(historyPath)) {
+          if (isJson) console.log(JSON.stringify({ error: 'No quality history found' }));
+          else log('No quality history found. Run "setu onboarding enrich" first.');
+          process.exit(0);
+        }
+
+        try {
+          const lines = fs.readFileSync(historyPath, 'utf8').split('\n').filter(Boolean);
+          const allRuns = lines.map(l => { try { return JSON.parse(l); } catch (_) { return null; } }).filter(Boolean);
+          const recent = allRuns.slice(-20);
+
+          if (isJson) {
+            console.log(JSON.stringify({ total_runs: allRuns.length, runs: recent }, null, 2));
+          } else {
+            log('📈 Documentation Quality Trend (-20)');
+            recent.forEach(r => {
+              const bar = '█'.repeat(Math.round(r.avg_quality / 5)).padEnd(20, '░');
+              const icon = r.placeholder_rate === 0 ? '✅' : '⚠️ ';
+              console.log(`   ${r.timestamp.split('T')[0]} | ${icon} | Avg: ${r.avg_quality}% [${bar}] | Placeholders: ${r.placeholder_rate}%`);
+            });
+          }
+        } catch (e) {
+          if (isJson) console.log(JSON.stringify({ error: 'Parse failed' }));
+          else log('🛑 Failed to parse quality history.');
+        }
+        process.exit(0);
+      }
+
+      const report = getRepoQuality();
+
+      if (isJson) {
+        // Omit individual scores for JSON brevity; include summary
+        const summary = {
+          total_docs: report.total_docs,
+          populated_docs: report.populated_docs,
+          placeholder_docs: report.placeholder_docs,
+          placeholder_rate: report.placeholder_rate,
+          avg_quality: report.avg_quality,
+          p50_quality: report.p50_quality,
+          p95_quality: report.p95_quality,
+          low_quality_count: report.low_quality_files.length,
+          low_quality_files: report.low_quality_files.map(f => ({ path: f.path, score: f.total_score, issues: f.issues })),
+        };
+        console.log(JSON.stringify(summary, null, 2));
+      } else {
+        log('📊 Documentation Quality Report');
+        console.log(`   Total Docs:     ${report.total_docs}`);
+        console.log(`   Populated:      ${report.populated_docs}`);
+        console.log(`   Placeholders:   ${report.placeholder_docs} (${report.placeholder_rate}%)`);
+        console.log(`   Avg Quality:    ${report.avg_quality}%`);
+        console.log(`   p50 Quality:    ${report.p50_quality}%`);
+        console.log(`   p95 Quality:    ${report.p95_quality}%`);
+
+        if (report.low_quality_files.length > 0) {
+          console.log(`\n   ⚠️  Low Quality Docs (${report.low_quality_files.length}):`);
+          report.low_quality_files.forEach(f => {
+            console.log(`   - ${f.path} (score: ${f.total_score}) — ${f.issues.join('; ')}`);
+          });
+        }
+
+        if (report.placeholder_rate > 0) {
+          console.log('\n   🔧 TO FIX:');
+          console.log('   Run: "setu onboarding enrich --only-missing"');
+        }
+      }
+      process.exit(0);
+    } else if (subCmd === 'doctor') {
+      const isHelp = args.includes('--help') || args.includes('-h');
+      if (isHelp) {
+        log('🩺 Setu Onboarding Doctor Usage:');
+        console.log('  setu onboarding doctor --diff         : Run drift validations against target branch.');
+        console.log('  setu onboarding doctor --links        : Validate all internal doc links.');
+        console.log('  setu onboarding doctor --links --fix  : Auto-repair common broken link patterns.');
+        console.log('  setu onboarding doctor --trend        : View recent drift history telemetry.');
+        console.log('  setu onboarding doctor --autofix-plan : Generate JSON remediation commands.');
+        console.log('  setu onboarding doctor --digest-weekly: Preview or trigger the weekly email metrics.');
+        console.log('\n  Flags:');
+        console.log('  --strict-diff  : Will explicitly fail if a 0-file diff occurs in PR context.');
+        console.log('  --base <ref>   : Override fallback branch target (e.g. --base origin/main).');
+        console.log('  --json         : Output responses purely as parseable JSON.');
+        console.log('  --show-ignored : Print explicitly excluded files during diff scans.');
+        console.log('  --owners-debug : Print rule engine evaluation trace for file ownership.');
+        process.exit(0);
+      }
+
+      const isLinks = args.includes('--links');
+      if (isLinks) {
+        const { validateAllLinks } = require('../lib/onboarding/doc-links');
+        const isJson = args.includes('--json');
+        const isFix = args.includes('--fix');
+        const repoRoot = path.resolve(__dirname, '..');
+
+        if (isFix) {
+          // Auto-fix mode
+          const docsDir = path.join(repoRoot, 'docs');
+          let fixed = 0, touched = 0;
+
+          function fixDir(dir) {
+            const entries = fs.readdirSync(dir, { withFileTypes: true });
+            for (const entry of entries) {
+              const full = path.join(dir, entry.name);
+              if (entry.isDirectory()) { fixDir(full); continue; }
+              if (!entry.name.endsWith('.md')) continue;
+              let content = fs.readFileSync(full, 'utf8');
+              let changed = false;
+              const original = content;
+              // Strip github.com URLs
+              content = content.replace(/\[([^\]]*)\]\(https?:\/\/github\.com[^)]*\)/g, '`$1`');
+              // Strip (link to ...) placeholders
+              content = content.replace(/\[([^\]]*)\]\(link to [^)]+\)/gi, '`$1`');
+              // Strip empty links
+              content = content.replace(/\[([^\]]*)\]\(\s*\)/g, '`$1`');
+              // Fix missing extensions in /files/ links
+              content = content.replace(/\(([^)]*\/files\/[^)]*?)\.md\)/g, (m, prefix) => {
+                if (/\.(js|jsx|ts|tsx|json|yml|yaml|css|html|py|sh|mjs|cjs)$/i.test(prefix)) return m;
+                return `(${prefix}.js.md)`;
+              });
+              if (content !== original) { fs.writeFileSync(full, content); fixed++; touched++; changed = true; }
+            }
+          }
+          fixDir(docsDir);
+
+          if (isJson) console.log(JSON.stringify({ fixed, files_touched: touched }));
+          else log(`[DOC-LINKS] Fixed ${fixed} files with broken link patterns.`);
+
+          // Re-validate after fix
+          const report = validateAllLinks(repoRoot);
+          if (!isJson) {
+            console.log(`   After fix: ${report.valid_links}/${report.total_links} valid, ${report.broken_links} broken`);
+          }
+          process.exit(report.ok ? 0 : 1);
+        }
+
+        const report = validateAllLinks(repoRoot);
+
+        if (isJson) {
+          console.log(JSON.stringify({
+            ok: report.ok,
+            total_files: report.total_files,
+            total_links: report.total_links,
+            valid_links: report.valid_links,
+            broken_links: report.broken_links,
+            github_blob_links: report.github_blob_links,
+            empty_links: report.empty_links,
+            files_with_issues: report.files_with_broken.length,
+            top_broken_patterns: report.top_broken_patterns,
+          }, null, 2));
+        } else {
+          log('🔗 Documentation Link Validation');
+          console.log(`   Total files: ${report.total_files} | Links: ${report.total_links}`);
+          console.log(`   ✅ Valid: ${report.valid_links} | ❌ Broken: ${report.broken_links} | 🔗 GitHub: ${report.github_blob_links} | ⚪ Empty: ${report.empty_links}`);
+          if (report.files_with_broken.length > 0) {
+            console.log(`\n   Files affected: ${report.files_with_broken.length}`);
+            report.broken_details.slice(0, 5).forEach(d => {
+              console.log(`   - ${d.file}:${d.line} [${d.label}](${d.href})`);
+            });
+          }
+          if (!report.ok) {
+            console.log('\n   🔧 Run: setu onboarding doctor --links --fix');
+          }
+        }
+        process.exit(report.ok ? 0 : 1);
+      }
+
+      const isTrend = args.includes('--trend');
+      if (isTrend) {
+        const { getSetuPath } = require('../lib/onboarding/paths');
+        const logPath = getSetuPath('drift-history.jsonl');
+        const isJson = args.includes('--json');
+
+        if (!fs.existsSync(logPath)) {
+          if (isJson) {
+            console.log(JSON.stringify({ error: 'No history found' }));
+          } else {
+            console.log('   No history found. Run "setu onboarding doctor --diff" first.');
+          }
+          process.exit(0);
+        }
+
+        try {
+          const lines = fs.readFileSync(logPath, 'utf8').split('\n').filter(Boolean);
+          const allRuns = lines.map(l => {
+            try { return JSON.parse(l); } catch (e) { return null; }
+          }).filter(Boolean);
+
+          const last50 = allRuns.slice(-50);
+          const last20 = allRuns.slice(-20);
+
+          const getFailRate = (runs) => runs.length ? ((runs.filter(r => !r.ok).length / runs.length) * 100).toFixed(1) : 0;
+          const failRate50 = getFailRate(last50);
+          const failRate20 = getFailRate(last20);
+
+          let sumDrift = 0;
+          let drifts = [];
+
+          // Source tracking
+          const sources = { github_api: 0, git_diff: 0, head_fallback: 0 };
+          const missingFreq = {};
+
+          allRuns.forEach(r => {
+            sumDrift += r.drift_percent;
+            drifts.push(r.drift_percent);
+
+            if (r.source) {
+              sources[r.source] = (sources[r.source] || 0) + 1;
+            }
+            if (r.missing_docs && Array.isArray(r.missing_docs)) {
+              r.missing_docs.forEach(doc => {
+                missingFreq[doc] = (missingFreq[doc] || 0) + 1;
+              });
+            }
+          });
+
+          const avgDrift = allRuns.length ? (sumDrift / allRuns.length).toFixed(1) : 0;
+          drifts.sort((a, b) => a - b);
+          const p95Index = Math.floor(drifts.length * 0.95);
+          const p95Drift = drifts.length ? drifts[p95Index] : 0;
+
+          const topMissing = Object.entries(missingFreq)
+            .sort((a, b) => b[1] - a[1])
+            .slice(0, 10);
+
+          if (isJson) {
+            console.log(JSON.stringify({
+              total_runs: allRuns.length,
+              fail_rate_last_20: parseFloat(failRate20),
+              fail_rate_last_50: parseFloat(failRate50),
+              avg_drift_percent: parseFloat(avgDrift),
+              p95_drift_percent: parseFloat(p95Drift),
+              sources,
+              top_missing_docs: topMissing.map(([doc, freq]) => ({ doc, freq }))
+            }, null, 2));
+            process.exit(0);
+          }
+
+          log('📈 Docs Drift Telemetry Trend');
+          console.log(`   Total Runs Checked: ${allRuns.length}`);
+          console.log(`   Rolling Fail Rate: ${failRate20}% (last 20) | ${failRate50}% (last 50)`);
+          console.log(`   Drift Percent: ${avgDrift}% (Avg) | ${p95Drift}% (p95)`);
+
+          console.log('\n   Source Reliability Split:');
+          Object.entries(sources).forEach(([src, count]) => {
+            const perc = ((count / allRuns.length) * 100).toFixed(1);
+            console.log(`   - ${src}: ${count} runs (${perc}%)`);
+          });
+
+          if (topMissing.length > 0) {
+            console.log('\n   Top 10 Missing Docs Frequency:');
+            topMissing.forEach(([doc, freq]) => {
+              console.log(`   - [${freq}x] ${doc}`);
+            });
+          }
+
+          console.log('\n   Recent Executions:');
+          last20.slice(-5).reverse().forEach(r => {
+            const icon = r.ok ? '✅ ' : '🛑 ';
+            console.log(`   ${r.timestamp} | ${icon} | Drift: ${r.drift_percent}% | Source: ${r.source}`);
+          });
+
+        } catch (e) {
+          if (isJson) {
+            console.log(JSON.stringify({ error: 'Failed to parse telemetry' }));
+          } else {
+            console.log('🛑 Failed to parse telemetry.');
+          }
+        }
+        process.exit(0);
+      }
+
+      const isAutofix = args.includes('--autofix-plan');
+      if (isAutofix) {
+        const { computeDrift } = require('../lib/onboarding/drift');
+        const result = computeDrift({ strict: true });
+        const commands = [
+          "setu onboarding run --only-missing",
+          "setu onboarding doctor --diff --strict-diff"
+        ];
+
+        const payload = {
+          missing_paths: result.missing_docs,
+          commands_to_run: commands
+        };
+
+        const { getSetuPath } = require('../lib/onboarding/paths');
+        const outPath = getSetuPath('autofix-plan.json');
+        fs.writeFileSync(outPath, JSON.stringify(payload, null, 2));
+
+        if (args.includes('--json')) {
+          console.log(JSON.stringify(payload, null, 2));
+        } else {
+          log('🛠️ AUTOFIX PLAN GENERATED');
+          console.log(`   Saved to: ${outPath}`);
+          console.log(`\n   Execute the following to remediate (${result.missing_docs.length} missing):`);
+          commands.forEach(c => console.log(`   > ${c}`));
+        }
+        process.exit(0);
+      }
+
+      const isDigest = args.includes('--digest-weekly');
+      if (isDigest) {
+        const { getSetuPath } = require('../lib/onboarding/paths');
+        const logPath = getSetuPath('drift-history.jsonl');
+        const isJson = args.includes('--json');
+
+        if (!fs.existsSync(logPath)) {
+          if (isJson) console.log(JSON.stringify({ error: 'No history found' }));
+          else log('   No history found. Run "setu onboarding doctor --diff" first.');
+          process.exit(0);
+        }
+
+        try {
+          const lines = fs.readFileSync(logPath, 'utf8').split('\n').filter(Boolean);
+          const allRuns = lines.map(l => {
+            try { return JSON.parse(l); } catch (e) { return null; }
+          }).filter(Boolean);
+
+          const now = new Date().getTime();
+          const weekMs = 7 * 24 * 60 * 60 * 1000;
+          const weekRuns = allRuns.filter(r => (now - new Date(r.timestamp).getTime()) <= weekMs);
+
+          const failCount = weekRuns.filter(r => !r.ok).length;
+          const failRate = weekRuns.length > 0 ? ((failCount / weekRuns.length) * 100).toFixed(1) : 0;
+          let sumDrift = 0, drifts = [];
+          const sources = { github_api: 0, git_diff: 0, head_fallback: 0 };
+          const missingFreq = {}, unownedFreq = {};
+
+          weekRuns.forEach(r => {
+            sumDrift += r.drift_percent;
+            drifts.push(r.drift_percent);
+            if (r.source) sources[r.source] = (sources[r.source] || 0) + 1;
+            if (r.missing_docs) r.missing_docs.forEach(d => missingFreq[d] = (missingFreq[d] || 0) + 1);
+            if (r.ownership && r.ownership.unowned_files) {
+              r.ownership.unowned_files.forEach(f => unownedFreq[f] = (unownedFreq[f] || 0) + 1);
+            }
+          });
+
+          drifts.sort((a, b) => a - b);
+          const p95Drift = drifts.length ? drifts[Math.floor(drifts.length * 0.95)] : 0;
+          const avgDrift = weekRuns.length ? (sumDrift / weekRuns.length).toFixed(1) : 0;
+          const topMissing = Object.entries(missingFreq).sort((a, b) => b[1] - a[1]).slice(0, 3).map(x => x[0]);
+          const topUnowned = Object.entries(unownedFreq).sort((a, b) => b[1] - a[1]).slice(0, 3).map(x => x[0]);
+
+          const payload = {
+            period: '7d',
+            total_runs: weekRuns.length,
+            fail_rate: parseFloat(failRate),
+            avg_drift: parseFloat(avgDrift),
+            p95_drift: parseFloat(p95Drift),
+            sources,
+            top_missing_docs: topMissing,
+            top_unowned_files: topUnowned,
+            recommended_actions: [
+              'Run "setu onboarding run --only-missing"',
+              topUnowned.length > 0 ? `Update ONBOARDING.json for unowned paths (e.g. ${topUnowned[0]})` : 'Maintain 100% ownership mapping',
+              'Review .setu/governance-profile.json policy scaling constraints'
+            ]
+          };
+
+          if (isJson) {
+            console.log(JSON.stringify(payload, null, 2));
+          } else {
+            log('📊 WEEKLY GOVERNANCE DIGEST (-7d)');
+            console.log(`   Runs: ${payload.total_runs} | Fail Rate: ${payload.fail_rate}%`);
+            console.log(`   Drift: ${payload.avg_drift}% (Avg) | ${payload.p95_drift}% (P95)`);
+            console.log('\n   🔥 Top Unowned Files:');
+            payload.top_unowned_files.length ? payload.top_unowned_files.forEach(f => console.log(`     - ${f}`)) : console.log('     [None]');
+            console.log('\n   🔥 Top Missing Docs:');
+            payload.top_missing_docs.length ? payload.top_missing_docs.forEach(f => console.log(`     - ${f}`)) : console.log('     [None]');
+            console.log('\n   💡 Recommended Actions:');
+            payload.recommended_actions.forEach((a, i) => console.log(`     ${i + 1}. ${a}`));
+          }
+        } catch (e) {
+          if (isJson) console.log(JSON.stringify({ error: e.message }));
+          else console.log('🛑 Failed to parse digest.');
+        }
+        process.exit(0);
+      }
+
+      const isDiff = args.includes('--diff');
+      if (isDiff) {
+        let baseRefConfig = undefined;
+        const baseIndex = args.indexOf('--base');
+        if (baseIndex !== -1 && args[baseIndex + 1]) {
+          baseRefConfig = args[baseIndex + 1];
+        }
+
+        const isStrict = args.includes('--strict-diff');
+
+        const { computeDrift } = require('../lib/onboarding/drift');
+        const result = computeDrift({ base: baseRefConfig, strict: isStrict });
+
+        const isJson = args.includes('--json');
+        const showIgnored = args.includes('--show-ignored');
+
+        if (isJson) {
+          console.log(JSON.stringify(result, null, 2));
+          process.exit(result.ok ? 0 : 1);
+        }
+
+        if (result.strict_diff_warning) {
+          if (result.strict_diff_failed) {
+            console.log(`\n🛑 STRICT DIFF CHECK FAILED:`);
+            console.log(`   ${result.strict_diff_warning}`);
+            process.exit(1);
+          } else {
+            console.log(`\n⚠️  WARNING [Strict-Diff Mode OFF]:`);
+            console.log(`   ${result.strict_diff_warning}`);
+          }
+        }
+
+        if (result.ok) {
+          log(`✅ No drift detected (Checked ${result.changed_files.length} changed files against ${result.base_ref_used})`);
+          if (showIgnored && result.ignored_files.length > 0) {
+            console.log('\n🙈 Ignored Files:');
+            result.ignored_files.forEach(f => console.log(`   - ${f}`));
+          }
+          process.exit(0);
+        } else {
+          if (result.ownership_sla && result.ownership_sla.unowned_blocking) {
+            log(`🛑 Ownership SLA Failed!`);
+            log(`   ${result.ownership_sla.blocking_files.length} unowned files matched required paths.`);
+          } else if (result.drift_percent > 0) {
+            log(`🛑 Docs Drift Detected: ${result.drift_percent}%`);
+            log(`   ${result.changed_files.length} changed files require ${result.required_docs.length} doc updates; ${result.missing_docs.length} missing.\n`);
+          }
+          log(`   Comparison base: ${result.base_ref_used} (via ${result.changed_files_source})`);
+
+          const missingFiles = result.missing_docs.filter(d => d.includes('/files/'));
+          const missingFolders = result.missing_docs.filter(d => d.includes('/folders/'));
+
+          if (missingFiles.length) {
+            console.log('\n📄 Missing File Docs:');
+            missingFiles.forEach(f => console.log(`   - ${f}`));
+          }
+          if (missingFolders.length) {
+            console.log('\n📁 Missing Folder Summaries:');
+            missingFolders.forEach(f => console.log(`   - ${f}`));
+          }
+
+          if (showIgnored && result.ignored_files.length > 0) {
+            console.log('\n🙈 Ignored Files:');
+            result.ignored_files.forEach(f => console.log(`   - ${f}`));
+          }
+
+          const ownerSourceTitle = result.ownership.ownership_source === 'onboarding' ? 'ONBOARDING' :
+            (result.ownership.ownership_source === 'codeowners' ? 'CODEOWNERS fallback' : 'None');
+          console.log(`\n👥 Suggested Reviewers/Owners (${ownerSourceTitle}):`);
+          const owners = Object.keys(result.ownership.by_owner);
+          if (owners.length > 0) {
+            owners.forEach(owner => {
+              console.log(`   - @${owner} (${result.ownership.by_owner[owner].length} files touched)`);
+            });
+          } else {
+            console.log(`   (No owners identified limits)`);
+          }
+
+          if (result.ownership.unowned_files && result.ownership.unowned_files.length > 0) {
+            console.log('\n⚠️  WARNING: Unowned Files Detected');
+            console.log(`   ${result.ownership.unowned_files.length} changed files have no designated module owner.`);
+            console.log('   Please assign them so drift routing hints operate smoothly.');
+          }
+
+          const isOwnersDebug = args.includes('--owners-debug');
+          if (isOwnersDebug && result.ownership.ownership_resolution_trace) {
+            console.log('\n🔍 OWNERSHIP RESOLUTION TRACE:');
+            for (const [file, info] of Object.entries(result.ownership.ownership_resolution_trace)) {
+              const ownersText = info.owners.length > 0 ? info.owners.join(', ') : 'Unowned';
+              console.log(`   ${file}`);
+              console.log(`     -> Source: ${info.source}`);
+              console.log(`     -> Rule: ${info.rule}`);
+              console.log(`     -> Owners: ${ownersText}`);
+            }
+          }
+
+          console.log('\n🔧 TO FIX:');
+          console.log('   Run: "setu onboarding run --only-missing"');
+          console.log('   Then rerun: "setu onboarding doctor --diff"');
+          process.exit(1);
+        }
+      } else {
+        const doc = spawn('node', [path.join(__dirname, '../agents/Vaidya.js')], { stdio: 'inherit' });
+        doc.on('exit', (code) => process.exit(code));
+      }
+    } else {
+      log('Usage: setu onboarding [run|status|enrich|quality|doctor] [--dry-run] [--only-missing]');
+      log('');
+      log('  run       Scaffold placeholder doc stubs for all files/folders');
+      log('  status    Check onboarding completeness');
+      log('  enrich    Generate rich docs via LLM (two-pass: facts + LLM)');
+      log('  quality   View documentation quality report');
+      log('  doctor    Run drift, trend, autofix, and digest commands');
+    }
     break;
 
   default:
-    console.log('Usage: setu [start|stop|status|init|chat|task|dashboard|ignite|adopt]');
+    console.log('Usage: setu [start|stop|status|onboarding|chat|task|dashboard|ignite]');
+    console.log('  onboarding enrich   — Generate rich docs via LLM');
+    console.log('  onboarding quality  — View documentation quality report');
 }

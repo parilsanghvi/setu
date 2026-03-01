@@ -6,7 +6,8 @@
   "scripts": {
     "start": "node index.js",
     "dev": "node --watch index.js",
-    "ignite": "node scripts/ignite.js"
+    "ignite": "node scripts/ignite.js",
+    "onboarding:status": "node scripts/onboarding-status.js"
   },
   "keywords": [],
   "author": "",
@@ -27,5 +28,10 @@
   },
   "devDependencies": {
     "socket.io-client": "^4.8.3"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "better-sqlite3"
+    ]
   }
 }

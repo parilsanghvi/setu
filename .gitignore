@@ -47,5 +47,17 @@ test-results/
 auth.json
 models.json
 setu.*
+
+# Local crash/noise artifacts
+Agent Shishya crashed*
+<Agent Shishya crashed error log>
+agent log.txt
+knowledge_document.json
+SYSTEM_LOGS.txt
+MISSION_completed.txt
+
+# Local temp snapshots
 temp_openclaw_exact/
 pi-mono-temp/
+temp_intern_scope/
+output/demo-project/

@@ -3,29 +3,29 @@ const Module = require('module');
 
 // Mock require to avoid loading better-sqlite3 via lib/db.js
 const originalRequire = Module.prototype.require;
-Module.prototype.require = function(path) {
+Module.prototype.require = function (path) {
     if (path === 'better-sqlite3' || path.includes('/db')) {
-        return function() {
+        return function () {
             return {
-                prepare: () => ({ run: () => {}, get: () => {} }),
+                prepare: () => ({ run: () => { }, get: () => { } }),
                 transaction: (fn) => fn(),
-                pragma: () => {},
-                exec: () => {},
-                heartbeat: () => {},
+                pragma: () => { },
+                exec: () => { },
+                heartbeat: () => { },
                 getDeadAgents: () => [],
-                updateTask: () => {},
+                updateTask: () => { },
             };
         };
     }
     if (path === 'dotenv') {
-        return { config: () => {} };
+        return { config: () => ({}) };
     }
     if (path === 'zod') {
         return {
             z: {
-                object: () => ({ parse: () => {} }),
+                object: () => ({ parse: () => { } }),
                 string: () => ({}),
-                ZodType: class {}
+                ZodType: class { }
             }
         };
     }
@@ -42,7 +42,7 @@ Module.prototype.require = function(path) {
     }
     if (path.endsWith('/SessionLogger')) {
         return class {
-            log() {}
+            log() { }
         };
     }
 

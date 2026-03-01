@@ -1,0 +1,31 @@
+name: Governance Digest
+on:
+  schedule:
+    - cron: '0 9 * * 1' # Monday at 9:00 AM UTC
+  workflow_dispatch:
+
+jobs:
+  digest:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: Verify Setup
+        run: chmod +x bin/setu
+
+      - name: Run Digest Report
+        run: |
+          ./bin/setu onboarding doctor --digest-weekly > artifacts/digest.md || true
+          cat artifacts/digest.md >> $GITHUB_STEP_SUMMARY
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: governance-weekly-digest
+          path: artifacts/digest.md
