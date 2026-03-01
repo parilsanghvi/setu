@@ -1,3 +1,4 @@
+<!-- PLACEHOLDER -->
 # File: tests/test-server-error-handling.js
 
 **Purpose:** [What does this file do?]

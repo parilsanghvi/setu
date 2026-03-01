@@ -1,3 +1,4 @@
+<!-- PLACEHOLDER -->
 # File: tests/verify-path-traversal.js
 
 **Purpose:** [What does this file do?]
