@@ -1,9 +1,24 @@
-# File: tests/test-server-error-handling.js
+---
+title: test-server-error-handling.js
+description: Tests for server error handling.
+---
+# test-server-error-handling.js
 
-**Purpose:** [What does this file do?]
+This file contains tests verifying that the server correctly catches exceptions and returns appropriate generic error messages to the client without leaking sensitive stack traces.
 
-**Key Exports/Entrypoints:**
-- [List functions/classes export]
+## Purpose
+It validates the error boundary of `DashboardServer` API routes.
 
-**Side Effects:**
-- [E.g., modifies DB, writes files, sets globals]
+## Exports
+None.
+
+## Dependencies
+Depends on `assert` and standard Node test runner.
+
+## Side Effects
+Mocks internals of `express` and other libraries to simulate runtime failures.
+
+| Test | Expected |
+| --- | --- |
+| Error Leakage | None |
+
