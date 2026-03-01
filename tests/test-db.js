@@ -200,9 +200,6 @@ test('Bus: Agent Heartbeat - Upsert', (t) => {
     bus.heartbeat('AgentB', 'RoleB', 5678, 'IDLE');
     const firstAgent = bus.db.prepare('SELECT * FROM agents WHERE name = ?').get('AgentB');
 
-    // Simulate time passing (although strftime('%s', 'now') in SQLite might not change instantly if executed in same second)
-    // To ensure a change, we can wait a bit or just verify the fields updated.
-
     // Update the agent
     bus.heartbeat('AgentB', 'RoleB', 9999, 'WORKING');
 
