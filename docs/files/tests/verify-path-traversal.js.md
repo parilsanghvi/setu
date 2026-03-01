@@ -1,9 +1,8 @@
-# File: tests/verify-path-traversal.js
+---
+description: Tests for path traversal vulnerabilities in agent file access
+---
+# `tests/verify-path-traversal.js`
 
-**Purpose:** [What does this file do?]
+This script verifies that the `CoreAgent` file system access functions (`readFile`, `writeFile`, etc.) are secured against path traversal attacks.
 
-**Key Exports/Entrypoints:**
-- [List functions/classes export]
-
-**Side Effects:**
-- [E.g., modifies DB, writes files, sets globals]
+It ensures that agents cannot use relative paths like `../` or absolute paths to escape their designated workspace or access files outside their `scope` directory.
