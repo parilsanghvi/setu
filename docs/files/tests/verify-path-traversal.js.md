@@ -4,6 +4,7 @@ description: "Verifies CoreAgent path traversal protections."
 
 # `tests/verify-path-traversal.js`
 
+## Purpose
 This verification script is an automated security test that validates the `CoreAgent`'s path isolation and sandboxing mechanisms.
 
 Specifically, it tests the `_resolvePath` utility function used internally by agents to ensure that:
@@ -12,3 +13,12 @@ Specifically, it tests the `_resolvePath` utility function used internally by ag
 - Absolute path requests that resolve outside the agent's safe directory are safely rejected.
 
 Passing this test confirms that the codebase correctly mitigates arbitrary file read/write vulnerabilities during automated agent operations.
+
+## Exports
+None. This file runs as a standalone test script.
+
+## Dependencies
+- `lib/CoreAgent.js`
+
+## Side Effects
+None. Performs static assertions against isolated classes.
