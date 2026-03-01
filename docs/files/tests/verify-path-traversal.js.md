@@ -1,9 +1,14 @@
-# File: tests/verify-path-traversal.js
+# `tests/verify-path-traversal.js`
 
-**Purpose:** [What does this file do?]
+## Purpose
+This file tests path traversal mitigation in `CoreAgent`, verifying that the isolation correctly handles absolute paths and directory escapes (`..`). This ensures that the agent cannot access files outside its designated workspace directory.
 
-**Key Exports/Entrypoints:**
-- [List functions/classes export]
+## Exports
+None.
 
-**Side Effects:**
-- [E.g., modifies DB, writes files, sets globals]
+## Dependencies
+- `lib/CoreAgent.js` is the primary module being tested for path isolation.
+
+## Side Effects
+None.
+

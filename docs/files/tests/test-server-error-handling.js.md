@@ -1,9 +1,14 @@
-# File: tests/test-server-error-handling.js
+# `tests/test-server-error-handling.js`
 
-**Purpose:** [What does this file do?]
+## Purpose
+This file verifies that API endpoints in the Dashboard server return generic error messages instead of leaking internal exception details during server failures. This is a crucial security measure to prevent sensitive information from being exposed to the client.
 
-**Key Exports/Entrypoints:**
-- [List functions/classes export]
+## Exports
+None.
 
-**Side Effects:**
-- [E.g., modifies DB, writes files, sets globals]
+## Dependencies
+- `express` framework is required to set up the mock server environment for testing error handling.
+
+## Side Effects
+None.
+
