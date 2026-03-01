@@ -283,13 +283,19 @@ app.get('/api/sessions/:filename', async (req, res) => {
 // --- TREND API ROUTES (Unified with lib/server.js) ---
 const { getSetuPath } = require('./lib/onboarding/paths');
 
-app.get('/api/onboarding-trend', (req, res) => {
+app.get('/api/onboarding-trend', async (req, res) => {
   try {
     const logPath = getSetuPath('onboarding-history.jsonl');
-    if (!fs.existsSync(logPath)) {
-      return res.json({ runs: [], error: 'No history found' });
+    let content;
+    try {
+      content = await fs.promises.readFile(logPath, 'utf8');
+    } catch (e) {
+      if (e.code === 'ENOENT') {
+        return res.json({ runs: [], error: 'No history found' });
+      }
+      throw e;
     }
-    const lines = fs.readFileSync(logPath, 'utf8').split('\n').filter(Boolean);
+    const lines = content.split('\n').filter(Boolean);
     const allRuns = lines.map(l => { try { return JSON.parse(l); } catch (e) { return null; } }).filter(Boolean);
     res.json({ runs: allRuns.slice(-20) });
   } catch (e) {
@@ -297,13 +303,19 @@ app.get('/api/onboarding-trend', (req, res) => {
   }
 });
 
-app.get('/api/drift-trend', (req, res) => {
+app.get('/api/drift-trend', async (req, res) => {
   try {
     const logPath = getSetuPath('drift-history.jsonl');
-    if (!fs.existsSync(logPath)) {
-      return res.json({ total_runs: 0, fail_rate: 0, drift_percent: 0, top_missing: 'N/A' });
+    let content;
+    try {
+      content = await fs.promises.readFile(logPath, 'utf8');
+    } catch (e) {
+      if (e.code === 'ENOENT') {
+        return res.json({ total_runs: 0, fail_rate: 0, drift_percent: 0, top_missing: 'N/A' });
+      }
+      throw e;
     }
-    const lines = fs.readFileSync(logPath, 'utf8').split('\n').filter(Boolean);
+    const lines = content.split('\n').filter(Boolean);
     const allRuns = lines.map(l => { try { return JSON.parse(l); } catch (e) { return null; } }).filter(Boolean);
     if (allRuns.length === 0) return res.json({ total_runs: 0, fail_rate: 0, drift_percent: 0, top_missing: 'N/A' });
 
