@@ -1,10 +1,17 @@
 # File: tests/test-security-error-handling.js
 
-**Purpose:** Validates that API endpoints in `lib/server.js` do not leak sensitive error details (e.g., stack traces) in 500 responses, instead returning a generic "Internal Server Error".
+## Purpose
+This script validates the error handling mechanism within the DashboardServer API endpoints. It ensures that internal errors and exceptions caught by the server are properly obscured from the end user to prevent leakage of sensitive system information (such as stack traces), thereby enhancing the application's overall security posture. The tests verify that the server returns generic error messages and appropriate HTTP status codes (typically 500 Internal Server Error) when unexpected exceptions occur.
 
-**Key Exports/Entrypoints:**
-- Standalone test script executed via `node`.
+## Exports
+- None
 
-**Side Effects:**
-- Mocks `express` and `socket.io` modules.
-- Writes to `console.log` for test output.
+## Dependencies
+- Node.js `node:test` module
+- Node.js `node:assert` module
+- `express` (mocked)
+- `socket.io` (mocked)
+- `../lib/server`
+
+## Side Effects
+- Mocks network responses and server routing functionality during the test execution.
