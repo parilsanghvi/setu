@@ -136,3 +136,46 @@ test('Bus: Task Update', (t) => {
     task = bus.db.prepare('SELECT * FROM tasks WHERE id = ?').get(taskId);
     assert.strictEqual(task.status, 'DONE');
 });
+
+test('Bus: getTasks and getTaskMeta', (t) => {
+    // Clean up existing tasks to ensure a clean state
+    bus.db.prepare('DELETE FROM tasks').run();
+
+    // Verify empty state
+    let tasks = bus.getTasks();
+    assert.strictEqual(tasks.length, 0);
+
+    let meta = bus.getTaskMeta();
+    assert.strictEqual(meta.c, 0);
+    assert.strictEqual(meta.t, null);
+
+    // Add multiple tasks
+    bus.updateTask('TASK-1', 'TODO', { owner: 'Alice' });
+    bus.updateTask('TASK-2', 'IN_PROGRESS', { owner: 'Bob' });
+    bus.updateTask('TASK-3', 'DONE', { owner: 'Charlie' });
+
+    // Force specific updated_at values to test MAX(updated_at)
+    bus.db.prepare('UPDATE tasks SET updated_at = ? WHERE id = ?').run(1000, 'TASK-1');
+    bus.db.prepare('UPDATE tasks SET updated_at = ? WHERE id = ?').run(2000, 'TASK-2');
+    bus.db.prepare('UPDATE tasks SET updated_at = ? WHERE id = ?').run(3000, 'TASK-3');
+
+    // Verify getTasks
+    tasks = bus.getTasks();
+    assert.strictEqual(tasks.length, 3);
+
+    // Sort tasks by id for deterministic checking
+    tasks.sort((a, b) => a.id.localeCompare(b.id));
+    assert.strictEqual(tasks[0].id, 'TASK-1');
+    assert.strictEqual(tasks[0].status, 'TODO');
+
+    assert.strictEqual(tasks[1].id, 'TASK-2');
+    assert.strictEqual(tasks[1].status, 'IN_PROGRESS');
+
+    assert.strictEqual(tasks[2].id, 'TASK-3');
+    assert.strictEqual(tasks[2].status, 'DONE');
+
+    // Verify getTaskMeta
+    meta = bus.getTaskMeta();
+    assert.strictEqual(meta.c, 3, 'Task count should be 3');
+    assert.strictEqual(meta.t, 3000, 'Max updated_at should be 3000');
+});
