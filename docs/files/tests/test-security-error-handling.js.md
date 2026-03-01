@@ -1,10 +1,18 @@
-# File: tests/test-security-error-handling.js
+# \`tests/test-security-error-handling.js\`
 
-**Purpose:** Validates that API endpoints in `lib/server.js` do not leak sensitive error details (e.g., stack traces) in 500 responses, instead returning a generic "Internal Server Error".
+## Purpose
+This file verifies that API endpoints in the Dashboard server return generic error messages instead of leaking internal exception details during server failures.
+It tests all configured endpoints by mocking the dependencies and asserting the response bodies and status codes. This ensures that no sensitive stack traces are exposed to external users. It also specifically verifies that `lib/Logger` captures the error payload without sending it over the wire.
 
-**Key Exports/Entrypoints:**
-- Standalone test script executed via `node`.
+## Exports
+None.
 
-**Side Effects:**
-- Mocks `express` and `socket.io` modules.
-- Writes to `console.log` for test output.
+## Dependencies
+- \`express\`
+- \`socket.io\`
+- \`supertest\`
+- \`../lib/server.js\`
+
+## Side Effects
+None.
+
