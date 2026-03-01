@@ -1,9 +1,8 @@
-# File: tests/test-server-error-handling.js
+# Test: Server Error Handling
 
-**Purpose:** [What does this file do?]
+## Scope
+Verifies the dashboard server's response handling in the event of unexpected exceptions during runtime.
 
-**Key Exports/Entrypoints:**
-- [List functions/classes export]
-
-**Side Effects:**
-- [E.g., modifies DB, writes files, sets globals]
+## Details
+- Asserts that generic "Internal Server Error" responses are returned.
+- Validates that stack traces and other internal system state are not leaked to external clients.
