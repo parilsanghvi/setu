@@ -1,9 +1,10 @@
-# File: tests/test-server-error-handling.js
+---
+title: Server Error Handling Tests
+description: A suite of verification tests confirming that the dashboard server implements robust error handling, correctly isolating unhandled exceptions, and safely managing failure states without crashing or leaking sensitive information.
+---
 
-**Purpose:** [What does this file do?]
+# Server Error Handling Tests
 
-**Key Exports/Entrypoints:**
-- [List functions/classes export]
+The `test-server-error-handling.js` file is dedicated to validating the resilience and security of the server's error management capabilities.
 
-**Side Effects:**
-- [E.g., modifies DB, writes files, sets globals]
+It programmatically injects faults and triggers edge-case failure scenarios within the server to ensure that unexpected errors are caught gracefully. Specifically, it tests that sensitive stack traces or internal environment variables are never leaked to the client in HTTP responses, and that the server continues to operate normally after recovering from a simulated catastrophic failure within a route handler.
