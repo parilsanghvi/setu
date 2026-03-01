@@ -79,6 +79,6 @@ const ChatBox = ({ agents, logs }) => {
             </form>
         </div>
     );
-});
+};
 
 export default React.memo(ChatBox);

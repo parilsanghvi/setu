@@ -137,11 +137,11 @@ const TaskBoard = React.memo(({ tasks }) => {
                                 ))
                             )}
                         </div>
-                        );
-                })}
                     </div>
+                ))}
+            </div>
         </div>
-            );
+    );
 });
 
-            export default React.memo(TaskBoard);
+export default React.memo(TaskBoard);
