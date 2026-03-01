@@ -1,9 +1,16 @@
-# File: tests/verify-path-traversal.js
+---
+title: Verify Path Traversal
+description: "Security test verifying prevention of directory traversal attacks."
+---
 
-**Purpose:** [What does this file do?]
+# \`tests/verify-path-traversal.js\`
 
-**Key Exports/Entrypoints:**
-- [List functions/classes export]
+## Purpose
+This test script confirms that the file access boundaries defined in \`lib/CoreAgent.js\` successfully block read/write operations outside the agent's assigned workspace.
 
-**Side Effects:**
-- [E.g., modifies DB, writes files, sets globals]
+## Tests
+- Attempts to read/write using \`..\` or absolute paths traversing beyond the designated \`scope\` directory.
+- Asserts that all such operations are explicitly rejected.
+
+## Important Notes
+- This is a critical security test preventing unauthorized system access via the LLM context.
