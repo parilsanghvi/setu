@@ -1,9 +1,19 @@
-# File: tests/verify-path-traversal.js
+---
+type: file
+---
 
-**Purpose:** [What does this file do?]
+# verify-path-traversal.js
 
-**Key Exports/Entrypoints:**
-- [List functions/classes export]
+## Purpose
+Tests the CoreAgent class for path traversal vulnerabilities. Ensures that `readFile` and `writeFile` operations do not escape their assigned isolated scope, providing strong security guarantees against rogue agents or unauthorized file access.
 
-**Side Effects:**
-- [E.g., modifies DB, writes files, sets globals]
+## Exports
+- None
+
+## Dependencies
+- node:test
+- node:assert
+- ../lib/CoreAgent.js
+
+## Side Effects
+- Uses file system modifications within isolated scopes.

@@ -1,9 +1,20 @@
-# File: tests/test-server-error-handling.js
+---
+type: file
+---
 
-**Purpose:** [What does this file do?]
+# test-server-error-handling.js
 
-**Key Exports/Entrypoints:**
-- [List functions/classes export]
+## Purpose
+Tests the dashboard server's error handling to ensure error details aren't leaked.
 
-**Side Effects:**
-- [E.g., modifies DB, writes files, sets globals]
+## Exports
+- None
+
+## Dependencies
+- node:test
+- node:assert
+- ../lib/server.js
+- proxyquire (mocking express)
+
+## Side Effects
+- Uses in-memory database to prevent modifying real DB state.
