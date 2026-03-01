@@ -1,9 +1,9 @@
-# File: tests/verify-path-traversal.js
+---
+description: Tests to ensure file system path traversal constraints are respected
+---
 
-**Purpose:** [What does this file do?]
+# verify-path-traversal.js
 
-**Key Exports/Entrypoints:**
-- [List functions/classes export]
+Verifies that agents cannot access files outside their designated workspace using path traversal techniques. Tests \`CoreAgent\` path isolation by asserting that \`readFile\` and \`writeFile\` reject paths escaping \`this.scope\` via \`..\`, absolute paths, or sibling directory traversal.
 
-**Side Effects:**
-- [E.g., modifies DB, writes files, sets globals]
+This is a critical security check to ensure that the AI agents running on the platform cannot read or write arbitrary files on the host system, keeping the execution environment secure.
