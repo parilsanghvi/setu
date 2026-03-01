@@ -33,7 +33,6 @@ Rules:
 - [playwright-report/](./playwright-report/SUMMARY.md)
 - `public/` _(summary not yet generated)_
 - [src/](./src/SUMMARY.md)
-- [test-results/](./test-results/SUMMARY.md)
 - [tests/](./tests/SUMMARY.md)
 - [eslint.config.js](../../../files/frontend/app/eslint.config.js.md)
 - [package.json](../../../files/frontend/app/package.json.md)
