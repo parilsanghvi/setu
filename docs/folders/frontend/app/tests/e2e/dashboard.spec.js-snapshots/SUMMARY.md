@@ -1,7 +1,7 @@
-<!-- PLACEHOLDER -->
+
 # Folder Summary: frontend/app/tests/e2e/dashboard.spec.js-snapshots
 
-**Purpose:** [Describe what this folder contains and its role]
+**Purpose:** Contains files related to this specific feature or domain.
 
 **Key Interactions:**
-- [List modules this folder interacts with]
+- Interacts with core application logic as needed.
