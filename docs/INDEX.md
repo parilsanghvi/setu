@@ -2,8 +2,8 @@
 
 **Repo:** 
 **Owner:**
-**Purpose:** [Short description of the project]
+**Purpose:** Sutradhar Backend
 
 ## Quick Links
-- [Architecture](architecture/overview.md)
-- [Operations](operations/how-to-run.md)
+- [Architecture](current-state.md)
+- [Operations](runbook.md)
