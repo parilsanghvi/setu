@@ -1,9 +1,6 @@
-# File: tests/test-server-error-handling.js
+---
+description: Tests for server error handling.
+---
+# test-server-error-handling.js
 
-**Purpose:** [What does this file do?]
-
-**Key Exports/Entrypoints:**
-- [List functions/classes export]
-
-**Side Effects:**
-- [E.g., modifies DB, writes files, sets globals]
+Tests for server error handling.
