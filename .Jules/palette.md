@@ -13,3 +13,7 @@
 ## 2026-02-23 - [A11y: Status Indicators]
 **Learning:** The Onboarding widget relied solely on color (red/green borders) to convey status, making it inaccessible to colorblind users and screen readers. Status messages should always combine color with text and icons, and use semantic roles like `role="status"`.
 **Action:** Always include explicit text labels or aria-labels alongside color indicators, and use semantic HTML elements for status updates.
+
+## 2026-03-01 - [UX: Modal Focus Restoration]
+**Learning:** The Modal component successfully trapped focus and allowed closing via the Escape key, but failed to restore focus to the triggering element upon closing. This causes screen readers and keyboard users to lose their place on the page, significantly disrupting navigation continuity.
+**Action:** Always capture `document.activeElement` when a modal or dialog mounts, and implement a cleanup function in `useEffect` to restore focus to that element when the modal unmounts.
