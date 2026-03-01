@@ -1,9 +1,14 @@
-# File: tests/verify-path-traversal.js
+# \`tests/verify-path-traversal.js\`
 
-**Purpose:** [What does this file do?]
+## Purpose
+Verification script for path traversal vulnerability. This script tests the application's input validation and path resolution logic to ensure that malicious inputs cannot be used to access files outside the intended directory structure. It acts as a security regression test.
 
-**Key Exports/Entrypoints:**
-- [List functions/classes export]
+## Dependencies
+* \`node:test\`: Test runner.
+* \`node:assert\`: Assertion library.
 
-**Side Effects:**
-- [E.g., modifies DB, writes files, sets globals]
+## Known Issues
+* None
+
+## To Do
+* None
