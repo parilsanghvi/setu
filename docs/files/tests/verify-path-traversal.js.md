@@ -14,3 +14,12 @@ This test script confirms that the file access boundaries defined in \`lib/CoreA
 
 ## Important Notes
 - This is a critical security test preventing unauthorized system access via the LLM context.
+
+## Exports
+- None
+
+## Dependencies
+- None
+
+## Side Effects
+- None

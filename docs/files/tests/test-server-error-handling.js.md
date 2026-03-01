@@ -13,3 +13,9 @@ This script validates that the \`DashboardServer\` appropriately catches uncaugh
 
 ## Dependencies
 - \`supertest\`: Used to simulate HTTP requests against the running Express application.
+
+## Exports
+- None
+
+## Side Effects
+- None

@@ -14,3 +14,12 @@ This file contains integration tests for the \`/api/agents\` and \`/api/chat\` e
 
 ## Important Notes
 - Requires a mocked environment for \`lib/db.js\` to simulate agent state and history.
+
+## Exports
+- None
+
+## Dependencies
+- \`supertest\`: Used to simulate HTTP requests against the running Express application.
+
+## Side Effects
+- None
