@@ -1,9 +1,14 @@
-# File: tests/test-server-error-handling.js
+# `tests/test-server-error-handling.js`
 
-**Purpose:** [What does this file do?]
+## 1. Overview
+This file verifies the server's error handling capabilities. It ensures that the server responds with appropriate status codes and safe error messages without leaking internal details.
 
-**Key Exports/Entrypoints:**
-- [List functions/classes export]
+## 2. Key Components
+*   **Error Responses**: Verifies that exceptions result in 500 status codes.
+*   **Information Disclosure Prevention**: Checks that stack traces are not returned in API responses.
 
-**Side Effects:**
-- [E.g., modifies DB, writes files, sets globals]
+## 3. Usage
+Executed during the standard test suite run via `node tests/runner.js`.
+
+## 4. Dependencies
+*   Testing libraries.
