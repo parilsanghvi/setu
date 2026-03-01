@@ -11,6 +11,7 @@ const ChatBox = ({ agents, logs }) => {
     // Filter logs for chat messages or show all?
     // For now, let's show all system logs + chat to give "The Matrix" feel
     // OR filter for [CHAT] prefix we added in useSocket
+    // Memoized to prevent re-filtering on every keystroke
     const chatHistory = useMemo(() =>
         logs.filter(l => typeof l.content === 'string' && l.content.startsWith('[CHAT]')),
         [logs]
