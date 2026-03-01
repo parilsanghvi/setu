@@ -652,7 +652,6 @@ function startSystemLoops() {
     // E. Sutradhar is now a separate process, so no kernel heartbeat for it.
 
   }, 1000); // Check every 1s (High frequency for responsiveness)
-
   // D. Log File Watcher REMOVED
   // Reason: The `log()` function already broadcasts logs via Socket.IO immediately.
   // Watching the file caused duplicate log emissions (one from `log()`, one from `fs.watch`).
