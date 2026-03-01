@@ -3,19 +3,19 @@
     "domain": "backend",
     "spec": "Develop a new user login route. Use console.log for debugging errors.",
     "status": "APPROVED",
-    "timestamp": "2026-02-28T19:49:12.615Z",
+    "timestamp": "2026-03-01T10:54:08.735Z",
     "vetoes": []
   },
   "TASK-INFRA-BAD": {
     "domain": "infra",
     "spec": "We will just run the app on the host machine using sudo node server.js. No Docker needed.",
     "status": "VETOED",
-    "timestamp": "2026-02-28T19:49:26.944Z",
+    "timestamp": "2026-03-01T10:54:23.000Z",
     "vetoes": [
       {
         "agent": "Vishwakarma-Test",
         "reason": "Violation of Isolation Principle.",
-        "timestamp": "2026-02-28T19:49:26.945Z"
+        "timestamp": "2026-03-01T10:54:23.001Z"
       }
     ]
   },
@@ -23,7 +23,7 @@
     "domain": "infra",
     "spec": "We will use a Dockerfile based on node:18-alpine. It will run as a non-root user 'node'. Healthchecks enabled.",
     "status": "APPROVED",
-    "timestamp": "2026-02-28T19:49:26.946Z",
+    "timestamp": "2026-03-01T10:54:23.002Z",
     "vetoes": []
   }
 }
