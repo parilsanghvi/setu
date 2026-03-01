@@ -3,7 +3,7 @@
 **Last Updated:** 2026-03-01
 
 ## Architectural State
-- Stable.
+- [Describe current architecture stability]
 
 ## Operational State
-- Stable.
+- [Describe current deploy/runtime stability]
