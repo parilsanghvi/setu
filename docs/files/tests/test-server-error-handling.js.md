@@ -1,9 +1,12 @@
-# File: tests/test-server-error-handling.js
+# `tests/test-server-error-handling.js`
 
-**Purpose:** [What does this file do?]
+## Purpose
+Tests error handling in the `lib/server.js` file.
 
-**Key Exports/Entrypoints:**
-- [List functions/classes export]
+## What it does
+- Validates that errors within the server don't crash the server.
+- Verifies proper generic responses are sent to clients without leaking sensitive stack traces.
 
-**Side Effects:**
-- [E.g., modifies DB, writes files, sets globals]
+## Dependencies
+- `node:test`
+- `node:assert`

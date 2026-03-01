@@ -1,9 +1,12 @@
-# File: tests/verify-path-traversal.js
+# `tests/verify-path-traversal.js`
 
-**Purpose:** [What does this file do?]
+## Purpose
+Tests that directory traversal vulnerabilities are correctly prevented.
 
-**Key Exports/Entrypoints:**
-- [List functions/classes export]
+## What it does
+- Attempts directory traversals using payloads like `../` to access files out of bounds.
+- Validates that the application correctly sanitizes paths and prevents the requests.
 
-**Side Effects:**
-- [E.g., modifies DB, writes files, sets globals]
+## Dependencies
+- `node:test`
+- `node:assert`
