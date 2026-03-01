@@ -8,3 +8,16 @@ description: Integration tests validating the Dashboard API behavior, endpoints,
 The `test-dashboard-api.js` script contains a comprehensive suite of integration tests designed to thoroughly validate the functionality of the dashboard backend server APIs.
 
 It explicitly tests proper validation of requests, verifies JSON responses and schemas, and ensures appropriate HTTP status codes are returned for both successful interactions and various error states, including malformed requests, unauthorized access, and edge cases. These tests ensure the overall health and contract stability of the dashboard's programmatic interface.
+
+
+## Purpose
+Provides test coverage for this component.
+
+## Exports
+None.
+
+## Dependencies
+Relies on node:test and core agents.
+
+## Side Effects
+None.
