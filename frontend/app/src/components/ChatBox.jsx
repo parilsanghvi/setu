@@ -80,4 +80,4 @@ const ChatBox = ({ agents, logs }) => {
     );
 };
 
-export default ChatBox;
+export default React.memo(ChatBox);

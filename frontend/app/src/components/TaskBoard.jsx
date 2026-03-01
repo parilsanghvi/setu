@@ -134,4 +134,4 @@ const TaskBoard = ({ tasks }) => {
     );
 };
 
-export default TaskBoard;
+export default React.memo(TaskBoard);
