@@ -1,172 +1,171 @@
 const assert = require('assert');
-const Module = require('module');
 
-console.log('🧪 Testing lib/llm/OpenAI.js...');
+// Keep original fetch
+const originalFetch = global.fetch;
 
-// Mock dependencies
-const originalRequire = Module.prototype.require;
-let mockHttpsResponse = {
-    statusCode: 200,
-    body: JSON.stringify({ choices: [{ message: { content: "Mock Response" } }] }),
-    headers: {}
-};
-let mockRequestError = null;
-let lastRequestOptions = null;
-let lastRequestBody = null;
+// Variables to capture fetch calls
+let lastFetchUrl = null;
+let lastFetchOptions = null;
+let mockResponse = null;
 
-Module.prototype.require = function(id) {
-    if (id === 'https') {
-        return {
-            request: (url, options, callback) => {
-                lastRequestOptions = options;
-                let requestBody = '';
+// Mock global fetch
+global.fetch = async (url, options) => {
+    lastFetchUrl = url;
+    lastFetchOptions = options;
 
-                const req = {
-                    on: (event, handler) => {
-                        if (event === 'error' && mockRequestError) {
-                            // Simulate async error
-                            setTimeout(() => handler(mockRequestError), 10);
-                        }
-                    },
-                    write: (chunk) => {
-                        requestBody += chunk;
-                    },
-                    end: () => {
-                        lastRequestBody = requestBody;
-                        if (!mockRequestError) {
-                            const res = {
-                                statusCode: mockHttpsResponse.statusCode,
-                                headers: mockHttpsResponse.headers,
-                                on: (event, handler) => {
-                                    if (event === 'data') {
-                                        handler(mockHttpsResponse.body);
-                                    }
-                                    if (event === 'end') {
-                                        handler();
-                                    }
-                                }
-                            };
-                            if (callback) callback(res);
-                        }
-                    }
-                };
-                return req;
-            }
-        };
+    if (mockResponse instanceof Error) {
+        throw mockResponse;
     }
-    return originalRequire.apply(this, arguments);
+
+    return {
+        ok: mockResponse.ok,
+        status: mockResponse.status,
+        text: async () => mockResponse.text,
+        json: async () => mockResponse.json,
+    };
 };
 
-const OpenAI = require('../lib/llm/OpenAI');
+const OpenAIProvider = require('../lib/models/providers/openai');
 
-// Reset mock state before each test
 function resetMocks() {
-    mockHttpsResponse = {
-        statusCode: 200,
-        body: JSON.stringify({ choices: [{ message: { content: "Mock Response" } }] }),
-        headers: {}
-    };
-    mockRequestError = null;
-    lastRequestOptions = null;
-    lastRequestBody = null;
+    lastFetchUrl = null;
+    lastFetchOptions = null;
+    mockResponse = null;
 }
+
+console.log('🧪 Testing lib/models/providers/openai.js...');
 
 (async () => {
     try {
-        // Test 1: Happy Path
+        // Test 1: Standard Generation (No Tool Calls)
+        console.log('Test 1: Standard Generation');
         resetMocks();
-        const provider = new OpenAI({ openaiApiKey: 'test-key' });
-        const result = await provider.generate('System Prompt', 'User Prompt');
-
-        assert.strictEqual(result, 'Mock Response', 'Should return correct response text');
-        assert.strictEqual(lastRequestOptions.headers['Authorization'], 'Bearer test-key', 'Should include API key in headers');
-        assert.strictEqual(lastRequestOptions.method, 'POST', 'Should use POST method');
-
-        const parsedBody = JSON.parse(lastRequestBody);
-        assert.strictEqual(parsedBody.model, 'gpt-4o', 'Should use correct model');
-        assert.strictEqual(parsedBody.messages[0].role, 'system', 'Should include system role');
-        assert.strictEqual(parsedBody.messages[0].content, 'System Prompt', 'Should include system prompt');
-        assert.strictEqual(parsedBody.messages[1].role, 'user', 'Should include user role');
-        assert.strictEqual(parsedBody.messages[1].content, 'User Prompt', 'Should include user prompt');
-
-        console.log('✅ Happy Path Passed');
-
-        // Test 2: API Error
-        resetMocks();
-        mockHttpsResponse = {
-            statusCode: 400,
-            body: 'Bad Request'
+        mockResponse = {
+            ok: true,
+            status: 200,
+            json: {
+                choices: [{
+                    finish_reason: 'stop',
+                    message: {
+                        role: 'assistant',
+                        content: 'Standard mock response'
+                    }
+                }]
+            }
         };
 
-        await assert.rejects(
-            provider.generate('Sys', 'User'),
-            (err) => {
-                assert(err.message.includes('OpenAI API Error: 400 Bad Request'), 'Error message should include status code and body');
-                return true;
-            },
-            'Should throw error on 400 response'
-        );
+        const provider1 = new OpenAIProvider({
+            model: 'gpt-4o',
+            auth: { key: 'test-key-123' },
+            baseUrl: 'https://custom-openai.com/v1'
+        });
+
+        const result1 = await provider1.generate('You are an AI', 'Hello');
+
+        assert.strictEqual(lastFetchUrl, 'https://custom-openai.com/v1/chat/completions');
+        assert.strictEqual(lastFetchOptions.method, 'POST');
+        assert.strictEqual(lastFetchOptions.headers['Authorization'], 'Bearer test-key-123');
+
+        const body1 = JSON.parse(lastFetchOptions.body);
+        assert.strictEqual(body1.model, 'gpt-4o');
+        assert.strictEqual(body1.messages[0].role, 'system');
+        assert.strictEqual(body1.messages[0].content, 'You are an AI');
+        assert.strictEqual(body1.messages[1].role, 'user');
+        assert.strictEqual(body1.messages[1].content, 'Hello');
+        assert.strictEqual(result1, 'Standard mock response');
+        console.log('✅ Standard Generation Passed');
+
+        // Test 2: Tool Call Handling
+        console.log('Test 2: Tool Call Handling');
+        resetMocks();
+        mockResponse = {
+            ok: true,
+            status: 200,
+            json: {
+                choices: [{
+                    finish_reason: 'tool_calls',
+                    message: {
+                        role: 'assistant',
+                        content: '',
+                        tool_calls: [
+                            {
+                                id: 'call_abc123',
+                                type: 'function',
+                                function: {
+                                    name: 'get_weather',
+                                    arguments: '{"location":"San Francisco"}'
+                                }
+                            }
+                        ]
+                    }
+                }]
+            }
+        };
+
+        const provider2 = new OpenAIProvider({
+            model: 'gpt-4',
+            auth: { key: 'test-key' }
+        });
+
+        const tools = [{
+            name: 'get_weather',
+            description: 'Get current weather',
+            parameters: { type: 'object', properties: { location: { type: 'string' } } }
+        }];
+
+        const result2 = await provider2.generate('Sys', 'What is the weather?', tools, { reasoning_effort: 'high' });
+
+        const body2 = JSON.parse(lastFetchOptions.body);
+        assert(body2.tools.length === 1);
+        assert.strictEqual(body2.tools[0].function.name, 'get_weather');
+        assert.strictEqual(body2.reasoning_effort, 'high');
+
+        // Assert returned object structure matches expected
+        assert.strictEqual(typeof result2, 'object');
+        assert.strictEqual(result2.content, '');
+        assert(Array.isArray(result2.toolCalls));
+        assert.strictEqual(result2.toolCalls.length, 1);
+        assert.strictEqual(result2.toolCalls[0].id, 'call_abc123');
+        assert.strictEqual(result2.toolCalls[0].name, 'get_weather');
+        assert.deepStrictEqual(result2.toolCalls[0].args, { location: 'San Francisco' });
+        console.log('✅ Tool Call Handling Passed');
+
+        // Test 3: API Error Handling
+        console.log('Test 3: API Error Handling');
+        resetMocks();
+        mockResponse = {
+            ok: false,
+            status: 400,
+            text: 'Bad Request: Invalid model'
+        };
+
+        try {
+            await provider2.generate('Sys', 'User');
+            assert.fail('Should have thrown an error on 400 response');
+        } catch (e) {
+            assert(e.message.includes('OpenAI API Error: 400 Bad Request: Invalid model'), 'Error message should include status code and text');
+        }
         console.log('✅ API Error Handling Passed');
 
-        // Test 3: Network Error
+        // Test 4: Network Error Handling
+        console.log('Test 4: Network Error Handling');
         resetMocks();
-        mockRequestError = new Error('Connection Reset');
+        mockResponse = new Error('fetch failed');
 
-        await assert.rejects(
-            provider.generate('Sys', 'User'),
-            (err) => {
-                assert.strictEqual(err.message, 'Connection Reset', 'Should propagate network error');
-                return true;
-            },
-            'Should throw error on network failure'
-        );
+        try {
+            await provider2.generate('Sys', 'User');
+            assert.fail('Should have thrown network error');
+        } catch (e) {
+            assert.strictEqual(e.message, 'fetch failed');
+        }
         console.log('✅ Network Error Handling Passed');
 
-        // Test 4: Invalid JSON Response
-        resetMocks();
-        mockHttpsResponse = {
-            statusCode: 200,
-            body: 'Invalid JSON'
-        };
-
-        await assert.rejects(
-            provider.generate('Sys', 'User'),
-            SyntaxError,
-            'Should propagate JSON parse error'
-        );
-        console.log('✅ Invalid JSON Error Handling Passed');
-
-        // Test 5: Missing API Key (Mock Response)
-        resetMocks();
-        const noKeyProvider = new OpenAI({});
-        // Suppress console.warn for this test
-        const originalWarn = console.warn;
-        console.warn = () => {};
-
-        const mockResult = await noKeyProvider.generate('Sys', 'User');
-        console.warn = originalWarn; // Restore warn
-
-        assert(typeof mockResult === 'string', 'Should return a string');
-        try {
-            const parsed = JSON.parse(mockResult);
-            assert.strictEqual(parsed.slug, 'mock-skill-generated');
-        } catch (e) {
-             assert.fail('Mock response should be valid JSON for standard prompt');
-        }
-        console.log('✅ Missing API Key Handling Passed');
-
-        // Test 6: Verify VETO logic from BaseProvider via OpenAI
-        resetMocks();
-        const vetoResult = await noKeyProvider.generate('Sys', 'Evaluate this architectural spec');
-        assert(vetoResult.startsWith('VETO:'), 'Should return VETO response');
-        console.log('✅ VETO Logic Passed');
-
-        console.log('🎉 All OpenAI Tests Passed!');
-
+        console.log('🎉 All OpenAIProvider Tests Passed!');
     } catch (e) {
-        console.error('❌ OpenAI Test Failed:', e);
-        process.exit(1);
+        console.error('❌ Test Failed:', e);
+        throw e;
     } finally {
-        Module.prototype.require = originalRequire;
+        // Restore global fetch
+        global.fetch = originalFetch;
     }
 })();
