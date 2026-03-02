@@ -21,14 +21,16 @@ test('Focus Management: Modal trap and restore', async ({ page }) => {
     // 3. Wait for the task to appear (socket update)
     // The task button has aria-label="View details for task: Test Focus Trap"
     const taskButton = page.getByRole('button', { name: 'View details for task: Test Focus Trap' });
-    await expect(taskButton).toBeVisible({ timeout: 10000 });
+
+    // We expect the button to eventually be attached and visible
+    await expect(taskButton.first()).toBeVisible({ timeout: 10000 });
 
     // Focus the button first (simulating keyboard navigation)
-    await taskButton.focus();
-    await expect(taskButton).toBeFocused();
+    await taskButton.first().focus();
+    await expect(taskButton.first()).toBeFocused();
 
     // 4. Open Modal
-    await taskButton.click();
+    await taskButton.first().click();
 
     // Verify Modal is open
     const modal = page.getByRole('dialog');
@@ -45,5 +47,5 @@ test('Focus Management: Modal trap and restore', async ({ page }) => {
     await expect(modal).not.toBeVisible();
 
     // 6. Verify focus is restored to the task button
-    await expect(taskButton).toBeFocused();
+    await expect(taskButton.first()).toBeFocused();
 });

@@ -1,19 +1,10 @@
----
-title: BaseProvider
-description: "Base class for LLM providers"
----
+<!-- PLACEHOLDER -->
+# File: lib/models/providers/base.js
 
-# `lib/models/providers/base.js`
+**Purpose:** [What does this file do?]
 
-## Purpose
-This file contains the `BaseProvider` class, which serves as the base class for all LLM provider integrations (e.g., OpenAI, Anthropic, Google, Ollama). It standardizes the configuration initialization.
+**Key Exports/Entrypoints:**
+- [List functions/classes export]
 
-## Exports
-- `BaseProvider`: The base class containing common properties (`config`, `auth`, `model`, `baseUrl`) and a stub `generate` method.
-
-## Dependencies
-- None.
-
-## Important Notes
-- Subclasses must implement the `generate(systemPrompt, userPrompt, tools, options)` method, otherwise an error will be thrown.
-- It streamlines the constructor logic for provider subclasses.
+**Side Effects:**
+- [E.g., modifies DB, writes files, sets globals]

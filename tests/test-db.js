@@ -8,16 +8,16 @@ const originalRequire = Module.prototype.require;
 
 // Only mock if not already mocked
 if (!originalRequire._isMocked) {
-    Module.prototype.require = function(id) {
-      if (id === 'better-sqlite3') {
-        return class MockDatabase extends RealDatabase {
-          constructor(path, options) {
-            // Force in-memory database for isolation regardless of path
-            super(':memory:', options);
-          }
+    Module.prototype.require = function (id) {
+        if (id === 'better-sqlite3') {
+            return class MockDatabase extends RealDatabase {
+                constructor(path, options) {
+                    // Force in-memory database for isolation regardless of path
+                    super(':memory:', options);
+                }
+            }
         }
-      }
-      return originalRequire.apply(this, arguments);
+        return originalRequire.apply(this, arguments);
     };
     Module.prototype.require._isMocked = true;
 }
