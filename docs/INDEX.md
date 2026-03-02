@@ -2,8 +2,6 @@
 
 **Repo:** 
 **Owner:**
-**Purpose:** Setu is an Agentic Engineering Platform.
+**Purpose:** A project component.
 
 ## Quick Links
-- [Architecture](architecture/overview.md)
-- [Operations](operations/how-to-run.md)
