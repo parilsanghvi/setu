@@ -1,10 +1,8 @@
-# How to run
-This file provides instructions on how to run the application locally.
+# Operations: How to Run
 
-To run the application, make sure you have all dependencies installed using `pnpm install`. Then, configure the necessary environment variables in a `.env` file (like `LLM_PROVIDER`, `OPENAI_API_KEY`, etc.).
+This document outlines the steps to run the application locally or in production.
 
-Start the backend:
-`node index.js`
-
-Start the frontend:
-`cd frontend/app && pnpm dev`
+## Running Locally
+1.  Ensure all dependencies are installed using `npm install` or `pnpm install`.
+2.  Start the core engine using `node index.js`.
+3.  Start the dashboard using `npm start` in the `frontend/app` directory.
