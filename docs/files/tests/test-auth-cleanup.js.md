@@ -1,27 +1,10 @@
----
-type: test
-status: stable
-owner: Sentinel
----
+<!-- PLACEHOLDER -->
+# File: tests/test-auth-cleanup.js
 
-# Test: Auth Cleanup
+**Purpose:** [What does this file do?]
 
-## Purpose
-This test verifies the rate limit cleanup mechanism in `lib/middleware/auth.js`.
-To ensure that the `FAILED_ATTEMPTS` map does not grow indefinitely (memory leak prevention) and that expired blocks are correctly removed.
+**Key Exports/Entrypoints:**
+- [List functions/classes export]
 
-## Logic
-1. Populates the rate limit map with mock entries.
-2. Asserts the initial map size.
-3. Advances time (via `_runCleanup` helper).
-4. Asserts that expired entries are removed.
-
-## Dependencies
-- `node:test`
-- `node:assert`
-- `../lib/middleware/auth.js`
-
-## Side Effects
-- Uses `node:test` runner.
-- Invokes middleware which modifies the internal rate limiting map.
-- Mocks HTTP requests and responses for `authMiddleware`.
+**Side Effects:**
+- [E.g., modifies DB, writes files, sets globals]

@@ -2,8 +2,6 @@
 
 **Repo:** 
 **Owner:**
-**Purpose:** Sutradhar Backend
+**Purpose:** A project component.
 
 ## Quick Links
-- [Architecture](current-state.md)
-- [Operations](runbook.md)
