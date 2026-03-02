@@ -1,14 +1,13 @@
-
-# ONBOARDING.json
+# File: ONBOARDING.json
 
 ## Purpose
-This file is functionally complete and tested. It provides necessary implementation details for the module it belongs to.
+Stores metadata about the current state of project documentation completeness and coverage. This file acts as the source of truth for the documentation quality gate, providing metrics such as total files, documented files, missing artifacts, and percentage completeness. It is primarily used during CI/CD pipelines and local build verification to ensure that the repository maintains 100% documentation coverage.
 
 ## Exports
-None.
+- None
 
 ## Dependencies
-None.
+- None
 
 ## Side Effects
-None.
+- None
