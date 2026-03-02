@@ -65,7 +65,7 @@ io.use(socketAuth);
 app.get('/api/onboarding', (req, res) => {
   try {
     const { getOnboardingStatus } = require('./lib/onboarding/status');
-    const status = getOnboardingStatus();
+    const status = getOnboardingStatus({ fast: true });
     res.json(status);
   } catch (e) {
     res.status(500).json({ error: e.message });
@@ -297,17 +297,39 @@ app.get('/api/onboarding-trend', (req, res) => {
   }
 });
 
-app.get('/api/drift-trend', (req, res) => {
+app.get('/api/drift-trend', async (req, res) => {
   try {
     const logPath = getSetuPath('drift-history.jsonl');
-    if (!fs.existsSync(logPath)) {
+    try {
+      await fs.promises.access(logPath);
+    } catch {
       return res.json({ total_runs: 0, fail_rate: 0, drift_percent: 0, top_missing: 'N/A' });
     }
-    const lines = fs.readFileSync(logPath, 'utf8').split('\n').filter(Boolean);
-    const allRuns = lines.map(l => { try { return JSON.parse(l); } catch (e) { return null; } }).filter(Boolean);
-    if (allRuns.length === 0) return res.json({ total_runs: 0, fail_rate: 0, drift_percent: 0, top_missing: 'N/A' });
 
-    const last20 = allRuns.slice(-20);
+    let total_runs = 0;
+    try {
+      await new Promise((resolve, reject) => {
+        const stream = fs.createReadStream(logPath);
+        stream.on('data', chunk => {
+          for (let i = 0; i < chunk.length; ++i) {
+            if (chunk[i] === 10) total_runs++;
+          }
+        });
+        stream.on('end', resolve);
+        stream.on('error', reject);
+      });
+    } catch (err) {
+      console.error('[SUTRADHAR] Stream error reading drift history:', err);
+    }
+
+    const last20Lines = await readLastLines(logPath, 20);
+    const last20 = last20Lines.map(l => { try { return JSON.parse(l); } catch (e) { return null; } }).filter(Boolean);
+
+    // Fallback if file doesn't end with newline but has valid lines
+    if (total_runs === 0 && last20Lines.length > 0) total_runs = last20Lines.length;
+
+    if (last20.length === 0) return res.json({ total_runs: 0, fail_rate: 0, drift_percent: 0, top_missing: 'N/A' });
+
     const fails = last20.filter(r => !r.ok).length;
     const failRate = ((fails / last20.length) * 100).toFixed(1);
     const avgDrift = (last20.reduce((acc, r) => acc + r.drift_percent, 0) / last20.length).toFixed(1);
@@ -318,13 +340,13 @@ app.get('/api/drift-trend', (req, res) => {
     const topMissing = top ? top[0].replace('docs/files/', '') : 'None';
 
     const lastRun = last20[last20.length - 1];
-    const unowned = (lastRun.ownership && lastRun.ownership.unowned_count) || 0;
+    const unowned = (lastRun && lastRun.ownership && lastRun.ownership.unowned_count) || 0;
 
     const { getActiveProfile } = require('./lib/onboarding/governance-profiles');
     const activeProfile = getActiveProfile();
 
     res.json({
-      total_runs: allRuns.length,
+      total_runs: total_runs,
       fail_rate: parseFloat(failRate),
       drift_percent: parseFloat(avgDrift),
       top_missing: topMissing,
@@ -562,7 +584,7 @@ function startSystemLoops() {
         // GUARD: Only resurrect agents that exist in our AGENT_MAP (prevents test-injected zombies)
         if (!AGENT_MAP[agent.role]) {
           debug(`🧹 Skipping unknown agent '${agent.name}' (role: ${agent.role}). Cleaning from DB.`);
-          bus.db.prepare('DELETE FROM agents WHERE name = ?').run(agent.name);
+          bus._stmt('deleteAgentByName', 'DELETE FROM agents WHERE name = ?').run(agent.name);
           return;
         }
 
