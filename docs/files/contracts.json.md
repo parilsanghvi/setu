@@ -1,15 +1,10 @@
+<!-- PLACEHOLDER -->
 # File: contracts.json
 
-## Purpose
-This file stores the security contracts and spec approvals/vetoes for various tasks handled by Vishwakarma and other agents. It acts as a persistent ledger of what has been reviewed and approved.
+**Purpose:** [What does this file do?]
 
-## Exports
-- None (JSON data)
+**Key Exports/Entrypoints:**
+- [List functions/classes export]
 
-## Dependencies
-- `lib/Contractor.js`: The primary module that manages these records.
-
-## Side Effects
-- Read and written by `Contractor.js` during task specification cycles.
-
-${'x'.repeat(400)}
+**Side Effects:**
+- [E.g., modifies DB, writes files, sets globals]

@@ -2,6 +2,7 @@ import React, { useState, useMemo } from 'react';
 import Modal from './Modal';
 import ScreenshotGallery from './ScreenshotGallery';
 import Spinner from './Spinner';
+import TaskColumn from './TaskColumn';
 import styles from './TaskBoard.module.scss';
 
 const TaskBoard = React.memo(({ tasks }) => {
@@ -40,9 +41,9 @@ const TaskBoard = React.memo(({ tasks }) => {
                 try {
                     const spec = JSON.parse(t.spec || '{}');
                     displayTitle = spec.task;
-                } catch (e) {
+                } catch {
                     // Fallback to undefined or handle error if needed
-                    console.error('Failed to parse task spec:', e);
+
                 }
             }
 
@@ -94,50 +95,12 @@ const TaskBoard = React.memo(({ tasks }) => {
 
             <div className={styles.board}>
                 {Object.entries(cols).map(([status, items]) => (
-                    <div key={status} className={styles.column}>
-                        <div className={styles.columnHeader}>
-                            {{
-                                TODO: 'To Do',
-                                IN_PROGRESS: 'In Progress',
-                                DONE: 'Done'
-                            }[status] || status}
-                        </div>
-                        <div className={styles.taskList}>
-                            {items.length === 0 ? (
-                                <div className={styles.emptyState}>
-                                    {{
-                                        TODO: 'No pending tasks',
-                                        IN_PROGRESS: 'No active tasks',
-                                        DONE: 'No completed tasks'
-                                    }[status] || 'No tasks'}
-                                </div>
-                            ) : (
-                                items.map(t => (
-                                    <div
-                                        key={t.id}
-                                        role="button"
-                                        tabIndex={0}
-                                        onClick={() => setSelectedTask(t)}
-                                        onKeyDown={(e) => {
-                                            if (e.key === 'Enter' || e.key === ' ') {
-                                                e.preventDefault();
-                                                setSelectedTask(t);
-                                            }
-                                        }}
-                                        aria-label={`View details for task: ${t.displayTitle}`}
-                                        className={styles.taskCard}
-                                    >
-                                        <div className={styles.taskId}>{t.id}</div>
-                                        <div className={styles.taskTitle}>{t.displayTitle}</div>
-                                        <div className={styles.taskFooter}>
-                                            <span>{t.owner || 'Unassigned'}</span>
-                                            <span className={styles.viewLink}>View 📸</span>
-                                        </div>
-                                    </div>
-                                ))
-                            )}
-                        </div>
-                    </div>
+                    <TaskColumn
+                        key={status}
+                        status={status}
+                        items={items}
+                        onTaskClick={setSelectedTask}
+                    />
                 ))}
             </div>
         </div>
