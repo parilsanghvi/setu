@@ -40,9 +40,9 @@ const TaskBoard = React.memo(({ tasks }) => {
                 try {
                     const spec = JSON.parse(t.spec || '{}');
                     displayTitle = spec.task;
-                } catch (e) {
+                } catch {
                     // Fallback to undefined or handle error if needed
-                    console.error('Failed to parse task spec:', e);
+
                 }
             }
 

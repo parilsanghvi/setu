@@ -1,19 +1,22 @@
----
-description: Tests for checking secure error handling across DashboardServer routes
----
+# File: tests/test-security-error-handling.js
 
-# test-security-error-handling.js
-Tests that verify the DashboardServer properly handles exceptions without leaking sensitive server information.
+**Purpose:** Validates that API endpoints in `lib/server.js` do not leak sensitive error details (e.g., stack traces) in 500 responses, instead returning a generic "Internal Server Error".
+
+**Key Exports/Entrypoints:**
+- Standalone test script executed via `node`.
+
+**Side Effects:**
+- Mocks `express` and `socket.io` modules.
+- Writes to `console.log` for test output.
 
 ## Purpose
-Ensure that unexpected backend exceptions or malicious inputs result in generic client-facing error messages instead of leaking `node` runtime stack traces.
+Tests the dashboard server to ensure that internal application errors are caught and a generic error response is provided instead of returning sensitive stack traces.
 
 ## Exports
-This file does not export any functions. It is a test runner script.
+- None
 
 ## Dependencies
-- Custom test runner utilities.
-- Target code dependencies in `lib/server.js`.
+- \`supertest\`: Used to simulate HTTP requests against the running Express application.
 
 ## Side Effects
-- Starts the backend server and shuts it down.
+- None
