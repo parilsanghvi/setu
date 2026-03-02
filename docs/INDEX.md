@@ -2,8 +2,6 @@
 
 **Repo:** 
 **Owner:**
-**Purpose:** [Short description of the project]
+**Purpose:** A project component.
 
 ## Quick Links
-- [Architecture](architecture/overview.md)
-- [Operations](operations/how-to-run.md)

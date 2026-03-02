@@ -7,9 +7,9 @@ const Module = require('module');
 
 // Mock require for gray-matter
 const originalRequire = Module.prototype.require;
-Module.prototype.require = function(path) {
+Module.prototype.require = function (path) {
     if (path === 'gray-matter') {
-        return function(content) {
+        return function (content) {
             // Simple frontmatter parser for testing
             const lines = content.split('\n');
             const data = {};
@@ -26,7 +26,7 @@ Module.prototype.require = function(path) {
 
                         // Handle basic array syntax [a, b]
                         if (val.startsWith('[') && val.endsWith(']')) {
-                             val = val.slice(1, -1).split(',').map(s => s.trim());
+                            val = val.slice(1, -1).split(',').map(s => s.trim());
                         }
 
                         data[key] = val;
@@ -163,20 +163,20 @@ module.exports = [
         const missingDir = path.join(tempDir, 'non-existent');
         const emptyLoader = new SkillLoader(missingDir);
 
-        // Suppress console.warn for this test
-        const originalWarn = console.warn;
+        // Suppress logger.warn for this test
+        const originalWarn = emptyLoader.logger.warn;
         let warnCalled = false;
-        console.warn = (msg) => {
-            if (msg.includes('Skills directory not found')) warnCalled = true;
-            else originalWarn(msg);
+        emptyLoader.logger.warn = (msg, ...args) => {
+            if (typeof msg === 'string' && msg.includes('Skills directory not found')) warnCalled = true;
+            else originalWarn.call(emptyLoader.logger, msg, ...args);
         };
 
         try {
             const skills = emptyLoader.load();
             assert.strictEqual(skills.size, 0);
-            assert.ok(warnCalled, 'Should verify console.warn was called');
+            assert.ok(warnCalled, 'Should verify logger.warn was called');
         } finally {
-            console.warn = originalWarn;
+            emptyLoader.logger.warn = originalWarn;
         }
     });
 });
