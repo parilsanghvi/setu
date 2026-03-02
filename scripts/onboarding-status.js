@@ -2,7 +2,7 @@
 
 const { getOnboardingStatus } = require('../lib/onboarding/status');
 
-const status = getOnboardingStatus();
+const status = getOnboardingStatus({ fast: true });
 
 console.log(JSON.stringify(status, null, 2));
 
