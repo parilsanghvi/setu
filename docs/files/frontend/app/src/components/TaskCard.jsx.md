@@ -1,11 +1,12 @@
-# TaskCard Component
+## Purpose
+The purpose of the \`TaskCard.jsx\` file is to display an individual task inside the Kanban board view. It renders task metadata and state.
 
-This component represents a single task on the Kanban board.
-It renders the task ID, title, and handles click events to show the task modal.
+## Exports
+- The default export is the \`TaskCard\` React functional component.
 
-## Properties
-- `task`: The task object containing ID, title, owner, status, etc.
-- `onClick`: Callback triggered when the card is clicked.
+## Dependencies
+- Depends on the React library to manage component state and effects.
+- Relies on internal UI styling or theme context for rendering styles.
 
-## Accessibility
-The card implements proper aria labels and handles keyboard navigation (Enter/Space) to trigger the `onClick` event.
+## Side Effects
+- When rendered, it visually outputs DOM elements representing the task. It may trigger side effects if it dispatches state actions upon interaction (like drag-and-drop operations).
