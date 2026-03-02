@@ -65,7 +65,7 @@ io.use(socketAuth);
 app.get('/api/onboarding', (req, res) => {
   try {
     const { getOnboardingStatus } = require('./lib/onboarding/status');
-    const status = getOnboardingStatus();
+    const status = getOnboardingStatus({ fast: true });
     res.json(status);
   } catch (e) {
     res.status(500).json({ error: e.message });
