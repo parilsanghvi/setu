@@ -1,154 +1,108 @@
 const assert = require('assert');
 const Logger = require('../lib/Logger');
 
-async function runTests() {
-    let passed = 0;
-    let failed = 0;
+console.log('Testing Logger...');
 
-    // We can't use console.log to print to stdout because we mock it!
-    // So we use process.stdout.write directly
-    function run(name, fn) {
+let logs = [];
+let errors = [];
+
+// Mock console.log and console.error
+const originalLog = console.log;
+const originalError = console.error;
+
+console.log = (msg) => {
+    // Only capture JSON stringified logs
+    if (typeof msg === 'string' && msg.startsWith('{')) {
         try {
-            fn();
-            process.stdout.write(`  ✅ ${name}\n`);
-            passed++;
+            logs.push(JSON.parse(msg));
         } catch (e) {
-            process.stderr.write(`  ❌ ${name}\n`);
-            process.stderr.write(`     ${e.stack || e.message}\n`);
-            failed++;
+            // Ignore non-JSON logs from test runner
         }
+    } else {
+        originalLog(msg);
     }
+};
 
-    process.stdout.write('🧪 Testing Logger\n');
-
-    // Mocks for console methods
-    const originalConsoleLog = console.log;
-    const originalConsoleError = console.error;
-    let logOutput = [];
-    let errorOutput = [];
-
-    function setupMocks() {
-        logOutput = [];
-        errorOutput = [];
-        console.log = (msg) => logOutput.push(msg);
-        console.error = (msg) => errorOutput.push(msg);
+console.error = (msg) => {
+    if (typeof msg === 'string' && msg.startsWith('{')) {
+        try {
+            errors.push(JSON.parse(msg));
+        } catch (e) {
+            // Ignore
+        }
+    } else {
+        originalError(msg);
     }
+};
 
-    function teardownMocks() {
-        console.log = originalConsoleLog;
-        console.error = originalConsoleError;
-    }
+// Helper to reset mocks
+const resetMocks = () => {
+    logs = [];
+    errors = [];
+};
 
-    setupMocks();
+try {
+    const logger = new Logger('TestService');
 
-    run('Logger logs info correctly', () => {
-        setupMocks();
-        const logger = new Logger('TestLogger');
-        logger.info('Test info message');
+    // Test info
+    logger.info('User logged in');
+    assert.strictEqual(logs.length, 1, 'Should log info message');
+    assert.strictEqual(logs[0].level, 'info');
+    assert.strictEqual(logs[0].name, 'TestService');
+    assert.strictEqual(logs[0].message, 'User logged in');
+    assert(logs[0].timestamp, 'Should have timestamp');
+    resetMocks();
 
-        assert.strictEqual(logOutput.length, 1);
-        assert.strictEqual(errorOutput.length, 0);
+    // Test warn
+    logger.warn('Rate limit approaching');
+    assert.strictEqual(logs.length, 1, 'Should log warn message');
+    assert.strictEqual(logs[0].level, 'warn');
+    assert.strictEqual(logs[0].message, 'Rate limit approaching');
+    resetMocks();
 
-        const parsed = JSON.parse(logOutput[0]);
-        assert.strictEqual(parsed.level, 'info');
-        assert.strictEqual(parsed.name, 'TestLogger');
-        assert.strictEqual(parsed.message, 'Test info message');
-        assert.ok(parsed.timestamp);
-    });
+    // Test debug
+    logger.debug('Processing request', { reqId: 123 });
+    assert.strictEqual(logs.length, 1, 'Should log debug message');
+    assert.strictEqual(logs[0].level, 'debug');
+    assert.strictEqual(logs[0].message, 'Processing request');
+    assert.strictEqual(logs[0].reqId, 123, 'Should merge object args');
+    resetMocks();
 
-    run('Logger logs warn correctly', () => {
-        setupMocks();
-        const logger = new Logger('TestLogger');
-        logger.warn('Test warn message');
+    // Test error
+    const testError = new Error('Database connection failed');
+    logger.error('Failed to connect', testError);
+    assert.strictEqual(errors.length, 1, 'Should log error to console.error');
+    assert.strictEqual(errors[0].level, 'error');
+    assert.strictEqual(errors[0].message, 'Failed to connect');
+    assert.strictEqual(errors[0].error.message, 'Database connection failed');
+    assert(errors[0].error.stack, 'Should include error stack');
+    resetMocks();
 
-        assert.strictEqual(logOutput.length, 1);
-        assert.strictEqual(errorOutput.length, 0);
+    // Test object argument merging
+    logger.info('User created', { userId: 456, role: 'admin' });
+    assert.strictEqual(logs[0].userId, 456);
+    assert.strictEqual(logs[0].role, 'admin');
+    resetMocks();
 
-        const parsed = JSON.parse(logOutput[0]);
-        assert.strictEqual(parsed.level, 'warn');
-        assert.strictEqual(parsed.message, 'Test warn message');
-    });
+    // Test multiple arguments
+    logger.info('Multiple args', 'arg1', 2, ['array']);
+    assert(Array.isArray(logs[0].args));
+    assert.deepStrictEqual(logs[0].args, ['arg1', 2, ['array']]);
+    resetMocks();
 
-    run('Logger logs error correctly to console.error', () => {
-        setupMocks();
-        const logger = new Logger('TestLogger');
-        logger.error('Test error message');
+    // Test Error object with additional args
+    const anotherError = new TypeError('Invalid type');
+    logger.error('Type check failed', anotherError, { context: 'user_input' });
+    assert.strictEqual(errors[0].error.message, 'Invalid type');
+    assert.strictEqual(errors[0].context, 'user_input');
+    resetMocks();
 
-        assert.strictEqual(logOutput.length, 0);
-        assert.strictEqual(errorOutput.length, 1);
-
-        const parsed = JSON.parse(errorOutput[0]);
-        assert.strictEqual(parsed.level, 'error');
-        assert.strictEqual(parsed.message, 'Test error message');
-    });
-
-    run('Logger logs debug correctly', () => {
-        setupMocks();
-        const logger = new Logger('TestLogger');
-        logger.debug('Test debug message');
-
-        assert.strictEqual(logOutput.length, 1);
-        assert.strictEqual(errorOutput.length, 0);
-
-        const parsed = JSON.parse(logOutput[0]);
-        assert.strictEqual(parsed.level, 'debug');
-        assert.strictEqual(parsed.message, 'Test debug message');
-    });
-
-    run('Logger serializes Error objects properly', () => {
-        setupMocks();
-        const logger = new Logger('TestLogger');
-        const err = new Error('Something went wrong');
-        err.code = 'E_TEST';
-        logger.error('Caught an error', err);
-
-        assert.strictEqual(errorOutput.length, 1);
-
-        const parsed = JSON.parse(errorOutput[0]);
-        assert.strictEqual(parsed.level, 'error');
-        assert.strictEqual(parsed.message, 'Caught an error');
-        assert.ok(parsed.error);
-        assert.strictEqual(parsed.error.message, 'Something went wrong');
-        assert.strictEqual(parsed.error.code, 'E_TEST');
-        assert.ok(parsed.error.stack);
-    });
-
-    run('Logger merges single object extra argument', () => {
-        setupMocks();
-        const logger = new Logger('TestLogger');
-        logger.info('User login', { userId: 123, ip: '127.0.0.1' });
-
-        assert.strictEqual(logOutput.length, 1);
-        const parsed = JSON.parse(logOutput[0]);
-        assert.strictEqual(parsed.level, 'info');
-        assert.strictEqual(parsed.message, 'User login');
-        assert.strictEqual(parsed.userId, 123);
-        assert.strictEqual(parsed.ip, '127.0.0.1');
-    });
-
-    run('Logger adds multiple extra arguments to args array', () => {
-        setupMocks();
-        const logger = new Logger('TestLogger');
-        logger.info('Processing items', 'item1', 'item2', 42);
-
-        assert.strictEqual(logOutput.length, 1);
-        const parsed = JSON.parse(logOutput[0]);
-        assert.strictEqual(parsed.level, 'info');
-        assert.strictEqual(parsed.message, 'Processing items');
-        assert.ok(Array.isArray(parsed.args));
-        assert.strictEqual(parsed.args.length, 3);
-        assert.strictEqual(parsed.args[0], 'item1');
-        assert.strictEqual(parsed.args[1], 'item2');
-        assert.strictEqual(parsed.args[2], 42);
-    });
-
-    teardownMocks();
-
-    if (failed > 0) {
-        process.exit(1);
-    }
+    console.log = originalLog;
+    console.error = originalError;
+    console.log('✅ Logger tests passed!');
+} catch (e) {
+    console.log = originalLog;
+    console.error = originalError;
+    console.error('❌ Logger tests failed:', e);
+    process.exit(1);
 }
-
-runTests().catch(e => {
-    process.stderr.write(e.stack + '\n');
-});

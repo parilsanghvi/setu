@@ -1,17 +1,17 @@
-# tests/test-logger.js
+---
+description: Unit tests for the Logger class.
+---
 
-Unit tests for the `Logger` utility class (`lib/Logger.js`).
+# `tests/test-logger.js`
 
-## Purpose
+This file contains unit tests to verify the functionality of the `Logger` class (`lib/Logger.js`).
 
-This file contains isolated unit tests designed to verify the correct functionality of the custom `Logger` class without requiring external dependencies or testing frameworks. It tests core logging behaviors such as:
+It covers:
+- The standard logging methods (`info`, `warn`, `error`, `debug`).
+- Verification that the correct console method (`console.log` vs `console.error`) is used based on log level.
+- Correct serialization of log entries into JSON format, including `timestamp`, `level`, `name`, and `message`.
+- Handling and formatting of `Error` objects, specifically capturing message and stack trace.
+- Merging extra object arguments into the main JSON log structure.
+- Handling multiple arguments correctly without breaking serialization.
 
-- Outputting correct JSON log objects
-- Proper routing to `console.log` vs `console.error` depending on the log level (`info`, `warn`, `error`, `debug`)
-- Safely serializing and capturing `Error` objects and their stack traces
-- Appending extra arguments or merging extra object properties into the JSON output
-
-## Implementation Notes
-
-- These tests run via the custom `tests/runner.js`.
-- `console.log` and `console.error` are temporarily mocked during test execution to intercept output and prevent cluttering the test runner's terminal output, ensuring that what gets "printed" matches expectations exactly.
+The script mocks `console.log` and `console.error` to intercept and assert against output, enabling testing without external frameworks or polluting test runner outputs.

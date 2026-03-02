@@ -5,6 +5,10 @@ const DashboardServer = require('../lib/server');
 console.log('🧪 Testing /api/tasks endpoint...');
 process.env.DASHBOARD_PASS = 'secret';
 
+// Mock Onboarding Status to pass the hard gate
+const statusModule = require('../lib/onboarding/status');
+statusModule.getOnboardingStatus = () => ({ ok: true });
+
 const PORT = 4002;
 const server = new DashboardServer(PORT);
 
