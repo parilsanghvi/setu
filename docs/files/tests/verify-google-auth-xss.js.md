@@ -1,10 +1,33 @@
-<!-- PLACEHOLDER -->
 # File: tests/verify-google-auth-xss.js
 
-**Purpose:** [What does this file do?]
+## Purpose
+- Verifies the fix for the Reflected XSS vulnerability in `lib/auth/google.js`.
+- Confirms that the local OAuth callback server returns `text/plain` responses for errors instead of vulnerable `text/html`.
 
-**Key Exports/Entrypoints:**
-- [List functions/classes export]
+## Exports
+- This is a standalone test script executed via `node`.
 
-**Side Effects:**
-- [E.g., modifies DB, writes files, sets globals]
+## Dependencies
+- `http`
+- `assert`
+- `child_process`
+- `module`
+- `../lib/auth/google`
+
+## Side Effects
+- Mocks `child_process.spawn` to prevent browser launch.
+- Mocks `dotenv` (via `Module.prototype.require` interception) to satisfy `lib/Config.js` dependencies.
+- Starts the `GoogleAuth` local HTTP server on port 51121.
+- Exits the process with code 0 (success) or 1 (failure).
+
+## Purpose
+Tests the Google Auth OAuth callback endpoint to ensure it properly handles input containing malicious scripts and prevents Cross-Site Scripting (XSS).
+
+## Exports
+- None
+
+## Dependencies
+- None
+
+## Side Effects
+- None
