@@ -1,14 +1,37 @@
-## Purpose
-This file provides core functionality for the system. It handles many things in the architecture. It is an important file.
+---
+source_hash: bca5bfbd27983a8a
+facts_hash: e670339b503b4b71
+generated_at: 2026-03-01T11:17:38.555Z
+generator_version: 1.0.0
+model: fallback_no_llm
+quality_score: 94
+---
+# File: status.json
 
-## Exports
-- Various utility functions and classes are exported for others to use.
+## Purpose
+Source file with 0 symbols and 29 lines. (LLM enrichment unavailable — fact-only mode.)
+
+## Exports / API Surface
+No detected exports.
+
+
+## Internal Logic
+No functions or classes detected.
 
 ## Dependencies
-- Node.js core modules.
-- Other internal files.
+No imports detected.
 
 ## Side Effects
-- Reads and writes to the file system or environment variables, or updates the database.
+No side effects detected.
 
-This text is added to ensure that the document exceeds the MIN_MEANINGFUL_LENGTH requirement (300 characters). This text is added to ensure that the document exceeds the MIN_MEANINGFUL_LENGTH requirement (300 characters). This text is added to ensure that the document exceeds the MIN_MEANINGFUL_LENGTH requirement (300 characters).
+## Dependents
+- [doc-enricher.js](./lib/onboarding/doc-enricher.js.md)
+- [doc-facts.js](./lib/onboarding/doc-facts.js.md)
+- [drift.js](./lib/onboarding/drift.js.md)
+- [generator.js](./lib/onboarding/generator.js.md)
+
+## Cross-References
+- [doc-enricher.js](./lib/onboarding/doc-enricher.js.md)
+- [doc-facts.js](./lib/onboarding/doc-facts.js.md)
+- [drift.js](./lib/onboarding/drift.js.md)
+- [generator.js](./lib/onboarding/generator.js.md)
