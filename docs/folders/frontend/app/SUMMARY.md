@@ -30,8 +30,10 @@ Rules:
 - Use import statements with exact module paths in React components.
 
 ## Cross-References
+
 - `public/` _(summary not yet generated)_
 - [src/](./src/SUMMARY.md)
+
 - [tests/](./tests/SUMMARY.md)
 - [eslint.config.js](../../../files/frontend/app/eslint.config.js.md)
 - [package.json](../../../files/frontend/app/package.json.md)
