@@ -1,18 +1,10 @@
----
-title: test-db.js
-description: Tests for the db module.
----
-# test-db.js
-Verifies that the database interaction module (`lib/db.js`) correctly formats and executes queries like `getTasks` and handles edge cases securely.
+<!-- PLACEHOLDER -->
+# File: tests/test-db.js
 
-## Purpose
-This file tests the database interaction module.
+**Purpose:** [What does this file do?]
 
-## Exports
-This file exports tests.
+**Key Exports/Entrypoints:**
+- [List functions/classes export]
 
-## Dependencies
-This file depends on the `lib/db.js` module.
-
-## Side Effects
-This file performs tests and does not have significant side effects outside of testing.
+**Side Effects:**
+- [E.g., modifies DB, writes files, sets globals]

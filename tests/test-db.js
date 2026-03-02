@@ -8,16 +8,16 @@ const originalRequire = Module.prototype.require;
 
 // Only mock if not already mocked
 if (!originalRequire._isMocked) {
-    Module.prototype.require = function(id) {
-      if (id === 'better-sqlite3') {
-        return class MockDatabase extends RealDatabase {
-          constructor(path, options) {
-            // Force in-memory database for isolation regardless of path
-            super(':memory:', options);
-          }
+    Module.prototype.require = function (id) {
+        if (id === 'better-sqlite3') {
+            return class MockDatabase extends RealDatabase {
+                constructor(path, options) {
+                    // Force in-memory database for isolation regardless of path
+                    super(':memory:', options);
+                }
+            }
         }
-      }
-      return originalRequire.apply(this, arguments);
+        return originalRequire.apply(this, arguments);
     };
     Module.prototype.require._isMocked = true;
 }
@@ -137,46 +137,45 @@ test('Bus: Task Update', (t) => {
     assert.strictEqual(task.status, 'DONE');
 });
 
-test('Bus: getTasks', (t) => {
-    // Ensure clean state before testing
+test('Bus: getTasks and getTaskMeta', (t) => {
+    // Clean up existing tasks to ensure a clean state
     bus.db.prepare('DELETE FROM tasks').run();
 
-    // Add a couple of tasks
-    bus.updateTask('TASK-1', 'TODO', { title: 'Task 1', owner: 'A' });
-    bus.updateTask('TASK-2', 'DONE', { title: 'Task 2', owner: 'B' });
+    // Verify empty state
+    let tasks = bus.getTasks();
+    assert.strictEqual(tasks.length, 0);
 
-    const tasks = bus.getTasks();
-    assert.strictEqual(tasks.length, 2, 'Should return all tasks');
+    let meta = bus.getTaskMeta();
+    assert.strictEqual(meta.c, 0);
+    assert.strictEqual(meta.t, null);
 
-    // Sort tasks by ID to ensure deterministic assertions
+    // Add multiple tasks
+    bus.updateTask('TASK-1', 'TODO', { owner: 'Alice' });
+    bus.updateTask('TASK-2', 'IN_PROGRESS', { owner: 'Bob' });
+    bus.updateTask('TASK-3', 'DONE', { owner: 'Charlie' });
+
+    // Force specific updated_at values to test MAX(updated_at)
+    bus.db.prepare('UPDATE tasks SET updated_at = ? WHERE id = ?').run(1000, 'TASK-1');
+    bus.db.prepare('UPDATE tasks SET updated_at = ? WHERE id = ?').run(2000, 'TASK-2');
+    bus.db.prepare('UPDATE tasks SET updated_at = ? WHERE id = ?').run(3000, 'TASK-3');
+
+    // Verify getTasks
+    tasks = bus.getTasks();
+    assert.strictEqual(tasks.length, 3);
+
+    // Sort tasks by id for deterministic checking
     tasks.sort((a, b) => a.id.localeCompare(b.id));
-
     assert.strictEqual(tasks[0].id, 'TASK-1');
     assert.strictEqual(tasks[0].status, 'TODO');
 
     assert.strictEqual(tasks[1].id, 'TASK-2');
-    assert.strictEqual(tasks[1].status, 'DONE');
-});
+    assert.strictEqual(tasks[1].status, 'IN_PROGRESS');
 
-test('Bus: getTaskMeta', (t) => {
-    // Ensure clean state before testing
-    bus.db.prepare('DELETE FROM tasks').run();
+    assert.strictEqual(tasks[2].id, 'TASK-3');
+    assert.strictEqual(tasks[2].status, 'DONE');
 
-    let meta = bus.getTaskMeta();
-    assert.strictEqual(meta.c, 0, 'Count should be 0 when no tasks exist');
-    assert.strictEqual(meta.t, null, 'Max updated_at should be null when no tasks exist');
-
-    // Add tasks
-    bus.updateTask('TASK-1', 'TODO', { title: 'Task 1' });
-
-    // Slight delay to ensure different updated_at timestamps if database allows precision,
-    // though sqlite strftime('%s') is seconds resolution, so we'll force it
-    bus.db.prepare('UPDATE tasks SET updated_at = ? WHERE id = ?').run(1000, 'TASK-1');
-
-    bus.updateTask('TASK-2', 'DONE', { title: 'Task 2' });
-    bus.db.prepare('UPDATE tasks SET updated_at = ? WHERE id = ?').run(2000, 'TASK-2');
-
+    // Verify getTaskMeta
     meta = bus.getTaskMeta();
-    assert.strictEqual(meta.c, 2, 'Count should be 2');
-    assert.strictEqual(meta.t, 2000, 'Max updated_at should be the latest timestamp');
+    assert.strictEqual(meta.c, 3, 'Task count should be 3');
+    assert.strictEqual(meta.t, 3000, 'Max updated_at should be 3000');
 });

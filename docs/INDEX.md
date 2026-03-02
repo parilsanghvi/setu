@@ -2,8 +2,6 @@
 
 **Repo:** 
 **Owner:**
-**Purpose:** Project Root documentation.
+**Purpose:** A project component.
 
 ## Quick Links
-- Architecture
-- Operations

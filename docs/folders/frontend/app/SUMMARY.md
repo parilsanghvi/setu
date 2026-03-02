@@ -30,10 +30,10 @@ Rules:
 - Use import statements with exact module paths in React components.
 
 ## Cross-References
-- playwright-report/
+
 - `public/` _(summary not yet generated)_
 - [src/](./src/SUMMARY.md)
-- test-results/
+
 - [tests/](./tests/SUMMARY.md)
 - [eslint.config.js](../../../files/frontend/app/eslint.config.js.md)
 - [package.json](../../../files/frontend/app/package.json.md)
