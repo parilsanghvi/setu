@@ -584,7 +584,7 @@ function startSystemLoops() {
         // GUARD: Only resurrect agents that exist in our AGENT_MAP (prevents test-injected zombies)
         if (!AGENT_MAP[agent.role]) {
           debug(`🧹 Skipping unknown agent '${agent.name}' (role: ${agent.role}). Cleaning from DB.`);
-          bus.db.prepare('DELETE FROM agents WHERE name = ?').run(agent.name);
+          bus._stmt('deleteAgentByName', 'DELETE FROM agents WHERE name = ?').run(agent.name);
           return;
         }
 
