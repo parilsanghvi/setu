@@ -1,16 +1,15 @@
-# File: tests/test-llm-openai.js
+# test-llm-openai.js
 
 ## Purpose
-This file contains the test suite for the `OpenAIProvider` class located in `lib/models/providers/openai.js`. It validates the behavior of the `generate` function, ensuring it correctly constructs the API payload, interacts with the OpenAI API via `fetch`, and properly processes standard text generation as well as function/tool call responses. It also verifies error handling for API rejections and network failures.
+This file contains the unit tests for the OpenAI language model provider (`lib/llm/OpenAI.js`). It verifies the correct behavior of the OpenAI integration, including request formatting, response parsing, error handling (HTTP and network errors), and fallback mechanisms when an API key is missing. It ensures the provider adheres to the expected interface and robustly handles various edge cases.
 
 ## Exports
-This file does not export any functions or classes. It is an executable test script designed to be run standalone or by the project's test runner.
+This file is a standalone test script and does not export any modules or functions.
 
 ## Dependencies
-- `assert`: Node.js built-in assertion library for validating test expectations.
-- `../lib/models/providers/openai`: The main `OpenAIProvider` class being tested.
+*   **assert**: Node.js built-in assertion library used to write test expectations and verify outcomes.
+*   **module**: Node.js built-in module used to intercept and mock `require` calls, specifically for mocking the `https` module to avoid making real network requests during testing.
+*   **../lib/llm/OpenAI.js**: The actual OpenAI provider implementation being tested.
 
 ## Side Effects
-- Temporarily overrides the global `fetch` function with a mock during test execution to prevent actual network requests. It restores the original `fetch` function in a `finally` block before exiting.
-- Exits the Node process with code `0` on success or code `1` on failure.
-- Outputs test progress and results to the console via `console.log` and `console.error`.
+When executed, this script runs a series of asynchronous tests and outputs the results to the console (stdout/stderr). It modifies the global `Module.prototype.require` temporarily to inject the mocked `https` module, but this change is reverted in a `finally` block to prevent polluting the Node.js module cache for subsequent tests. If any test fails, it forcefully exits the process with a non-zero exit code (`process.exit(1)`).

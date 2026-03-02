@@ -8,16 +8,16 @@ const originalRequire = Module.prototype.require;
 
 // Only mock if not already mocked
 if (!originalRequire._isMocked) {
-    Module.prototype.require = function(id) {
-      if (id === 'better-sqlite3') {
-        return class MockDatabase extends RealDatabase {
-          constructor(path, options) {
-            // Force in-memory database for isolation regardless of path
-            super(':memory:', options);
-          }
+    Module.prototype.require = function (id) {
+        if (id === 'better-sqlite3') {
+            return class MockDatabase extends RealDatabase {
+                constructor(path, options) {
+                    // Force in-memory database for isolation regardless of path
+                    super(':memory:', options);
+                }
+            }
         }
-      }
-      return originalRequire.apply(this, arguments);
+        return originalRequire.apply(this, arguments);
     };
     Module.prototype.require._isMocked = true;
 }
@@ -178,4 +178,59 @@ test('Bus: getTasks and getTaskMeta', (t) => {
     meta = bus.getTaskMeta();
     assert.strictEqual(meta.c, 3, 'Task count should be 3');
     assert.strictEqual(meta.t, 3000, 'Max updated_at should be 3000');
+});
+
+test('Bus: Agent Heartbeat - Insert', (t) => {
+    bus.db.prepare('DELETE FROM agents').run();
+
+    bus.heartbeat('AgentA', 'RoleA', 1234, 'IDLE');
+
+    const agent = bus.db.prepare('SELECT * FROM agents WHERE name = ?').get('AgentA');
+    assert.ok(agent, 'Agent should be inserted');
+    assert.strictEqual(agent.name, 'AgentA');
+    assert.strictEqual(agent.role, 'RoleA');
+    assert.strictEqual(agent.pid, 1234);
+    assert.strictEqual(agent.status, 'IDLE');
+    assert.ok(agent.last_heartbeat > 0, 'last_heartbeat should be set');
+});
+
+test('Bus: Agent Heartbeat - Upsert', (t) => {
+    bus.db.prepare('DELETE FROM agents').run();
+
+    bus.heartbeat('AgentB', 'RoleB', 5678, 'IDLE');
+    const firstAgent = bus.db.prepare('SELECT * FROM agents WHERE name = ?').get('AgentB');
+
+    // Update the agent
+    bus.heartbeat('AgentB', 'RoleB', 9999, 'WORKING');
+
+    const updatedAgent = bus.db.prepare('SELECT * FROM agents WHERE name = ?').get('AgentB');
+    assert.ok(updatedAgent, 'Agent should exist');
+    assert.strictEqual(updatedAgent.pid, 9999, 'PID should be updated');
+    assert.strictEqual(updatedAgent.status, 'WORKING', 'Status should be updated');
+
+    // Ensure only one agent exists
+    const count = bus.db.prepare('SELECT COUNT(*) as count FROM agents WHERE name = ?').get('AgentB').count;
+    assert.strictEqual(count, 1, 'Should only be one agent with this name');
+});
+
+test('Bus: getDeadAgents', (t) => {
+    bus.db.prepare('DELETE FROM agents').run();
+
+    // Insert an alive agent
+    bus.heartbeat('AliveAgent', 'Role1', 111, 'IDLE');
+
+    // Insert a dead agent (by manually updating last_heartbeat to be very old)
+    bus.heartbeat('DeadAgent', 'Role2', 222, 'IDLE');
+    bus.db.prepare('UPDATE agents SET last_heartbeat = ? WHERE name = ?')
+        .run(Math.floor(Date.now() / 1000) - 100, 'DeadAgent'); // 100 seconds ago
+
+    const deadAgents = bus.getDeadAgents(30);
+
+    assert.strictEqual(deadAgents.length, 1, 'Should find exactly one dead agent');
+    assert.strictEqual(deadAgents[0].name, 'DeadAgent', 'DeadAgent should be returned');
+    assert.strictEqual(deadAgents[0].role, 'Role2', 'Role should match');
+
+    // Test with a longer timeout
+    const deadAgentsLongTimeout = bus.getDeadAgents(120);
+    assert.strictEqual(deadAgentsLongTimeout.length, 0, 'No agents should be dead with a 120s timeout');
 });

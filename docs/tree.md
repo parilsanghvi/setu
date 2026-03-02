@@ -3,5 +3,5 @@
 Auto-generated representation of the high-level project structure.
 
 ```
-Structure available in codebase.
+[Run 'tree -L 2' to update this section]
 ```
