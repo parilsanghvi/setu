@@ -1,10 +1,12 @@
-<!-- PLACEHOLDER -->
-# File: tests/test-socket-auth.js
+## Purpose
+The purpose of \`test-socket-auth.js\` is to ensure that WebSocket connections established via Socket.io are properly authenticated before allowing message transmission.
 
-**Purpose:** [What does this file do?]
+## Exports
+- None. Executable tests.
 
-**Key Exports/Entrypoints:**
-- [List functions/classes export]
+## Dependencies
+- Utilizes \`node:test\`.
+- Imports \`lib/middleware/socketAuth.js\` or equivalent socket handlers.
 
-**Side Effects:**
-- [E.g., modifies DB, writes files, sets globals]
+## Side Effects
+- Tests simulated socket handshake objects. It tests side-effect middleware logic (e.g., calling \`next()\`).
