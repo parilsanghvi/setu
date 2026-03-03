@@ -8,29 +8,30 @@ const mocks = {
     'express': Object.assign(
         () => {
             const app = {
-                use: () => {},
-                get: () => {},
-                post: () => {},
-                listen: () => {},
+                use: () => { },
+                get: () => { },
+                post: () => { },
+                listen: () => { },
             };
-            app.static = () => {};
-            app.json = () => {};
+            app.static = () => { };
+            app.json = () => { };
             return app;
         },
-        { static: () => {}, json: () => {} }
+        { static: () => { }, json: () => { } }
     ),
     'http': {
-        createServer: () => ({ listen: (port, cb) => { if(cb) cb(); } })
+        createServer: () => ({ listen: (port, cb) => { if (cb) cb(); } })
     },
     'socket.io': {
         Server: class {
             constructor() {
                 this.handlers = {};
             }
+            use() { }
             on(event, handler) {
                 this.handlers[event] = handler;
             }
-            emit() {}
+            emit() { }
             // Helper to trigger event
             trigger(event, ...args) {
                 if (this.handlers[event]) {
@@ -39,25 +40,25 @@ const mocks = {
             }
         }
     },
-    'helmet': () => () => {},
+    'helmet': () => () => { },
     './db': {
         db: {
             prepare: () => ({
                 get: () => ({ count: 0 }),
                 all: () => [],
-                run: () => {}
+                run: () => { }
             })
         },
-        on: () => {},
-        send: () => {}
+        on: () => { },
+        send: () => { }
     },
-    './middleware/auth': () => {},
+    './middleware/auth': () => { },
     './utils': {
         readLastLines: async () => []
     }
 };
 
-Module.prototype.require = function(id) {
+Module.prototype.require = function (id) {
     if (mocks[id]) {
         return mocks[id];
     }
@@ -94,8 +95,8 @@ console.error = (...args) => logs.push({ level: 'error', args });
         // 2. Verify Logging
         // Trigger connection
         const socketMock = {
-            emit: () => {},
-            on: () => {}
+            emit: () => { },
+            on: () => { }
         };
 
         const connectionHandler = server.io.handlers['connection'];
