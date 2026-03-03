@@ -1,13 +1,12 @@
-# TaskColumn Component
+## Purpose
+The purpose of the \`TaskColumn.jsx\` file is to act as a container for a specific status column (e.g., TODO, IN_PROGRESS, DONE) within the Kanban board. It organizes multiple \`TaskCard\` components.
 
-This component represents a single column on the Kanban board.
-It renders the column title, a list of tasks, or an empty state if there are no tasks for its specific status.
+## Exports
+- The default export is the \`TaskColumn\` React functional component.
 
-## Properties
-- `status`: The status identifier (e.g., 'TODO', 'IN_PROGRESS', 'DONE').
-- `items`: An array of task objects to render in this column.
-- `onTaskClick`: A callback function passed down to the `TaskCard` items.
+## Dependencies
+- Depends on React for state and prop management.
+- Integrates with \`TaskCard.jsx\` for rendering children nodes.
 
-## Behavior
-If `items.length === 0`, it shows an empty state message corresponding to the current status.
-Otherwise, it maps through the `items` array and renders a `TaskCard` for each.
+## Side Effects
+- Outputs a column layout to the DOM. May handle drag-and-drop enter/leave events, modifying local UI state.

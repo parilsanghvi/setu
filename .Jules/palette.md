@@ -17,3 +17,7 @@
 ## 2026-03-01 - [UX: Modal Focus Restoration]
 **Learning:** The Modal component successfully trapped focus and allowed closing via the Escape key, but failed to restore focus to the triggering element upon closing. This causes screen readers and keyboard users to lose their place on the page, significantly disrupting navigation continuity.
 **Action:** Always capture `document.activeElement` when a modal or dialog mounts, and implement a cleanup function in `useEffect` to restore focus to that element when the modal unmounts.
+
+## 2026-03-01 - [UX: Modal Keyboard Trap]
+**Learning:** The Modal component allowed keyboard navigation (`Tab` and `Shift+Tab`) to escape the modal boundaries and interact with background elements, breaking the isolation of the dialog. This is highly confusing for screen reader and keyboard users.
+**Action:** Always implement a keyboard trap on modals by listening to the `Tab` key, querying all focusable elements, and wrapping the focus between the first and last elements to ensure the user's focus stays within the modal context until it's intentionally closed.
