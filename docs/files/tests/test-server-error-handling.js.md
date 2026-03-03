@@ -1,9 +1,6 @@
-# File: tests/test-server-error-handling.js
-
-**Purpose:** [What does this file do?]
-
-**Key Exports/Entrypoints:**
-- [List functions/classes export]
-
-**Side Effects:**
-- [E.g., modifies DB, writes files, sets globals]
+---
+title: "Dashboard Server Error Handling Tests"
+description: "Tests verifying secure error handling in the Dashboard API."
+---
+# Dashboard Server Error Handling Tests
+This file contains tests that verify secure error handling, ensuring generic errors are returned to clients rather than leaking internal details.

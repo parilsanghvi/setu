@@ -1,9 +1,6 @@
-# File: tests/verify-path-traversal.js
-
-**Purpose:** [What does this file do?]
-
-**Key Exports/Entrypoints:**
-- [List functions/classes export]
-
-**Side Effects:**
-- [E.g., modifies DB, writes files, sets globals]
+---
+title: "CoreAgent Path Traversal Prevention Test"
+description: "Security test to ensure CoreAgent isolates path access."
+---
+# Path Traversal Prevention Test
+This script verifies that the `CoreAgent` path resolution mechanism correctly prevents access to paths escaping its designated scope.
