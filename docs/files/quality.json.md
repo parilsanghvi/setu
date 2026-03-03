@@ -1,10 +1,11 @@
-<!-- PLACEHOLDER -->
-# File: quality.json
+## Purpose
+The \`quality.json\` file stores the aggregated metrics for the repository's documentation quality, evaluated against structural and completeness standards.
 
-**Purpose:** [What does this file do?]
+## Exports
+- JSON file: Contains metric data rather than executable code.
 
-**Key Exports/Entrypoints:**
-- [List functions/classes export]
+## Dependencies
+- Generated dynamically by the \`bin/setu onboarding quality\` command.
 
-**Side Effects:**
-- [E.g., modifies DB, writes files, sets globals]
+## Side Effects
+- Used as an artifact in reporting to ensure developers meet baseline documentation coverage standards.
