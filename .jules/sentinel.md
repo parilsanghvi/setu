@@ -1,24 +1,4 @@
-## 2024-05-24 - Path Traversal in File Download
-**Vulnerability:** Path Traversal vulnerability in `/api/tasks/:id/screenshots` allowing arbitrary file read if directory permissions allow.
-**Learning:** `req.params.id` was used directly in `path.join` without validation. Express does not automatically sanitize path parameters against `..` if they are URL-encoded or if the router allows them.
-**Prevention:** Always validate user input against a strict allowlist (e.g. alphanumeric) before using it in filesystem operations.
-
-## 2026-02-17 - Missing Content Security Policy
-**Vulnerability:** API endpoints returned 200 OK without any Content-Security-Policy or security headers.
-**Learning:** Security headers were completely absent for successful responses, leaving the application vulnerable to XSS and clickjacking. Helmet middleware was missing entirely.
-**Prevention:** Always use helmet middleware or equivalent early in the middleware chain to enforce secure defaults for all responses.
-
-## 2024-05-23 - [Critical] Unauthenticated WebSocket Access
-**Vulnerability:** Socket.IO connections were completely unauthenticated, allowing anyone with network access to monitor real-time system logs, chat messages, and agent activities.
-**Learning:** Middleware applied to Express apps (`app.use`) does not automatically protect Socket.IO namespaces when attached to the same HTTP server. Socket.IO requires its own middleware (`io.use`) to validate handshake data.
-**Prevention:** Always explicitly attach authentication middleware to Socket.IO instances using `io.use()`, verifying headers or query parameters from the handshake.
-
-## 2026-02-26 - [High] Reflected XSS in Google Auth Callback
-**Vulnerability:** The local `http.createServer` instance used for the Google OAuth callback returned `text/html` responses containing unescaped user input (the `error` query parameter), allowing Reflected XSS.
-**Learning:** Even short-lived local servers used for auth callbacks must treat all input as untrusted. Serving HTML error pages with user input requires rigorous escaping or, simpler, using `text/plain`.
-**Prevention:** When returning simple status messages or errors, prefer `Content-Type: text/plain` to avoid accidental HTML rendering of malicious payloads.
-
-## 2026-02-25 - [Critical] Path Traversal in CoreAgent File Operations
-**Vulnerability:** `CoreAgent.readFile` and `writeFile` directly used user-provided file paths with `fs.promises`, allowing access to arbitrary files outside the agent's scope via absolute paths or `..` sequences.
-**Learning:** Even if `scope` is passed to the constructor, it must be actively enforced during file operations using `path.resolve` and strict `startsWith` validation. `path.join` alone is insufficient if the input is absolute.
-**Prevention:** Implement a dedicated `_resolvePath` method that resolves against the scope and throws if the result escapes the scope. Use this method for all filesystem access.
+## 2025-03-02 - Unauthenticated Socket.IO Server Access
+**Vulnerability:** The Socket.IO server (`this.io = new Server(this.server)`) in `lib/server.js` was accessible without authentication, bypassing the Express basic auth.
+**Learning:** In applications mixing Express API routes with Socket.IO, middleware applied to Express (`this.app.use(authMiddleware)`) does not automatically apply to Socket.IO connections.
+**Prevention:** Always explicitly register authentication middleware for Socket.IO servers using `io.use(middleware)` to protect real-time data streams and interactions.

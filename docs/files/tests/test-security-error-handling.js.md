@@ -1,10 +1,12 @@
-# File: tests/test-security-error-handling.js
+## Purpose
+The purpose of \`test-security-error-handling.js\` is to validate the system's resilience against malformed inputs and unauthorized security access attempts.
 
-**Purpose:** Validates that API endpoints in `lib/server.js` do not leak sensitive error details (e.g., stack traces) in 500 responses, instead returning a generic "Internal Server Error".
+## Exports
+- None. Executable test file.
 
-**Key Exports/Entrypoints:**
-- Standalone test script executed via `node`.
+## Dependencies
+- Relies on \`node:test\` for the test framework.
+- Interacts with routing logic and the authentication middleware.
 
-**Side Effects:**
-- Mocks `express` and `socket.io` modules.
-- Writes to `console.log` for test output.
+## Side Effects
+- Generates synthetic failing requests to observe error handling. Does not mutate the filesystem permanently.

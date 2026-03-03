@@ -1,6 +1,11 @@
----
-title: "CoreAgent Path Traversal Prevention Test"
-description: "Security test to ensure CoreAgent isolates path access."
----
-# Path Traversal Prevention Test
-This script verifies that the `CoreAgent` path resolution mechanism correctly prevents access to paths escaping its designated scope. It attempts to traverse the directory tree upward using dot-dot-slash notation and absolute paths outside the allowed working directory. If these access attempts are correctly rejected by the underlying isolation checks, the test will pass, demonstrating that the agent is properly constrained to its sandbox environment.
+## Purpose
+The \`verify-path-traversal.js\` test file specifically focuses on testing security controls preventing arbitrary file reads across endpoints, mainly in \`lib/server.js\`.
+
+## Exports
+- None.
+
+## Dependencies
+- Relies on \`node:test\` and the server module.
+
+## Side Effects
+- Fires requests containing malicious path segments (like \`../\`) to verify that the server properly sanitizes paths and returns a \`403 Forbidden\` or \`400 Bad Request\`.

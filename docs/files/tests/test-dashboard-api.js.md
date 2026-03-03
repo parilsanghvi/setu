@@ -1,6 +1,12 @@
----
-title: "Dashboard API Integration Tests"
-description: "Integration tests for the Dashboard server API endpoints."
----
-# Dashboard API Integration Tests
-This file contains integration tests verifying the behavior of the `DashboardServer` API endpoints. It covers endpoints under `/api`, testing correct routing, authentication logic responses, and various edge cases. By exercising these critical pathways, the tests help ensure that the dashboard backend provides reliable state information and accepts legitimate actions properly while safeguarding against bad inputs.
+## Purpose
+The purpose of \`test-dashboard-api.js\` is to execute integration and unit tests for the main Dashboard API routes.
+
+## Exports
+- Standard test file, does not export modules.
+
+## Dependencies
+- Depends on the \`node:test\` native testing framework.
+- Depends on the local server module \`lib/server.js\` and HTTP request libraries.
+
+## Side Effects
+- Starts an in-memory or actual server instance to verify API responses. May read/write to an isolated sqlite database during test execution.
