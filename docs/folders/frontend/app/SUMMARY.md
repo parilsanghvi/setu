@@ -29,10 +29,8 @@ Enforces consistent indentation (4 spaces) throughout all code files.
 Ensures that test files are written using Jest.
 
 ## Cross-References
-- [playwright-report/](./playwright-report/SUMMARY.md)
 - [public/](./public/SUMMARY.md)
 - [src/](./src/SUMMARY.md)
-- [test-results/](./test-results/SUMMARY.md)
 - [tests/](./tests/SUMMARY.md)
 - [eslint.config.js](../../../files/frontend/app/eslint.config.js.md)
 - [package.json](../../../files/frontend/app/package.json.md)
