@@ -1,14 +1,10 @@
-# `tests/test-socket-auth.js`
+<!-- PLACEHOLDER -->
+# File: tests/test-socket-auth.js
 
-## Purpose
-This file contains unit tests for the `socketAuth` middleware (`lib/middleware/socketAuth.js`).
+**Purpose:** [What does this file do?]
 
-## What it does
-- Validates that the socket authentication middleware properly handles various Edge cases and properly checks headers.
-- Covers missing headers, malformed headers, invalid credentials, and valid credentials.
+**Key Exports/Entrypoints:**
+- [List functions/classes export]
 
-## Dependencies
-- `node:test`
-- `node:assert`
-- `lib/middleware/socketAuth`
-- `lib/auth/basic`
+**Side Effects:**
+- [E.g., modifies DB, writes files, sets globals]
