@@ -7,48 +7,49 @@ const originalRequire = Module.prototype.require;
 // Mock Express
 const expressMock = () => {
     const app = {
-        use: () => {},
-        get: function(path, handler) {
+        use: () => { },
+        get: function (path, handler) {
             this.routes = this.routes || {};
             this.routes[path] = handler;
         },
-        post: function(path, handler) {
+        post: function (path, handler) {
             this.routes = this.routes || {};
             this.routes[path] = handler;
         },
-        listen: () => {},
+        listen: () => { },
     };
     return app;
 };
-expressMock.static = () => {};
-expressMock.json = () => {};
+expressMock.static = () => { };
+expressMock.json = () => { };
 
 const logs = [];
 
 const mocks = {
     'express': expressMock,
     'http': {
-        createServer: () => ({ listen: (port, cb) => { if(cb) cb(); } })
+        createServer: () => ({ listen: (port, cb) => { if (cb) cb(); } })
     },
     'socket.io': {
         Server: class {
             constructor() {
-                this.on = () => {};
-                this.emit = () => {};
+                this.on = () => { };
+                this.emit = () => { };
+                this.use = () => { };
             }
         }
     },
-    'helmet': () => () => {},
+    'helmet': () => () => { },
     './db': {
         db: { prepare: () => ({ get: () => ({}), all: () => [] }) },
-        on: () => {},
-        send: () => {}
+        on: () => { },
+        send: () => { }
     },
-    './middleware/auth': () => {},
+    './middleware/auth': () => { },
     './utils': { readLastLines: async () => [] },
     './Logger': class {
-        constructor() {}
-        info() {}
+        constructor() { }
+        info() { }
         error(msg) {
             logs.push(msg);
         }
@@ -62,7 +63,7 @@ const mocks = {
     }
 };
 
-Module.prototype.require = function(id) {
+Module.prototype.require = function (id) {
     if (mocks[id]) return mocks[id];
     // Handle relative paths resolution for mocks
     if (id.endsWith('/db')) return mocks['./db'];
@@ -87,11 +88,11 @@ console.log('🧪 Verifying Server Error Handling...');
         const res = {
             statusCode: 200,
             body: null,
-            status: function(code) {
+            status: function (code) {
                 this.statusCode = code;
                 return this;
             },
-            json: function(data) {
+            json: function (data) {
                 this.body = data;
                 return this;
             }

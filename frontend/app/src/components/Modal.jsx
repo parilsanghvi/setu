@@ -18,6 +18,25 @@ const Modal = ({ children, onClose, title = "Modal" }) => {
                 if (onCloseRef.current) {
                     onCloseRef.current();
                 }
+            } else if (e.key === 'Tab') {
+                if (!modalRef.current) return;
+                const focusableElements = modalRef.current.querySelectorAll(
+                    'a[href], button, textarea, input, select, [tabindex]:not([tabindex="-1"])'
+                );
+                const firstElement = focusableElements[0];
+                const lastElement = focusableElements[focusableElements.length - 1];
+
+                if (e.shiftKey) {
+                    if (document.activeElement === firstElement || document.activeElement === modalRef.current) {
+                        e.preventDefault();
+                        lastElement?.focus();
+                    }
+                } else {
+                    if (document.activeElement === lastElement) {
+                        e.preventDefault();
+                        firstElement?.focus();
+                    }
+                }
             }
         };
 
