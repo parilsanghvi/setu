@@ -27,7 +27,7 @@ if (process.env.ALLOWED_ORIGINS) {
   ALLOWED_ORIGINS.push(...process.env.ALLOWED_ORIGINS.split(',').map(s => s.trim()));
 }
 
-// 👑 SUTRADHAR: The Orchestrator (formerly Narad)
+// 👑 SUTRADHAR: The Orchestrator
 const PORT = process.env.PORT || 3000;
 const app = express();
 const server = http.createServer(app);

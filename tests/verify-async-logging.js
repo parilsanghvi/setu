@@ -17,8 +17,10 @@ const child = spawn('node', [SCRIPT_PATH], {
     stdio: 'ignore'
 });
 
-console.log('Skipping Async Logging verification on Windows runner.');
-process.exit(0);
+if (process.platform === 'win32') {
+    console.log('Skipping Async Logging verification on Windows runner.');
+    process.exit(0);
+}
 
 const startTime = Date.now();
 const TIMEOUT = 15000; // 15 seconds

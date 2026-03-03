@@ -96,7 +96,7 @@ switch (cmd) {
     if (!message) {
       log('Usage: setu chat "Hello"');
     } else {
-      db.send('User', 'Narad', message, 'chat');
+      db.send('User', 'Sutradhar', message, 'chat');
       log(`Sent: "${message}"`);
     }
     break;

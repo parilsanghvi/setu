@@ -1,0 +1,122 @@
+@use '../styles/variables' as *;
+
+.modalContent {
+    padding: 1rem;
+}
+
+.headerRow {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+}
+
+.modalTitle {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #60a5fa; // text-blue-400
+    margin: 0;
+}
+
+.badge {
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.7rem;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.badgeAuto {
+    background: #374151;
+    color: #d1d5db;
+}
+
+.metaGrid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    background: #111827; // bg-gray-900
+    padding: 1rem;
+    border-radius: 8px;
+    border: 1px solid #374151;
+}
+
+.metaItem {
+    display: flex;
+    flex-direction: column;
+}
+
+.metaLabel {
+    font-size: 0.65rem;
+    color: #6b7280;
+    text-transform: uppercase;
+    font-weight: 700;
+    margin-bottom: 0.2rem;
+}
+
+.metaValue {
+    font-size: 0.85rem;
+    color: #e5e7eb;
+}
+
+.descriptionBlock {
+    margin-bottom: 1.5rem;
+}
+
+.sectionHeader {
+    font-size: 0.875rem;
+    font-weight: 700;
+    color: #9ca3af;
+    margin-bottom: 0.5rem;
+    border-bottom: 1px solid #374151;
+    padding-bottom: 0.25rem;
+}
+
+.descriptionText {
+    font-size: 0.85rem;
+    color: #d1d5db;
+    line-height: 1.5;
+    margin: 0;
+}
+
+.galleryHeader {
+    font-size: 0.875rem;
+    font-weight: 700;
+    color: #d1d5db; // text-gray-300
+    margin-bottom: 0.5rem;
+}
+
+.deleteButton {
+    background-color: transparent;
+    border: 1px solid #ef4444; // border-red-500
+    color: #ef4444; // text-red-500
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+
+    &:hover {
+        background-color: rgba(239, 68, 68, 0.1);
+    }
+}
+
+.revertButton {
+    background-color: transparent;
+    border: 1px solid #f59e0b; // border-amber-500
+    color: #f59e0b; // text-amber-500
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+
+    &:hover {
+        background-color: rgba(245, 158, 11, 0.1);
+    }
+}

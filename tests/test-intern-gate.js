@@ -45,9 +45,9 @@ async function testInternGate() {
     });
 
     // 3. Check if escalation message exists in DB
-    const msgs = bus.db.prepare("SELECT * FROM messages WHERE type = 'escalation' AND recipient = 'Narad'").all();
+    const msgs = bus.db.prepare("SELECT * FROM messages WHERE type = 'escalation' AND recipient = 'Sutradhar'").all();
     if (msgs.length > 0) {
-        console.log('✅ Escalation to Narad successful! Message:', msgs[0].content);
+        console.log('✅ Escalation to Sutradhar successful! Message:', msgs[0].content);
         console.log('✅ HUMAN GATE triggered successfully.');
     } else {
         console.error('❌ Human Gate failed to trigger!');

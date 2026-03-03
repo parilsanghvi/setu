@@ -1,0 +1,72 @@
+@use '../styles/variables' as *;
+
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.75);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal {
+    background-color: #1f2937; // bg-gray-800
+    border-radius: 0.5rem;
+    width: 90vw;
+    max-width: 800px;
+    height: 80vh;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    border: 1px solid #374151; // border-gray-700
+    overflow: hidden;
+}
+
+.header {
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid #374151; // border-gray-700
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #111827; // bg-gray-900
+
+    h2 {
+        margin: 0;
+        font-size: 1.25rem;
+        color: #f3f4f6; // text-gray-100
+        font-weight: 600;
+    }
+}
+
+.closeButton {
+    background: none;
+    border: none;
+    color: #9ca3af; // text-gray-400
+    font-size: 1.5rem;
+    line-height: 1;
+    cursor: pointer;
+    padding: 0 0.5rem;
+
+    &:hover {
+        color: #f3f4f6; // text-gray-100
+    }
+}
+
+.content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+
+    // We make ChatBox fill this container
+    >div {
+        flex: 1;
+        border: none;
+        border-radius: 0;
+        height: 100%;
+    }
+}

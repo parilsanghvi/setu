@@ -55,7 +55,7 @@ function launchSystem() {
         bus.send(
             'User',
             'Sutradhar',
-            'BEGIN AUDIT of adopted project.',
+            'Hello Sutradhar, ready to begin workflow management.',
             'command',
             { source: 'ignite-script' }
         );

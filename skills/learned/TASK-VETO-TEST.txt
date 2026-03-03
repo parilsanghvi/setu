@@ -1,0 +1,1 @@
+Task TASK-VETO-TEST is stuck. 3 strikes and you're out.

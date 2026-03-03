@@ -1,16 +1,18 @@
-import React from 'react';
+import React, { useState, useCallback } from 'react';
 import { useSocket } from './hooks/useSocket';
 import AgentCard from './components/AgentCard';
 import TaskBoard from './components/TaskBoard';
 import LogViewer from './components/LogViewer';
 import ChatBox from './components/ChatBox';
 import OnboardingStatus from './components/OnboardingStatus';
+import TaskCreationModal from './components/TaskCreationModal';
 import styles from './App.module.scss';
 import './index.scss';
 
 const App = () => {
   const { agents, tasks, logs } = useSocket();
-  const [onboarding, setOnboarding] = React.useState(null);
+  const [onboarding, setOnboarding] = useState(null);
+  const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
 
   React.useEffect(() => {
     fetch('/api/onboarding')
@@ -23,15 +25,53 @@ const App = () => {
     return agents.filter(a => a.status !== 'OFFLINE').length;
   }, [agents]);
 
+  const [isCommitting, setIsCommitting] = useState(false);
+
+  const handleGitCommit = useCallback(async () => {
+    setIsCommitting(true);
+    try {
+      const res = await fetch('/api/git/commit', { method: 'POST' });
+      if (!res.ok) throw new Error('Commit failed');
+      alert('Git commit successful!');
+    } catch (e) {
+      alert('Failed to commit to Git: ' + e.message);
+    } finally {
+      setIsCommitting(false);
+    }
+  }, []);
+
+  const handleTaskCreateRequest = useCallback(() => {
+    setIsTaskModalOpen(true);
+  }, []);
+
   return (
     <div className={styles.grid}>
+      {/* Modals */}
+      <TaskCreationModal
+        isOpen={isTaskModalOpen}
+        onClose={() => setIsTaskModalOpen(false)}
+        agents={agents}
+        logs={logs}
+      />
+
       {/* Header / Stats */}
       <div className={styles.header}>
         <h1 className={styles.title}>Setu <span className={styles.version}>v2.0</span></h1>
-        <div className={styles.stats}>
-          {activeAgentsCount} <span className={styles.statsLabel}>Active Agents</span>
+
+        <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+          <button
+            onClick={handleGitCommit}
+            disabled={isCommitting}
+            className={styles.commitButton}
+            aria-label="Commit to Git"
+          >
+            {isCommitting ? 'Committing...' : 'Commit to Git'}
+          </button>
+          <div className={styles.stats}>
+            {activeAgentsCount} <span className={styles.statsLabel}>Active Agents</span>
+          </div>
+          <OnboardingStatus data={onboarding} />
         </div>
-        <OnboardingStatus data={onboarding} />
       </div>
 
       {/* Agent List */}
@@ -44,7 +84,7 @@ const App = () => {
 
       {/* Kanban */}
       <div className={styles.kanban}>
-        <TaskBoard tasks={tasks} />
+        <TaskBoard tasks={tasks} onTaskCreateRequest={handleTaskCreateRequest} />
       </div>
 
       {/* Logs */}

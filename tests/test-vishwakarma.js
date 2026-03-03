@@ -25,7 +25,7 @@ async function testVishwakarma() {
     contractor.issueSpec(badTaskId, 'infra', badSpec);
 
     await agent.handleSpecProposal({
-        sender: 'Narad',
+        sender: 'Sutradhar',
         content: badSpec,
         meta: { taskId: badTaskId, type: 'PROPOSE_SPEC', domain: 'infra' }
     });
@@ -46,7 +46,7 @@ async function testVishwakarma() {
     contractor.issueSpec(goodTaskId, 'infra', goodSpec);
 
     await agent.handleSpecProposal({
-        sender: 'Narad',
+        sender: 'Sutradhar',
         content: goodSpec,
         meta: { taskId: goodTaskId, type: 'PROPOSE_SPEC', domain: 'infra' }
     });

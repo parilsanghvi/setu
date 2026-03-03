@@ -1,35 +1,10 @@
 import React, { useState, useMemo } from 'react';
-import Modal from './Modal';
-import ScreenshotGallery from './ScreenshotGallery';
-import Spinner from './Spinner';
+import TaskDetailModal from './TaskDetailModal';
 import TaskColumn from './TaskColumn';
 import styles from './TaskBoard.module.scss';
 
-const TaskBoard = React.memo(({ tasks }) => {
-    const [newTask, setNewTask] = useState("");
+const TaskBoard = React.memo(({ tasks, onTaskCreateRequest }) => {
     const [selectedTask, setSelectedTask] = useState(null);
-    const [isCreating, setIsCreating] = useState(false);
-
-    const createTask = async () => {
-        if (!newTask) return;
-        setIsCreating(true);
-        try {
-            await fetch('/api/tasks', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ title: newTask, type: 'gui-task' })
-            });
-            setNewTask("");
-        } finally {
-            setIsCreating(false);
-        }
-    };
-
-    const handleKeyDown = (e) => {
-        if (e.key === 'Enter' && !isCreating) {
-            createTask();
-        }
-    };
 
     const cols = useMemo(() => {
         const columns = { TODO: [], IN_PROGRESS: [], DONE: [] };
@@ -43,7 +18,6 @@ const TaskBoard = React.memo(({ tasks }) => {
                     displayTitle = spec.task;
                 } catch {
                     // Fallback to undefined or handle error if needed
-
                 }
             }
 
@@ -56,39 +30,20 @@ const TaskBoard = React.memo(({ tasks }) => {
 
     return (
         <div className={styles.container}>
-            {selectedTask && (
-                <Modal
-                    onClose={() => setSelectedTask(null)}
-                    title={selectedTask.title}
-                >
-                    <div className={styles.modalContent}>
-                        <h2 className={styles.modalTitle}>{selectedTask.title}</h2>
-                        <div className={styles.meta}>ID: {selectedTask.id} | Owner: {selectedTask.owner}</div>
-                        <div className={styles.galleryHeader}>Visual History</div>
-                        <ScreenshotGallery taskId={selectedTask.id} />
-                    </div>
-                </Modal>
-            )}
+            <TaskDetailModal
+                task={selectedTask}
+                onClose={() => setSelectedTask(null)}
+            />
 
             <div className={styles.header}>
                 <span className={styles.title}>KANBAN</span>
                 <div className={styles.controls}>
-                    <input
-                        value={newTask}
-                        onChange={e => setNewTask(e.target.value)}
-                        onKeyDown={handleKeyDown}
-                        disabled={isCreating}
-                        placeholder="New Task..."
-                        aria-label="New task title"
-                        className={styles.input}
-                    />
                     <button
-                        onClick={createTask}
-                        disabled={isCreating}
+                        onClick={onTaskCreateRequest}
                         className={styles.addButton}
-                        aria-label={isCreating ? "Creating task" : "Add new task"}
+                        aria-label="Add new task"
                     >
-                        {isCreating ? <Spinner /> : "ADD"}
+                        ADD BOARD TASK
                     </button>
                 </div>
             </div>

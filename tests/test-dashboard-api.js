@@ -26,23 +26,23 @@ const mockDb = {
     db: {
         prepare: (sql) => {
             // Simple SQL parsing for mock behavior
-            if (sql.includes('SELECT count(*) as count FROM agents')) {
+            if (sql.includes("count(*) as count FROM agents")) {
                 return { get: () => ({ count: MOCK_AGENTS.filter(a => a.status !== 'OFFLINE').length }) };
             }
-            if (sql.includes('SELECT count(*) as count FROM tasks')) {
+            if (sql.includes("count(*) as count FROM tasks")) {
                 return { get: () => ({ count: MOCK_TASKS.filter(t => t.status !== 'DONE').length }) };
             }
-            if (sql.includes('SELECT * FROM tasks')) {
+            if (sql.includes('FROM tasks')) {
                 return { all: () => MOCK_TASKS };
             }
-            if (sql.includes('SELECT * FROM agents')) {
+            if (sql.includes('FROM agents')) {
                 return { all: () => MOCK_AGENTS };
             }
             // Default fallback
             return {
                 get: () => ({}),
                 all: () => [],
-                run: () => {}
+                run: () => { }
             };
         }
     },
@@ -50,9 +50,9 @@ const mockDb = {
         // console.log('Mock updateTask called:', id, status, meta);
     },
     send: (sender, recipient, content, type, meta) => {
-         // console.log('Mock send called:', sender, recipient, content);
+        // console.log('Mock send called:', sender, recipient, content);
     },
-    on: (event, cb) => {} // No-op for bus events
+    on: (event, cb) => { } // No-op for bus events
 };
 
 // Mock Implementation for lib/utils
@@ -61,11 +61,11 @@ const mockUtils = {
 };
 
 // Intercept require
-Module.prototype.require = function(id) {
+Module.prototype.require = function (id) {
     const caller = this.filename;
     // Only mock calls originating from our project source or test
-    // We specifically want to intercept calls FROM lib/server.js
-    if (caller && (caller.endsWith('lib/server.js') || caller.endsWith('test-dashboard-api.js'))) {
+    // We specifically want to intercept calls FROM lib/server.js or lib/routes.js
+    if (caller && (caller.endsWith('lib/server.js') || caller.endsWith('lib/routes.js') || caller.endsWith('test-dashboard-api.js'))) {
         if (id === './db' || id.endsWith('/db')) return mockDb;
         if (id === './utils' || id.endsWith('/utils')) return mockUtils;
     }

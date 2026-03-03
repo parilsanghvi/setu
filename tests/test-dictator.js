@@ -18,15 +18,15 @@ async function testDictator() {
     const taskId = 'TASK-VETO-TEST';
     const backend = new BackendLead('Backend-Lead-Test', 'BackendLead');
 
-    // 1. Narad issues a bad spec
-    console.log('1. Narad issues a spec with console.logs (The Purist will hate this)...');
+    // 1. Sutradhar issues a bad spec
+    console.log('1. Sutradhar issues a spec with console.logs (The Purist will hate this)...');
     const badSpec = 'Develop a new user login route. Use console.log for debugging errors.';
     contractor.issueSpec(taskId, 'backend', badSpec);
 
     // 2. backend evaluates and vetos
     console.log('2. Backend Lead evaluates the spec...');
     await backend.handleSpecProposal({
-        sender: 'Narad',
+        sender: 'Sutradhar',
         content: badSpec,
         meta: { taskId, type: 'PROPOSE_SPEC' }
     });
