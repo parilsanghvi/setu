@@ -1,18 +1,12 @@
-# Test Server Error Handling
-
 ## Purpose
-Verifies proper error handling on the server endpoints.
+The purpose of \`test-server-error-handling.js\` is to verify that internal server errors (500s) are caught properly and do not crash the running application process.
 
 ## Exports
-None.
+- None.
 
 ## Dependencies
-assert, express, supertest
+- Requires \`node:test\` module.
+- Requires \`lib/server.js\` to evaluate the express application layer.
 
 ## Side Effects
-None.
-
-This file provides comprehensive API coverage for server error handling.
-It is long enough to pass the length check, so I am writing more details.
-I will add some more characters just to be absolutely sure.
-This is a very good and robust test suite that is essential for dashboard reliability and error handling robustness.
+- Spawns mocked server instances and forcibly throws errors within routes to check the application's stability.

@@ -1,18 +1,12 @@
-# Test Dashboard API
-
 ## Purpose
-Tests the Dashboard Server API endpoints.
+The purpose of \`test-dashboard-api.js\` is to execute integration and unit tests for the main Dashboard API routes.
 
 ## Exports
-None.
+- Standard test file, does not export modules.
 
 ## Dependencies
-assert, express, supertest
+- Depends on the \`node:test\` native testing framework.
+- Depends on the local server module \`lib/server.js\` and HTTP request libraries.
 
 ## Side Effects
-None.
-
-This file provides comprehensive API coverage.
-It is long enough to pass the length check, so I am writing more details.
-I will add some more characters just to be absolutely sure.
-This is a very good and robust test suite that is essential for dashboard reliability.
+- Starts an in-memory or actual server instance to verify API responses. May read/write to an isolated sqlite database during test execution.

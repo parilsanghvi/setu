@@ -5,7 +5,7 @@ const { Pariksha } = require('../lib/Pariksha');
 describe('Pariksha', () => {
     describe('runTest', () => {
         it('should return success: true when command succeeds', async () => {
-            const mockExec = async (cmd, opts) => ({ stdout: 'ok', stderr: '' });
+            const mockExec = async (file, args, opts) => ({ stdout: 'ok', stderr: '' });
             const pariksha = new Pariksha(mockExec);
             const result = await pariksha.runTest('echo hello', '.');
             assert.strictEqual(result.success, true);
@@ -13,7 +13,7 @@ describe('Pariksha', () => {
         });
 
         it('should return success: false when command fails', async () => {
-            const mockExec = async (cmd, opts) => {
+            const mockExec = async (file, args, opts) => {
                 const err = new Error('Command failed');
                 err.stdout = 'stdout';
                 err.stderr = 'stderr';
@@ -29,7 +29,7 @@ describe('Pariksha', () => {
     describe('enforce', () => {
         it('should pass on valid TDD cycle (Red -> Write -> Green)', async () => {
             let callCount = 0;
-            const mockExec = async (cmd, opts) => {
+            const mockExec = async (file, args, opts) => {
                 callCount++;
                 if (callCount === 1) {
                     // First run: Fail
@@ -55,7 +55,7 @@ describe('Pariksha', () => {
         });
 
         it('should throw TDD VIOLATION if test passes initially', async () => {
-            const mockExec = async (cmd, opts) => ({ stdout: 'pass', stderr: '' });
+            const mockExec = async (file, args, opts) => ({ stdout: 'pass', stderr: '' });
             const pariksha = new Pariksha(mockExec);
 
             await assert.rejects(
@@ -65,7 +65,7 @@ describe('Pariksha', () => {
         });
 
         it('should throw CODE FAILURE if test fails after writing code', async () => {
-             const mockExec = async (cmd, opts) => {
+             const mockExec = async (file, args, opts) => {
                 const err = new Error('Fail always');
                 err.stdout = 'fail';
                 err.stderr = '';

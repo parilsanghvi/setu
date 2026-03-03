@@ -1,14 +1,12 @@
-# `tests/test-socket-auth.js`
-
 ## Purpose
-This file contains unit tests for the `socketAuth` middleware (`lib/middleware/socketAuth.js`).
+The purpose of \`test-socket-auth.js\` is to ensure that WebSocket connections established via Socket.io are properly authenticated before allowing message transmission.
 
-## What it does
-- Validates that the socket authentication middleware properly handles various Edge cases and properly checks headers.
-- Covers missing headers, malformed headers, invalid credentials, and valid credentials.
+## Exports
+- None. Executable tests.
 
 ## Dependencies
-- `node:test`
-- `node:assert`
-- `lib/middleware/socketAuth`
-- `lib/auth/basic`
+- Utilizes \`node:test\`.
+- Imports \`lib/middleware/socketAuth.js\` or equivalent socket handlers.
+
+## Side Effects
+- Tests simulated socket handshake objects. It tests side-effect middleware logic (e.g., calling \`next()\`).

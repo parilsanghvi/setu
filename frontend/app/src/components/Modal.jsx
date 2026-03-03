@@ -21,7 +21,7 @@ const Modal = ({ children, onClose, title = "Modal" }) => {
             } else if (e.key === 'Tab') {
                 if (!modalRef.current) return;
                 const focusableElements = modalRef.current.querySelectorAll(
-                    'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+                    'a[href], button, textarea, input, select, [tabindex]:not([tabindex="-1"])'
                 );
                 if (focusableElements.length === 0) return;
 
@@ -31,12 +31,12 @@ const Modal = ({ children, onClose, title = "Modal" }) => {
                 if (e.shiftKey) {
                     if (document.activeElement === firstElement || document.activeElement === modalRef.current) {
                         e.preventDefault();
-                        lastElement.focus();
+                        lastElement?.focus();
                     }
                 } else {
                     if (document.activeElement === lastElement) {
                         e.preventDefault();
-                        firstElement.focus();
+                        firstElement?.focus();
                     }
                 }
             }
