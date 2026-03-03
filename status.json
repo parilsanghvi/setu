@@ -1,28 +1,38 @@
 {
-  "ok": true,
-  "completeness": 100,
+  "ok": false,
+  "completeness": 95,
   "stale": true,
-  "missing": [],
-  "errors": [],
+  "missing": [
+    "docs/files/fix-docs.js.md",
+    "docs/folders/frontend/app/SUMMARY.md",
+    "docs/files/lib/models/providers/base.js.md",
+    "docs/files/link-report.json.md",
+    "docs/files/quality.json.md",
+    "...and 6 more."
+  ],
+  "errors": [
+    "Missing docs for 10 file(s) and 1 folder(s).",
+    "Calculated completeness is 95%. It must be 100% to proceed."
+  ],
   "data": {
     "repo": "app",
     "default_branch": "master",
-    "head_commit": "840d691198ff3e23bf75aafb84385a9c374ecf29",
-    "generated_at": "2026-02-27T20:42:11.192Z",
-    "completeness_percent": 100,
+    "head_commit": "b2e0f0633781cc1ed45d031e1ed9d7693683754e",
+    "generated_at": "2026-03-01T18:02:30.810Z",
+    "completeness_percent": 2,
     "owners_modules": {},
     "checks": {
       "core_artifacts_ok": true,
-      "file_doc_coverage_percent": 99,
-      "folder_summary_coverage_percent": 100,
+      "file_doc_coverage_percent": 0,
+      "folder_summary_coverage_percent": 0,
       "stale_commit_check_ok": true
     }
   },
-  "generatedAt": "2026-02-27T20:42:11.192Z",
+  "generatedAt": "2026-03-01T18:02:30.810Z",
   "checks": {
     "core_artifacts_ok": true,
-    "file_doc_coverage_percent": 100,
-    "folder_summary_coverage_percent": 100,
+    "file_doc_coverage_percent": 95,
+    "folder_summary_coverage_percent": 97,
     "stale_commit_check_ok": false
   }
 }
