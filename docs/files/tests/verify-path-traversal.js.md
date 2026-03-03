@@ -1,9 +1,18 @@
-# File: tests/verify-path-traversal.js
+---
+description: Tests for path traversal vulnerability prevention
+module: tests
+---
 
-**Purpose:** [What does this file do?]
+# `verify-path-traversal.js`
 
-**Key Exports/Entrypoints:**
-- [List functions/classes export]
+## Purpose
+This file contains tests to ensure that `CoreAgent` properly isolates file system operations, explicitly rejecting path traversal attempts (like `../` or absolute paths) to ensure agents remain confined to their intended scope directories. This is an important security feature check.
 
-**Side Effects:**
-- [E.g., modifies DB, writes files, sets globals]
+## Exports
+None. This is an executable verification script.
+
+## Dependencies
+This file depends on the `CoreAgent` module and internal utilities for file mocking and assertion.
+
+## Side Effects
+It attempts local file access using mocked environments and performs cleanup after checks.

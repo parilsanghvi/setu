@@ -1,9 +1,18 @@
-# File: tests/test-server-error-handling.js
+---
+description: Tests for server error handling
+module: tests
+---
 
-**Purpose:** [What does this file do?]
+# `test-server-error-handling.js`
 
-**Key Exports/Entrypoints:**
-- [List functions/classes export]
+## Purpose
+This file contains security and robustness tests verifying that the dashboard server handles exceptions correctly without leaking internal stack traces or failing unexpectedly. It is crucial for ensuring server resilience.
 
-**Side Effects:**
-- [E.g., modifies DB, writes files, sets globals]
+## Exports
+None. This is an executable test script.
+
+## Dependencies
+This file depends on standard Node.js testing utilities and the server implementation.
+
+## Side Effects
+It initiates mock requests to test error boundaries but cleans up afterward.
