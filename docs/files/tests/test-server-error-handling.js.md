@@ -1,18 +1,12 @@
----
-description: Tests for server error handling
-module: tests
----
-
-# `test-server-error-handling.js`
-
 ## Purpose
-This file contains security and robustness tests verifying that the dashboard server handles exceptions correctly without leaking internal stack traces or failing unexpectedly. It is crucial for ensuring server resilience.
+The purpose of \`test-server-error-handling.js\` is to verify that internal server errors (500s) are caught properly and do not crash the running application process.
 
 ## Exports
-None. This is an executable test script.
+- None.
 
 ## Dependencies
-This file depends on standard Node.js testing utilities and the server implementation.
+- Requires \`node:test\` module.
+- Requires \`lib/server.js\` to evaluate the express application layer.
 
 ## Side Effects
-It initiates mock requests to test error boundaries but cleans up afterward.
+- Spawns mocked server instances and forcibly throws errors within routes to check the application's stability.

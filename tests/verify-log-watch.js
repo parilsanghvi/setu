@@ -19,7 +19,15 @@ dashboard.start();
 
 // Connect client
 console.log(`Connecting to http://localhost:${PORT}...`);
-const socket = io(`http://localhost:${PORT}`);
+const user = process.env.DASHBOARD_USER || 'admin';
+const pass = process.env.DASHBOARD_PASS || 'secret';
+const authString = Buffer.from(`${user}:${pass}`).toString('base64');
+
+const socket = io(`http://localhost:${PORT}`, {
+    extraHeaders: {
+        authorization: `Basic ${authString}`
+    }
+});
 
 const testMessage = `TEST_LOG_${Date.now()}`;
 

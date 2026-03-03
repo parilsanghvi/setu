@@ -1,18 +1,11 @@
----
-description: Tests for path traversal vulnerability prevention
-module: tests
----
-
-# `verify-path-traversal.js`
-
 ## Purpose
-This file contains tests to ensure that `CoreAgent` properly isolates file system operations, explicitly rejecting path traversal attempts (like `../` or absolute paths) to ensure agents remain confined to their intended scope directories. This is an important security feature check.
+The \`verify-path-traversal.js\` test file specifically focuses on testing security controls preventing arbitrary file reads across endpoints, mainly in \`lib/server.js\`.
 
 ## Exports
-None. This is an executable verification script.
+- None.
 
 ## Dependencies
-This file depends on the `CoreAgent` module and internal utilities for file mocking and assertion.
+- Relies on \`node:test\` and the server module.
 
 ## Side Effects
-It attempts local file access using mocked environments and performs cleanup after checks.
+- Fires requests containing malicious path segments (like \`../\`) to verify that the server properly sanitizes paths and returns a \`403 Forbidden\` or \`400 Bad Request\`.
