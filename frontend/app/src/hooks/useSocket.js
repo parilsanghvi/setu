@@ -1,98 +1,139 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { io } from 'socket.io-client';
 import { updateLogs } from '../utils/logUtils';
 
-// Initialize socket outside component to prevent multiple connections
-const socket = io({
-    autoConnect: false, // We'll connect manually in useEffect
-});
-
 const MAX_LOGS = 500;
 
+// Build auth header from browser's cached credentials
+// The browser auto-attaches Basic Auth headers to fetch() after the initial prompt,
+// so we can extract them by making a test fetch and reading the request.
+function getStoredCredentials() {
+    // Check if credentials were stored in sessionStorage from a previous page load
+    return sessionStorage.getItem('setu_auth') || null;
+}
+
+function storeCredentials(encoded) {
+    sessionStorage.setItem('setu_auth', encoded);
+}
+
 export const useSocket = () => {
-    const [isConnected, setIsConnected] = useState(socket.connected);
+    const [isConnected, setIsConnected] = useState(false);
     const [agents, setAgents] = useState([]);
     const [tasks, setTasks] = useState([]);
     const [logs, setLogs] = useState([]);
     const logIdRef = useRef(0);
+    const socketRef = useRef(null);
 
     useEffect(() => {
-        socket.connect();
+        let cancelled = false;
 
-        function formatLog(content) {
-            logIdRef.current += 1;
-            return {
-                id: logIdRef.current,
-                content
-            };
+        async function initSocket() {
+            // Try to get stored credentials or prompt user
+            let authHeader = getStoredCredentials();
+
+            if (!authHeader) {
+                // Try a fetch to /api/stats — if browser has cached Basic Auth, it will work
+                try {
+                    const res = await fetch('/api/stats');
+                    if (res.ok) {
+                        // Browser is sending auth automatically — but we can't extract the header
+                        // So we prompt user for credentials to pass to socket.io
+                    }
+                } catch (_) { }
+
+                // Prompt for credentials if not stored
+                const user = prompt('Dashboard Username:', 'admin');
+                if (!user) return;
+                const pass = prompt('Dashboard Password:');
+                if (!pass) return;
+
+                authHeader = btoa(`${user}:${pass}`);
+                storeCredentials(authHeader);
+            }
+
+            if (cancelled) return;
+
+            const socket = io({
+                autoConnect: true,
+                extraHeaders: {
+                    authorization: `Basic ${authHeader}`
+                },
+                transportOptions: {
+                    polling: {
+                        extraHeaders: {
+                            authorization: `Basic ${authHeader}`
+                        }
+                    }
+                }
+            });
+
+            socketRef.current = socket;
+
+            function formatLog(content) {
+                logIdRef.current += 1;
+                return { id: logIdRef.current, content };
+            }
+
+            socket.on('connect', () => {
+                if (!cancelled) setIsConnected(true);
+                console.log('[Socket] Connected');
+            });
+
+            socket.on('disconnect', () => {
+                if (!cancelled) setIsConnected(false);
+                console.log('[Socket] Disconnected');
+            });
+
+            socket.on('connect_error', (err) => {
+                console.error('[Socket] Connection error:', err.message);
+                if (err.message === 'Invalid credentials' || err.message === 'Authentication required') {
+                    // Clear stored credentials and retry
+                    sessionStorage.removeItem('setu_auth');
+                    socket.disconnect();
+                    if (!cancelled) initSocket();
+                }
+            });
+
+            socket.on('log', (msg) => {
+                if (!cancelled) setLogs((prev) => updateLogs(prev, formatLog(msg), MAX_LOGS));
+            });
+
+            socket.on('log_history', (hist) => {
+                const formatted = hist.map(content => formatLog(content));
+                if (!cancelled) setLogs((prev) => updateLogs(prev, formatted, MAX_LOGS));
+            });
+
+            socket.on('agents_update', (data) => {
+                if (!cancelled) setAgents(data);
+            });
+
+            socket.on('tasks_update', (data) => {
+                if (!cancelled) setTasks(data);
+            });
+
+            socket.on('chat_message', (msg) => {
+                const logMsg = `[CHAT] ${msg.sender} -> ${msg.recipient}: ${msg.content}`;
+                if (!cancelled) setLogs((prev) => updateLogs(prev, formatLog(logMsg), MAX_LOGS));
+            });
+
+            socket.on('chat_history', (history) => {
+                const formatted = history.map(msg => formatLog(`[CHAT] ${msg.sender} -> ${msg.recipient}: ${msg.content}`));
+                if (!cancelled) setLogs((prev) => updateLogs(prev, formatted, MAX_LOGS));
+            });
         }
 
-        function onConnect() {
-            setIsConnected(true);
-            console.log('[Socket] Connected');
-        }
-
-        function onDisconnect() {
-            setIsConnected(false);
-            console.log('[Socket] Disconnected');
-        }
-
-        function onLog(msg) {
-            setLogs((prev) => updateLogs(prev, formatLog(msg), MAX_LOGS));
-        }
-
-        function onLogHistory(hist) {
-            // Bulk format history logs
-            // We need to increment the ref for each item
-            const formatted = hist.map(content => formatLog(content));
-            setLogs((prev) => updateLogs(prev, formatted, MAX_LOGS));
-        }
-
-        function onAgentsUpdate(data) {
-            setAgents(data);
-        }
-
-        function onTasksUpdate(data) {
-            setTasks(data);
-        }
-
-        function onChatMessage(msg) {
-            // In a real app we might separate chat from logs, but for now
-            // we treat chat messages as high-priority logs
-            const logMsg = `[CHAT] ${msg.sender} -> ${msg.recipient}: ${msg.content}`;
-            setLogs((prev) => updateLogs(prev, formatLog(logMsg), MAX_LOGS));
-        }
-
-        function onChatHistory(history) {
-            // Convert structured history to log format
-            const formatted = history.map(msg => formatLog(`[CHAT] ${msg.sender} -> ${msg.recipient}: ${msg.content}`));
-            setLogs((prev) => updateLogs(prev, formatted, MAX_LOGS));
-        }
-
-        socket.on('connect', onConnect);
-        socket.on('disconnect', onDisconnect);
-        socket.on('log', onLog);
-        socket.on('log_history', onLogHistory);
-        socket.on('chat_history', onChatHistory);
-        socket.on('agents_update', onAgentsUpdate);
-        socket.on('tasks_update', onTasksUpdate);
-        socket.on('chat_message', onChatMessage);
+        initSocket();
 
         return () => {
-            socket.off('connect', onConnect);
-            socket.off('disconnect', onDisconnect);
-            socket.off('log', onLog);
-            socket.off('log_history', onLogHistory);
-            socket.off('chat_history', onChatHistory);
-            socket.off('agents_update', onAgentsUpdate);
-            socket.off('tasks_update', onTasksUpdate);
-            socket.off('chat_message', onChatMessage);
-            socket.disconnect();
+            cancelled = true;
+            if (socketRef.current) {
+                socketRef.current.disconnect();
+            }
         };
     }, []);
 
     return {
-        socket,
+        socket: socketRef.current,
         isConnected,
         agents,
         tasks,
