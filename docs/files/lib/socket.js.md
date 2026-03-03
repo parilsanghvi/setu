@@ -1,18 +1,49 @@
-# `lib/socket.js`
+---
+source_hash: 1a084d38dda51a6f
+facts_hash: 2942e3495d2ebfec
+generated_at: 2026-03-03T07:26:37.377Z
+generator_version: 1.0.0
+model: cheap
+quality_score: 84
+---
+# File: lib/socket.js
 
 ## Purpose
-This module handles all WebSocket interactions for the Mission Control dashboard. It sets up Socket.IO events, handles connection lifecycle, and streams real-time updates (logs, chat messages, agent status, and task updates) to connected clients.
+The `socket.js` file exports a single function, `setupSocket`, which sets up a socket connection for real-time communication between the client and server. It handles incoming requests from clients, emits log history to connected clients, and forwards chat messages from the database to connected sockets. The function also establishes a watcher on the log file to stream changes to clients.
 
-## Exports
-- `setupSocket(io, logger)`: A function that attaches WebSocket handlers to the provided `io` server instance and begins monitoring background updates. It returns a context object containing handles for timeouts, watchers, and intervals so they can be cleaned up on server shutdown.
+## Exports / API Surface
+| Export | Type | Description |
+|--------|------|-------------|
+| `setupSocket` | cjs_default | Sets up a socket connection for real-time communication between the client and server. |
+
+## Internal Logic
+The main execution flow of the `setupSocket` function is as follows:
+- It sets up an event listener for incoming connections from clients.
+- It emits the initial log history to connected clients.
+- It establishes a watcher on the log file to stream changes to clients.
+- It listens for disconnections from clients and logs disconnection events.
+- It forwards chat messages from the database to connected sockets.
+- It periodically polls the database for updates (simulated "push") and emits updates to connected sockets.
+
+Key functions:
+- `setupSocket(io, logger)`: Sets up a socket connection and establishes the watcher on the log file.
+- `io.on('connection', async (socket))`: Handles incoming connections from clients and emits initial log history.
+- `fs.watch(logFile, (eventType) => {...})`: Establishes a watcher on the log file to stream changes to clients.
 
 ## Dependencies
-- `./db`: For reading agent/task statuses and listening to broadcast messages from the local event bus.
-- `./utils`: Specifically `readLastLines` for initializing the log tail on fresh connections.
-- `fs` & `path`: Used to monitor changes to the main log file (`setu.log`).
+| Module | Local | Why |
+|--------|-------|-----|
+| `./db` | Yes | Provides database access utilities |
+| `./utils` | Yes | Provides utility functions for reading last lines of files |
 
 ## Side Effects
-- Mutates the provided `io` server object by adding connection handlers.
-- Initiates an `fs.watch` on `setu.log` which remains active in the background.
-- Sets up a recurrent `setInterval` to poll the database and emit updates to clients.
-- Listens to the shared `db` event bus for 'chat' messages and forwards them over WebSockets.
+- Database: The function forwards chat messages from the database to connected sockets and periodically polls the database for updates (simulated "push").
+- Filesystem_read: The function establishes a watcher on the log file to stream changes to clients.
+
+## Dependents
+- [server.js](./server.js.md)
+
+## Cross-References
+- [db.js](./db.js.md)
+- [utils.js](./utils.js.md)
+- [server.js](./server.js.md)

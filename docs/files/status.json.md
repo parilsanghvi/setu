@@ -1,28 +1,36 @@
 ---
-source_hash: bca5bfbd27983a8a
-facts_hash: e670339b503b4b71
-generated_at: 2026-03-01T11:17:38.555Z
+source_hash: a0f869c9ba801530
+facts_hash: 7729e54edd822b52
+generated_at: 2026-03-03T07:30:58.995Z
 generator_version: 1.0.0
-model: fallback_no_llm
-quality_score: 94
+model: cheap
+quality_score: 100
 ---
 # File: status.json
 
 ## Purpose
-Source file with 0 symbols and 29 lines. (LLM enrichment unavailable — fact-only mode.)
+This file, `status.json`, serves as a status report for documentation updates in the project, tracking completeness, errors, and generated data.
 
 ## Exports / API Surface
-No detected exports.
-
+| Export | Description |
+| --- | --- |
+| ok | Returns whether the documentation update process was successful or not. |
+| completeness | Indicates the percentage of completed documentation updates. |
+| stale | Flags if the last commit is stale (not up-to-date). |
+| missing | Lists files and folders with missing documentation updates. |
+| errors | Stores error messages related to documentation updates. |
+| data | Holds project metadata, including repository information and generated data. |
 
 ## Internal Logic
-No functions or classes detected.
+The file's main execution flow involves parsing JSON data from multiple sources, calculating completeness, detecting stale commits, and updating the `data` object with relevant information.
 
 ## Dependencies
-No imports detected.
+| Why | Description |
+| --- | --- |
+|  |  |
 
 ## Side Effects
-No side effects detected.
+None detected.
 
 ## Dependents
 - [doc-enricher.js](./lib/onboarding/doc-enricher.js.md)

@@ -1,14 +1,34 @@
-## Purpose
-This file provides core functionality for the system. It handles many things in the architecture. It is an important file.
+---
+source_hash: 94c25056b3364cb1
+facts_hash: b23373e4262a3217
+generated_at: 2026-03-03T07:17:13.319Z
+generator_version: 1.0.0
+model: cheap
+quality_score: 89
+---
+# File: lib/SwarmProtocol.js
 
-## Exports
-- Various utility functions and classes are exported for others to use.
+## Purpose
+This file defines a standardized workflow for task orchestration, specifically message types and constants used by the SwarmProtocol class. It allows managers to assign tasks to workers, receive progress updates, and acknowledge completion of tasks. The Protocol object serves as a centralized hub for task-related communication.
+
+| Export | Type | Description |
+|--------|------|-------------|
+| `createMessage` | function | Creates a message object with specified type, content, and metadata. |
+
+## Internal Logic
+The Protocol object is a key component in the SwarmProtocol class. The `createMessage` method generates a standardized message format for task-related communication.
+
+No specific constructor or main methods are defined in this file.
 
 ## Dependencies
-- Node.js core modules.
-- Other internal files.
+| Why | Description |
+|------|-------------|
+| No imports detected. | This module does not rely on external dependencies to function as intended. |
 
 ## Side Effects
-- Reads and writes to the file system or environment variables, or updates the database.
 
-This text is added to ensure that the document exceeds the MIN_MEANINGFUL_LENGTH requirement (300 characters). This text is added to ensure that the document exceeds the MIN_MEANINGFUL_LENGTH requirement (300 characters). This text is added to ensure that the document exceeds the MIN_MEANINGFUL_LENGTH requirement (300 characters).
+## Dependents
+- [CoreAgent.js](./CoreAgent.js.md)
+
+## Cross-References
+- [CoreAgent.js](./CoreAgent.js.md)

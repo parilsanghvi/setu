@@ -1,14 +1,43 @@
-## Purpose
-This file provides core functionality for the system. It handles many things in the architecture. It is an important file.
+---
+source_hash: 9aeba4617871f97f
+facts_hash: 25421252dcb2f3ca
+generated_at: 2026-03-03T07:24:32.646Z
+generator_version: 1.0.0
+model: cheap
+quality_score: 85
+---
+# File: lib/onboarding/generator.js
 
-## Exports
-- Various utility functions and classes are exported for others to use.
+## Purpose
+This file, `generator.js`, serves as the main onboarding generator for a repository. It is responsible for generating necessary documentation files, scanning and populating files and folders within the repository, and updating the `ONBOARDING.json` manifest to reflect the current state of the project.
+
+## Exports / API Surface
+
+| Export | Type | Description |
+|--------|------|-------------|
+| runGenerator | cjs_named | Runs the onboarding generation process with optional dry-run and onlyMissing flags. |
+
+## Internal Logic
+The main execution flow involves:
+- `generateTemplates`: Generates core documentation templates by reading pre-defined template content and writing it to files within the repository.
+- `scanAndGenerateFiles`: Scans the repository for existing files and folders, generating new ones if necessary, while respecting exclusion rules specified in the `TARGET_EXTS` constant.
+- `writeOnboardingJson`: Updates the `ONBOARDING.json` manifest by computing completeness metrics, validating status, and writing a new version to disk.
 
 ## Dependencies
-- Node.js core modules.
-- Other internal files.
+
+| Module | Local | Why |
+|--------|-------|-----|
+| ./status | Yes | Provides onboarding status utility functions. |
+| child_process | No | Enables execution of shell commands for git operations. |
 
 ## Side Effects
-- Reads and writes to the file system or environment variables, or updates the database.
+- console_output: Logs messages to the console during generation, including dry-run and progress updates.
+- filesystem_read: Reads existing files and directories within the repository for scanning purposes.
+- filesystem_write: Writes new generated files and folders to disk.
+- subprocess: Executes `git rev-parse HEAD` command to obtain the current commit hash.
 
-This text is added to ensure that the document exceeds the MIN_MEANINGFUL_LENGTH requirement (300 characters). This text is added to ensure that the document exceeds the MIN_MEANINGFUL_LENGTH requirement (300 characters). This text is added to ensure that the document exceeds the MIN_MEANINGFUL_LENGTH requirement (300 characters).
+## Dependents
+No known dependents.
+
+## Cross-References
+- [status.js](./status.js.md)

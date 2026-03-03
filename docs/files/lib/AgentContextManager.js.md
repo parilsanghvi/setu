@@ -1,16 +1,41 @@
+---
+source_hash: d2517338efc5ac61
+facts_hash: 64357a6f7338a634
+generated_at: 2026-03-03T07:14:06.160Z
+generator_version: 1.0.0
+model: cheap
+quality_score: 96
+---
 # File: lib/AgentContextManager.js
 
 ## Purpose
-`AgentContextManager` is a helper class for `CoreAgent` that manages the conversational context (short-term memory). It provides methods for efficiently counting tokens and compacting the context history using LLM summarization when limits are reached.
+The AgentContextManager class is responsible for managing the context of an agent, including compacting and summarizing conversations to reduce memory usage. It estimates token counts, compacts contexts, and logs events related to these operations.
 
-## Exports
-- `AgentContextManager` (Class): The main class for context management.
+## Exports / API Surface
+| Export | Type | Description |
+|--------|------|-------------|
+| `AgentContextManager` | cjs_default | Exposes the AgentContextManager class for use by other parts of the system. |
+
+## Internal Logic
+The main execution flow involves the following key functions:
+
+*   The `estimateTokenCount()` method estimates the total number of tokens in the current context, taking into account message roles, content, and tool calls.
+*   The `compactContext()` method compacts the conversation by summarizing the most important parts and discarding redundant information.
+*   The `estimateJsonLength(obj)` function recursively estimates the JSON string length of a value without serialization.
 
 ## Dependencies
-- `./LLM`: Used to invoke LLMs for memory summarization/compaction.
-- `./Config`: Provides the `contextCompactionThreshold`.
+| Module | Local | Why |
+|--------|-------|-----|
+| `./Config` | Yes | Provides configuration settings used in compacting contexts. |
+| `./LLM` | Yes | Offers language model capabilities for generating summaries. |
 
 ## Side Effects
-- Modifies the associated `CoreAgent`'s `context` array when compaction occurs.
-- Emits events on the `CoreAgent` (`context_compact_start`, `context_compact_end`).
-- Logs compaction events using `CoreAgent.sessionLogger`.
+None detected.
+
+## Dependents
+- [CoreAgent.js](./CoreAgent.js.md)
+
+## Cross-References
+- [Config.js](./Config.js.md)
+- [LLM.js](./LLM.js.md)
+- [CoreAgent.js](./CoreAgent.js.md)

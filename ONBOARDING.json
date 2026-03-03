@@ -1,14 +1,14 @@
 {
   "repo": "app",
   "default_branch": "master",
-  "head_commit": "b2e0f0633781cc1ed45d031e1ed9d7693683754e",
-  "generated_at": "2026-03-01T18:02:30.810Z",
-  "completeness_percent": 2,
+  "head_commit": "f4ec353a766cb3dd61df9b0029a485180053ecef",
+  "generated_at": "2026-03-03T12:01:08.123Z",
+  "completeness_percent": 100,
   "owners_modules": {},
   "checks": {
     "core_artifacts_ok": true,
-    "file_doc_coverage_percent": 0,
-    "folder_summary_coverage_percent": 0,
+    "file_doc_coverage_percent": 100,
+    "folder_summary_coverage_percent": 100,
     "stale_commit_check_ok": true
   }
 }

@@ -1,13 +1,38 @@
-## Purpose
-The purpose of \`fix-docs.js\` is to generate boilerplate or automated documentation fixes across the repository. This utility file is intended to patch the CI pipeline or onboarding systems.
+---
+source_hash: f26743bfcef63991
+facts_hash: 280760c5ea6c945c
+generated_at: 2026-03-03T07:09:07.024Z
+generator_version: 1.0.0
+model: cheap
+quality_score: 79
+---
+# File: fix-docs.js
 
-## Exports
-- This script does not explicitly export functions or modules. It runs automatically upon execution to patch the file system.
+## Purpose
+This file provides core functionality for the system by iterating through all files and folders in the 'docs' directory, updating their content with dummy data if necessary.
+
+## Exports / API Surface
+| Symbol | Type | Params | Description |
+|--------|------|--------|-------------|
+| `fixFiles` | function | `dir, isFolder` | Updates file or folder content to meet populated check requirements. |
+
+## Internal Logic
+The main execution flow of this file involves the `fixFiles` function, which recursively traverses the 'docs' directory and its contents, updating files with '.md' extensions.
 
 ## Dependencies
-- Requires Node.js built-in modules \`fs\` and \`path\`.
-- Requires the built-in \`child_process\` module to execute shell commands like \`execSync\`.
+| Module | Local | Why |
+|--------|-------|-----|
+| `child_process` | No | Enables execution of external processes to retrieve onboarding status. |
+| `fs` | No | Provides file system operations such as reading and writing. |
 
 ## Side Effects
-- Mutates the local file system by creating or overwriting markdown files within the \`docs/files\` and \`docs/folders\` directories.
-- Automatically creates documentation content to pass length validation and structural metric checks.
+- console_output: Logs a success message indicating that all documentation has been updated.
+- filesystem_read: Reads the contents of files and folders in the 'docs' directory to determine which ones need updating.
+- filesystem_write: Writes dummy content to files with '.md' extensions if they have not already been updated.
+- subprocess: Executes an external process to retrieve onboarding status information.
+
+## Dependents
+No known dependents.
+
+## Cross-References
+No cross-references.

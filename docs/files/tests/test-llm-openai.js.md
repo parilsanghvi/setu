@@ -1,15 +1,44 @@
-# test-llm-openai.js
+---
+source_hash: 3f99fd301c7d3243
+facts_hash: 4d4f2b45968c3078
+generated_at: 2026-03-03T07:43:16.697Z
+generator_version: 1.0.0
+model: cheap
+quality_score: 94
+---
+# File: tests/test-llm-openai.js
 
 ## Purpose
-This file contains the unit tests for the OpenAI language model provider (`lib/llm/OpenAI.js`). It verifies the correct behavior of the OpenAI integration, including request formatting, response parsing, error handling (HTTP and network errors), and fallback mechanisms when an API key is missing. It ensures the provider adheres to the expected interface and robustly handles various edge cases.
+This file tests the OpenAIProvider class, which is used to interact with the OpenAI API. It covers various scenarios such as standard generation, tool call handling, API error handling, and network error handling.
 
-## Exports
-This file is a standalone test script and does not export any modules or functions.
+## Exports / API Surface
+| Symbol | Type | Params | Description |
+|--------|------|--------|-------------|
+| `OpenAIProvider` | function | `{ model: string, auth: { key: string }, baseUrl: string }` | Creates an instance of the OpenAIProvider class to interact with the OpenAI API. |
+| `_global_fetch` | function | `(url: string, options: Object)` | Mocks the global fetch function to track and manipulate HTTP requests. |
+
+## Internal Logic
+The main execution flow involves setting up mocks for the global fetch function, creating instances of the OpenAIProvider class, calling its methods, and verifying the expected results.
+
+Key functions include:
+
+*   `resetMocks`: Resets the mock state by clearing the last fetch URL, options, and response.
+*   `_global_fetch`: Mocks the global fetch function to track and manipulate HTTP requests.
+*   `OpenAIProvider`: Creates an instance of the OpenAIProvider class to interact with the OpenAI API.
 
 ## Dependencies
-*   **assert**: Node.js built-in assertion library used to write test expectations and verify outcomes.
-*   **module**: Node.js built-in module used to intercept and mock `require` calls, specifically for mocking the `https` module to avoid making real network requests during testing.
-*   **../lib/llm/OpenAI.js**: The actual OpenAI provider implementation being tested.
+| Module | Local | Why |
+|--------|-------|-----|
+| `../lib/models/providers/openai` | Yes | Provides the implementation for interacting with the OpenAI API. |
+| `assert` | No | Provides assertion utilities for testing and validation. |
 
 ## Side Effects
-When executed, this script runs a series of asynchronous tests and outputs the results to the console (stdout/stderr). It modifies the global `Module.prototype.require` temporarily to inject the mocked `https` module, but this change is reverted in a `finally` block to prevent polluting the Node.js module cache for subsequent tests. If any test fails, it forcefully exits the process with a non-zero exit code (`process.exit(1)`).
+-   console_output: The file logs test results to the console using console.log and console.error statements.
+-   global_mutation: The file restores the original global fetch function after completing all tests by assigning it back to the originalFetch variable.
+-
+
+## Dependents
+No known dependents.
+
+## Cross-References
+- [openai.js](../lib/models/providers/openai.js.md)

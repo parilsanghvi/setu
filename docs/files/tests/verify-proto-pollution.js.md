@@ -1,14 +1,37 @@
-## Purpose
-This file provides core functionality for the system. It handles many things in the architecture. It is an important file.
+---
+source_hash: c726091ccdf5cce9
+facts_hash: cb6e947cfdea4a2a
+generated_at: 2026-03-03T07:54:50.634Z
+generator_version: 1.0.0
+model: cheap
+quality_score: 85
+---
+# File: tests/verify-proto-pollution.js
 
-## Exports
-- Various utility functions and classes are exported for others to use.
+## Purpose
+This file tests the safety of an object against prototype pollution vulnerabilities by simulating attacks and asserting that the expected behavior is observed. It specifically verifies the safety of `RUNNING_PROCESSES` and `SPAWN_TIMES` objects against prototype pollution. The test ensures that attempting to access or modify the prototype chain of these objects does not reveal sensitive information.
+
+## Exports / API Surface
+
+| Export | Description |
+|--------|-------------|
+| None   | No exports are exported from this module. |
+
+## Internal Logic
+The main execution flow involves simulating an attack on `RUNNING_PROCESSES` and `SPAWN_TIMES` by accessing their prototype chains (`__proto__`). The test uses the `assert` function to verify that attempting to access these properties results in a safe outcome.
 
 ## Dependencies
-- Node.js core modules.
-- Other internal files.
+
+| Module | Local | Why |
+|--------|-------|-----|
+| assert | Yes   | Verifies expectations about assertion behavior. |
 
 ## Side Effects
-- Reads and writes to the file system or environment variables, or updates the database.
+- console_output: The file logs messages to the console to report test outcomes, including success or failure indicators and exit codes.
+- process_control: The file exits the process with a non-zero code if any tests fail, indicating an error condition.
 
-This text is added to ensure that the document exceeds the MIN_MEANINGFUL_LENGTH requirement (300 characters). This text is added to ensure that the document exceeds the MIN_MEANINGFUL_LENGTH requirement (300 characters). This text is added to ensure that the document exceeds the MIN_MEANINGFUL_LENGTH requirement (300 characters).
+## Dependents
+No known dependents.
+
+## Cross-References
+No cross-references.

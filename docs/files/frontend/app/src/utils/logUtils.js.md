@@ -1,14 +1,31 @@
-## Purpose
-This file provides core functionality for the system. It handles many things in the architecture. It is an important file.
+---
+source_hash: 3e5314930f33068d
+facts_hash: 9bf7b713c3ef8344
+generated_at: 2026-03-03T07:12:21.400Z
+generator_version: 1.0.0
+model: cheap
+quality_score: 85
+---
+# File: frontend/app/src/utils/logUtils.js
 
-## Exports
-- Various utility functions and classes are exported for others to use.
+## Purpose
+This file provides a utility function `updateLogs` that updates an array of logs while maintaining a maximum size limit, allowing for efficient management of log data in the system.
+
+## Exports / API Surface
+| Export | Type | Description |
+| updateLogs | esm_named | Updates an array of logs while maintaining a maximum size limit. |
+
+## Internal Logic
+The `updateLogs` function takes three parameters: `prevLogs`, `newItems`, and `maxLogs`. It first checks if the length of `items` (which is either `newItems` or an array containing `newItems`) exceeds the maximum allowed size (`maxLogs`). If it does, it returns the last `maxLogs` items from the `prevLogs` array using slicing. Otherwise, it calculates the available space in the `prevLogs` array and slices it to include the last `availableSpace` items before concatenating the new `items`. The resulting updated array of logs is returned.
 
 ## Dependencies
-- Node.js core modules.
-- Other internal files.
+| Import | Why |
+| none | No specific dependencies are required for this utility function. |
 
 ## Side Effects
-- Reads and writes to the file system or environment variables, or updates the database.
 
-This text is added to ensure that the document exceeds the MIN_MEANINGFUL_LENGTH requirement (300 characters). This text is added to ensure that the document exceeds the MIN_MEANINGFUL_LENGTH requirement (300 characters). This text is added to ensure that the document exceeds the MIN_MEANINGFUL_LENGTH requirement (300 characters).
+## Dependents
+No known dependents.
+
+## Cross-References
+No cross-references.

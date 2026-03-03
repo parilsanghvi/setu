@@ -1,14 +1,44 @@
-## Purpose
-This file provides core functionality for the system. It handles many things in the architecture. It is an important file.
+---
+source_hash: 03b05e27f75b88ed
+facts_hash: 57972f6909686ca7
+generated_at: 2026-03-03T07:40:13.586Z
+generator_version: 1.0.0
+model: cheap
+quality_score: 82
+---
+# File: tests/test-docker.js
 
-## Exports
-- Various utility functions and classes are exported for others to use.
+## Purpose
+This file tests the functionality of the `Docker` module, ensuring it correctly detects Docker's presence and handles various scenarios such as availability checks, execution, and configuration.
+
+## Exports / API Surface
+| Symbol | Type | Params | Description |
+|--------|------|--------|-------------|
+| `mockExecSync` | arrow | `` | Executes a command synchronously. |
+| `mockSpawn` | arrow | `` | Spawns a new process. |
+| `resetDockerModule` | function | `` | Resets the Docker module to its default state. |
+
+## Internal Logic
+The main execution flow involves:
+- Setting up mock configurations and functions to control the behavior of the tests.
+- Testing various scenarios, including detection of Docker's presence, availability checks, and execution.
+- Verifying that the `Docker` module correctly handles these scenarios.
+
+Key functions include:
+- `resetDockerModule`: Resets the Docker module to its default state.
+- `mockExecSync` and `mockSpawn`: Mocks the behavior of the `execSync` and `spawn` methods in the child process module.
 
 ## Dependencies
-- Node.js core modules.
-- Other internal files.
+| Module | Local | Why |
+|--------|-------|-----|
+| `../lib/Docker` | Yes | Provides the Docker class to be tested. |
+| `module` | No | Provides helper utilities for mocking the `require` function. |
 
 ## Side Effects
-- Reads and writes to the file system or environment variables, or updates the database.
+- subprocess: The tests create and wait for subprocesses created by the mock `spawn` and `execSync` functions to complete before proceeding with further assertions.
 
-This text is added to ensure that the document exceeds the MIN_MEANINGFUL_LENGTH requirement (300 characters). This text is added to ensure that the document exceeds the MIN_MEANINGFUL_LENGTH requirement (300 characters). This text is added to ensure that the document exceeds the MIN_MEANINGFUL_LENGTH requirement (300 characters).
+## Dependents
+No known dependents.
+
+## Cross-References
+- [Docker.js](../lib/Docker.js.md)

@@ -1,14 +1,38 @@
-## Purpose
-This file provides core functionality for the system. It handles many things in the architecture. It is an important file.
+---
+source_hash: cf8d376d3dacc12e
+facts_hash: 742707fd6ad103b2
+generated_at: 2026-03-03T07:10:25.415Z
+generator_version: 1.0.0
+model: cheap
+quality_score: 75
+---
+# File: frontend/app/src/components/AgentCard.jsx
 
-## Exports
-- Various utility functions and classes are exported for others to use.
+## Purpose
+The AgentCard file is a React component that renders an agent's information in a card layout, displaying their name, role, and status. The AgentCard component uses the `React.memo` function to optimize performance by memoizing its props. The AgentCard module also includes CSS styles for styling the component.
+
+| Export | Type | Description |
+|--------|------|-------------|
+| React.memo(AgentCard) | esm_default | Renders an agent's information in a card layout, displaying their name, role, and status |
+| AgentCard | function | A memoized React component that renders an agent's information |
+
+## Internal Logic
+The main execution flow of the AgentCard file involves:
+- Initializing the `isOffline` variable to determine if the agent is offline based on its status.
+- Calculating the `cardClass` and `statusClass` using the `classNames` function, which conditionally applies styles based on the `isOffline` state.
+- Returning a JSX element with two main sections: one for displaying the agent's name and role, and another for displaying their status.
 
 ## Dependencies
-- Node.js core modules.
-- Other internal files.
+| Module | Local | Why |
+|--------|-------|-----|
+| classNames | No | Provides a utility function to conditionally apply CSS classes. |
+| './AgentCard.module.scss' | Yes | Contains CSS styles for styling the AgentCard component. |
 
 ## Side Effects
-- Reads and writes to the file system or environment variables, or updates the database.
+None detected.
 
-This text is added to ensure that the document exceeds the MIN_MEANINGFUL_LENGTH requirement (300 characters). This text is added to ensure that the document exceeds the MIN_MEANINGFUL_LENGTH requirement (300 characters). This text is added to ensure that the document exceeds the MIN_MEANINGFUL_LENGTH requirement (300 characters).
+## Dependents
+No known dependents.
+
+## Cross-References
+- [AgentCard.module.scss](./AgentCard.module.scss.md)
