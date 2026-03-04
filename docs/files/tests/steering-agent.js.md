@@ -1,39 +1,39 @@
 ---
 source_hash: 8120290e885e726e
-facts_hash: 467ae53175989654
-generated_at: 2026-03-03T07:32:50.767Z
+facts_hash: d323879fdaa5b8ef
+generated_at: 2026-03-04T05:51:58.539Z
 generator_version: 1.0.0
 model: cheap
-quality_score: 100
+quality_score: 95
 ---
 # File: tests/steering-agent.js
 
 ## Purpose
-This file defines a steering agent class, `SteeringAgent`, which extends the core agent class and is responsible for processing messages from users. The agent uses an LLM to simulate long-running tasks and echoes user messages back in response. When started, the agent processes incoming messages and logs signals for verification.
+This file tests the steering agent, a bot class that processes incoming messages and responds accordingly. The steering agent simulates a long-running task by mocking an LLM (Large Language Model) and echoing user input back to them.
 
-## Exports / API Surface
 | Symbol | Type | Params | Description |
 |--------|------|--------|-------------|
-| `echo` | method | `{ msg }` | Echoes the received message back to the user. |
-| `SteeringAgent` | class | `` | A steering agent class that extends the core agent and processes messages from users. |
+| `LLM.generate` | function | `{ prompt, messages, type, tools }` | Simulates generating a response from the LLM. |
+| `SteeringAgent` | class | `` | 
 
 ## Internal Logic
 The main execution flow of this file is as follows:
-
-- The `SteeringAgent` class is instantiated with its constructor, which sets up the tools and calls for the agent.
-- When the agent receives a message, it logs signals to indicate tool start and end events.
-- It processes the incoming message using the LLM's `generate` method, which simulates a delay and always returns a tool call to keep the loop going.
-- The `echo` method is called with the received message, echoing it back to the user in response.
+1. The steering agent is created and attached to an event bus.
+2. When a tool start event occurs, it logs a signal to the console.
+3. The steering agent processes an incoming message, which triggers its `processMessage` function.
+4. In the `processMessage` function, the steering agent checks if a long-running task should be started and simulates a delay using the mocked LLM's `generate` function.
+5. After the delay, it echoes the user input back to them.
 
 ## Dependencies
 | Module | Local | Why |
 |--------|-------|-----|
-| `../lib/CoreAgent` | Yes | Provides the core agent class foundation. |
-| `../lib/db` | Yes | Enables logging of bus events for test verification. |
-| `../lib/LLM` | Yes | Utilizes the LLM to simulate long-running tasks. |
+| `../lib/CoreAgent` | Yes | Provides a base class for agents in the system. |
+| `../lib/db` | Yes | Manages database events and signals. |
+| `../lib/LLM` | Yes | Simulates long-running tasks with its generated response. |
 
 ## Side Effects
-- console_output: The agent logs signals to indicate tool start and end events, as well as messages received from users, to the console.
+- console_output: The steering agent logs various signals to the console, including when a tool start or end event occurs.
+- console_output: When the steering agent processes an incoming message, it logs the content of the message to the console if the `message` event is emitted by the bus.
 
 ## Dependents
 No known dependents.

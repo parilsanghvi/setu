@@ -1,32 +1,32 @@
 ---
 source_hash: ea2bb7b449474b1f
 facts_hash: ea2bb7b449474b1f
-generated_at: 2026-03-03T07:58:45.557Z
+generated_at: 2026-03-04T06:17:07.745Z
 generator_version: 1.0.0
 model: cheap
-quality_score: 100
+quality_score: 93
 ---
 # Folder: lib/llm
 
 ## Purpose
-This folder contains a set of classes and interfaces for interacting with various language models, including Anthropic, LLaMA, and OpenAI. It provides a foundation for generating completion responses and enables users to easily integrate these APIs into their applications.
+This lib/llm/ folder contains classes and modules for interacting with various Large Language Model (LLM) APIs, including Anthropic's API and the OpenAI API, to generate responses based on user prompts and system prompts.
 
-## Key Files
 | File | Role |
 |------|------|
-| Anthropic.js | Provides interaction with the Anthropic API for generating responses based on user input and model specification |
-| BaseProvider.js | Offers a foundational implementation of task completions and mock response generation |
-| Ollama.js | Exports a class allowing users to generate responses using the LLaMA API |
-| OpenAI.js | Enables integration with OpenAI's gpt-4o model for generating text responses from user prompts |
-| OpenAICompatible.js | Offers a compatible API for OpenAI models, facilitating text response generation |
+| `Anthropic.js` | Provides a class named `Anthropic` that extends the `BaseProvider` class for interacting with Anthropic's API. |
+| `BaseProvider.js` | Serves as a base class for other provider classes in the system, providing methods for generating responses and mock data. |
+| `Ollama.js` | Implements the LLaMA API by extending the BaseProvider class, enabling response generation based on user input. |
+| `OpenAI.js` | Exports a class named OpenAI that provides an interface for interacting with the OpenAI API to generate human-like text. |
+| `OpenAICompatible.js` | Offers a customizable interface to OpenAI's API by handling different base URLs and API keys depending on the chosen model type. |
 
 ## Ownership
 Not yet assigned.
 
 ## Invariants / Rules
-Likely: The `generate` method in `BaseProvider.js` should be implemented according to the specific task completion requirements.
-Likely: All file exports should follow the camelCase naming convention.
-Likely: Each class and interface should maintain a consistent API for compatibility across different models.
+The files in this folder follow architectural constraints and coding conventions, including:
+- Likely: Consistent naming conventions across all file names.
+- Likely: Use of ES6 class syntax for object-oriented programming.
+- Use: Methods are documented with clear descriptions using JSDoc comments.
 
 ## Cross-References
 - [Anthropic.js](../../../files/lib/llm/Anthropic.js.md)

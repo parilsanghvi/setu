@@ -1,38 +1,40 @@
 ---
 source_hash: 2b8ecec36dd98908
-facts_hash: fa5003c14a62c8ad
-generated_at: 2026-03-03T07:20:11.746Z
+facts_hash: 4b7c1bf56472f195
+generated_at: 2026-03-04T05:40:02.355Z
 generator_version: 1.0.0
 model: cheap
-quality_score: 94
+quality_score: 90
 ---
 # File: lib/models/config.js
 
 ## Purpose
-The `config.js` file is responsible for loading configuration data from environment variables and a JSON file, and providing a way to resolve provider configurations for models.
+This file exports an instance of the `ModelConfig` class, which loads and configures model settings from environment variables and a JSON file.
 
 ## Exports / API Surface
 | Export | Type | Description |
 |--------|------|-------------|
-| ModelConfig | cjs_default | Creates a new instance of the model configuration class. |
+| `ModelConfig` | cjs_default | Returns a configuration object for models. |
 
 ## Internal Logic
-The main execution flow involves loading environment variables and a JSON file, parsing the JSON data, and providing methods to resolve provider configurations.
+The main execution flow of the `ModelConfig` class involves loading configuration settings from environment variables and a JSON file. The `load()` method is called in the constructor, which checks if the `.env` and `models.json` files exist and loads their contents accordingly.
 
-- The `constructor` initializes the object with paths to environment variables and a JSON file.
-- The `load` method checks for the existence of these files, loads their contents if they exist, and stores them in instance properties.
-- The `resolveProviderConfig` method checks for a specific provider configuration in the loaded data and returns it or falls back on default values.
+| Function | Description |
+|----------|-------------|
+| `constructor` | Initializes the `ModelConfig` instance with default values and calls the `load()` method to populate its configuration. |
+| `load()` | Loads configuration settings from environment variables and a JSON file, and populates the `config` object. |
+| `resolveProviderConfig(providerId)` | Resolves the provider ID for a given model by checking the `providers` section of the `models.json` file or using implicit discovery. |
 
 ## Dependencies
 | Module | Local | Why |
 |--------|-------|-----|
-| dotenv | No | Provides a way to load environment variables from a file. |
-| fs | No | Enables file system operations such as reading files. |
-| path | No | Helps construct paths to the JSON and environment variable files. |
+| `dotenv` | No | Provides a way to load environment variables from a `.env` file. |
+| `fs` | No | Provides functions for interacting with the file system. |
+| `path` | No | Provides utilities for working with file paths and directories. |
 
 ## Side Effects
-- console_output: The `ModelConfig` instance logs a warning message if it fails to parse the `models.json` file.
-- filesystem_read: The `load` method reads from the `fs` module to check for the existence of the configuration files and to read their contents.
+- console_output: The class logs a warning message to the console if it fails to parse the `models.json` file.
+- filesystem_read: The class reads from the file system to load configuration settings from the `.env` and `models.json` files.
 
 ## Dependents
 - [factory.js](./factory.js.md)

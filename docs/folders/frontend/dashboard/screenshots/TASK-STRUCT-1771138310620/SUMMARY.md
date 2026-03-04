@@ -1,7 +1,7 @@
 ---
 source_hash: ea83a819b942f200
 facts_hash: ea83a819b942f200
-generated_at: 2026-03-03T07:58:08.852Z
+generated_at: 2026-03-04T06:16:36.665Z
 generator_version: 1.0.0
 model: cheap
 quality_score: 94
@@ -9,21 +9,22 @@ quality_score: 94
 # Folder: frontend/dashboard/screenshots/TASK-STRUCT-1771138310620
 
 ## Purpose
-This folder is used to store screen captures for a specific dashboard task and its associated UI components, serving as a reference for developers when implementing or testing related features. The main responsibility of this folder is to provide visual aids that illustrate the expected behavior and appearance of the UI elements.
+This folder contains task-related screenshots for the frontend dashboard's screen capture functionality, responsible for displaying and capturing user interactions. Its key responsibility is to provide a visual representation of tasks for testing and debugging purposes.
 
 ## Key Files
-| Role       | File                 |
-|------------|-----------------------|
-| Design     | design screenshot.png  |
+| Role | Description |
+| --- | --- |
+| Screenshots Folder Creator | Generates and organizes screenshots in this folder based on task IDs. |
+| Task ID Generator | Assigns unique identifiers to each screenshot, allowing easy reference and organization. |
 
 ## Ownership
 Not yet assigned.
 
 ## Invariants / Rules
-| Rule          | Description           |
-|---------------|-----------------------|
-| Follows SCSS  | The folder uses SCSS for styling, adhering to the project's established CSS preprocessor convention. |
-| Consistent    | All screenshots should be taken in a consistent orientation and resolution to ensure accurate representation of the UI elements.
+Likely: All screenshots should be stored in a standardized format (e.g., PNG or JPEG) for efficient file management.
+Likely: The folder should be updated daily to reflect the latest task screenshots for accurate testing and debugging.
+| Screen Capture Image | Should be taken after user interaction with a specific task. |
+| Task ID Display | Should include the corresponding task ID in the filename for easy reference.
 
 ## Cross-References
 - [frontend/](./frontend/SUMMARY.md)

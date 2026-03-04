@@ -1,7 +1,7 @@
 ---
 source_hash: bd6405ba22323f2d
-facts_hash: 8f5dee0e23367660
-generated_at: 2026-03-03T07:23:14.060Z
+facts_hash: 01d6ec6d6c9721e5
+generated_at: 2026-03-04T05:42:51.221Z
 generator_version: 1.0.0
 model: cheap
 quality_score: 97
@@ -9,39 +9,42 @@ quality_score: 97
 # File: lib/onboarding/doc-facts.js
 
 ## Purpose
-This file, `doc-facts.js`, is a deterministic fact extraction layer that parses source files with lightweight regex heuristics to produce structured JSON facts without involving Large Language Models (LLMs). It extracts symbols, imports, exports, and side effects from the source code, providing a stable ordering and normalized paths. The extracted facts can be used for various purposes such as dependency analysis and debugging.
+This file, `doc-facts.js`, is a critical component of the system that extracts deterministic facts from source files using lightweight regex heuristics. It parses source code with language-agnostic patterns to produce structured JSON facts without involving large language models (LLMs). The results are deterministic, meaning stable ordering and normalized paths.
 
 ## Exports / API Surface
 | Export | Type | Description |
 |--------|------|-------------|
-| extractFacts | cjs_named | Extracts all facts from a single source file. |
-| extractExports | esm_named | Parses destructured exports and finds individual export statements. |
-| extractImports | esm_named | Finds import statements with relative or absolute paths. |
-| extractSideEffects | filesystem_write | Identifies side effects using regular expressions. |
-| extractSymbols | function | Extracts functions, classes, and arrow functions from the source code. |
-| findDependents | cjs_named | Finds files that import or require a given file. |
-| hashContent | cjs_prop | Generates a SHA-256 hash of the content as a property. |
+| `extractFacts` | function | Extracts all facts from a single source file. |
+| `extractExports` | cjs_named | Extracts exported variables and functions from source code. |
+| `extractImports` | cjs_named | Extracts imported modules and variables from source code. |
+| `extractSideEffects` | cjs_named | Identifies side effects in source code, such as filesystem writes or network requests. |
+| `extractSymbols` | cjs_named | Analyzes function and class definitions to extract symbols (names). |
+| `findDependents` | cjs_named | Finds files that import or require a given file, using git grep when available. |
+| `hashContent` | cjs_named | Computes the SHA-256 hash of source code content. |
+| `length` | cjs_prop | Returns the number of lines in the source file. |
 
 ## Internal Logic
-The main execution flow involves:
+The main execution flow involves reading the source file, applying language-agnostic regex patterns to extract facts and symbols, and then processing the extracted data.
 
-1. `extractFacts`: Reads the source file, extracts facts, and returns an object containing various properties such as file path, extension, lines, symbols, imports, exports, dependents, side effects, and confidence level.
-2. `hashContent`: Uses the SHA-256 algorithm to generate a hash of the content.
-3. `extractSymbols`, `extractImports`, and `extractExports` functions work together to extract relevant information from the source code by matching patterns with regular expressions.
+1. The `extractFacts` function reads the source file content and applies regex patterns to extract facts such as file metadata, imported modules, exported variables, side effects, and symbols.
+2. The `hashContent` function computes the SHA-256 hash of the source code content.
+3. The `findDependents` function searches for files that import or require a given file using git grep when available.
 
 ## Dependencies
 | Module | Local | Why |
 |--------|-------|-----|
-| crypto | Yes | Provides cryptographic functions. |
-| fs | No | Offers file system operations. |
-| path | No | Manages file paths and directories. |
-| child_process | No | Allows execution of external commands. |
+| `./status` | Yes | 
+| `child_process` | No | Used by the system but not directly by this file. |
+| `crypto` | No | Used to compute SHA-256 hashes of source code content. |
+| `fs` | No | Used to read and manipulate file paths and contents. |
+| `path` | No | Used to normalize and manipulate file paths. |
 
 ## Side Effects
-- Database: Extracts database-related side effects using regular expressions.
-- Filesystem_read: Identifies filesystem-read related side effects by matching patterns with `fs.readFile` or similar functions.
-- Network: Detects network-related side effects by matching patterns with HTTP requests (e.g., `fetch`, `axios`, or `https.request`).
-- Subprocess: Finds subprocess-related side effects by identifying function calls to `child_process.exec`, `child_process.spawn`, or similar methods.
+The extracted facts and symbols can trigger various side effects in the system, including:
+* Database: When a fact or symbol is imported from an external module, it may be stored in the database for later use.
+* Filesystem_read: The extraction process involves reading file contents, which can trigger filesystem reads.
+* Network: Some functions, like `extractFacts`, involve network requests to retrieve additional data or information.
+* Subprocess: The system uses subprocesses to execute external commands, such as git grep, when searching for dependent files.
 
 ## Dependents
 - [doc-enricher.js](./doc-enricher.js.md)

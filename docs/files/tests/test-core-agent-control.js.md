@@ -1,44 +1,40 @@
 ---
 source_hash: cfb97a7f18fcfb2d
-facts_hash: 8f7cbbe3cfe68c43
-generated_at: 2026-03-03T07:37:13.573Z
+facts_hash: 1f84327059a7615f
+generated_at: 2026-03-04T05:56:24.342Z
 generator_version: 1.0.0
 model: cheap
-quality_score: 87
+quality_score: 77
 ---
 # File: tests/test-core-agent-control.js
 
 ## Purpose
-This file tests the control signals for a CoreAgent bot, ensuring that STOP and REDIRECT commands are handled correctly in both idle and busy states.
+This file tests the control signals functionality of the CoreAgent class, verifying that it handles STOP and REDIRECT signals correctly under different scenarios.
 
 ## Exports / API Surface
 | Symbol | Type | Params | Description |
 |--------|------|--------|-------------|
-| `mockBus` | arrow | `{ ... }` | Mocks the bus module for testing purposes. |
-| `mockLLM` | arrow | `{ ... }` | Mocks the LLM module for testing purposes. |
-| `mockSkillLoader` | arrow | `{ ... }` | Mocks the skill loader module for testing purposes. |
-| `MockZodType` | class | `` | A mock implementation of ZodType for testing purposes. |
+| `mockBus` | arrow | `{ ... }` | Mocks the bus for testing purposes. |
+| `mockLLM` | arrow | `{ ... }` | Mocks the LLM for testing purposes. |
+| `mockSkillLoader` | arrow | `{ ... }` | Mocks the skill loader for testing purposes. |
+| `MockZodType` | class | `` | An empty mock Zod type class. |
 
 ## Internal Logic
 The main execution flow of this file is as follows:
-1. The `runTest` function is called, which initializes a new instance of the `TestAgent` class.
-2. The `TestAgent` class has a constructor that sets up the agent's state and mocks dependencies.
-3. The `runLoop` method is overridden to simulate setting the busy state as in the original runLoop.
-4. The `handleControlSignal` method is called with different control signals (STOP, REDIRECT) to test their handling.
-5. After each test, the state of the agent is checked to ensure it matches the expected behavior.
+- The `runTest` function creates an instance of the `TestAgent` class.
+- It sets up three test scenarios: STOP Signal, REDIRECT Signal (Idle), and REDIRECT Signal (Busy).
+- For each scenario, it calls the `handleControlSignal` method with a corresponding control signal message.
+- After handling each signal, it checks if the expected interrupt signal is set and verifies that the context has been updated correctly.
 
 ## Dependencies
 | Module | Local | Why |
 |--------|-------|-----|
-| `module` | Yes | Provides a way to modify the module prototype. |
-| `fs` | No | Not used in this file. |
-| `path` | No | Not used in this file. |
-| `../lib/CoreAgent` | Yes | Provides the CoreAgent class for testing purposes. |
+| `../lib/CoreAgent` | Yes | Provides the CoreAgent class for testing. |
 
 ## Side Effects
-- console_output: The console logs messages and errors during the test execution.
-- database: The database is not accessed in this file, as it's a mock environment.
-- process_control: The process control is affected by the control signals sent to the agent, which can interrupt or redirect its behavior.
+- console_output: The file logs various test results, error messages, and debug information to the console.
+- database: No database operations are performed in this file.
+- process_control: The file uses the `process.exit(1)` method to terminate the process if a test fails or encounters an unexpected state.
 
 ## Dependents
 No known dependents.

@@ -1,38 +1,37 @@
 ---
 source_hash: 7a6d5918e70f76ec
-facts_hash: f5ffad240471d518
-generated_at: 2026-03-03T07:32:03.255Z
+facts_hash: 8061b518802936e6
+generated_at: 2026-03-04T05:51:12.481Z
 generator_version: 1.0.0
 model: cheap
-quality_score: 89
+quality_score: 77
 ---
 # File: tests/lib/LLM.test.js
 
 ## Purpose
-This file tests the functionality of the `LLM` class in the `lib/llm` module, specifically its ability to delegate generation requests to either an expensive or cheap OpenAICompatible provider based on type.
+This file contains unit tests for the LLM Dual Model Factory class in the lib/LLM module, ensuring that it correctly initializes and delegates to OpenAICompatible providers based on model type.
 
-## Exports / API Surface
 | Symbol | Type | Params | Description |
 |--------|------|--------|-------------|
-| `generate` | function | `` | Handles the `generate` request and returns a response. |
-| `expensiveProvider` | property | `` | Returns the expensive OpenAICompatible provider instance. |
-| `cheapProvider` | property | `` | Returns the cheap OpenAICompatible provider instance. |
+| `generate` | function | `type`, `user`, `provider` | Handles model generation with specified parameters |
+| `LLM` | class | `` | 
 
 ## Internal Logic
-The main execution flow involves creating an instance of the `LLM` class, which initializes two instances of the OpenAICompatible providers (expensive and cheap). The `generate` method of the `LLM` class is called with different parameters to test its behavior.
+The main execution flow involves the LLM Dual Model Factory class, which initializes two instances of OpenAICompatible providers: one for expensive models and one for cheap models. The generate method is called on these instances, which delegate to their respective provider implementations based on model type.
 
-Key functions:
-
-- `jest.mock`: Mocks dependencies for testing purposes.
-- `require`: Loads modules and exports.
-- `describe`, `beforeEach`, `test`: Test suite and individual tests.
-- `OpenAICompatible.mockImplementation`: Updates the mock implementation of OpenAICompatible providers.
+Key functions include:
+- `beforeEach`: Resets test environment by re-mocking dependencies and resetting module mocks.
+- `test('should initialize two OpenAICompatible providers')`: Verifies that the LLM Dual Model Factory class initializes two instances of OpenAICompatible providers.
+- `test('generate should delegate to correct provider based on type')`: Tests that the generate method correctly delegates to either expensive or cheap provider implementation based on model type.
 
 ## Dependencies
 | Module | Local | Why |
 |--------|-------|-----|
-| `../../lib/Config` | Yes | Provides configuration settings for testing. |
-| `../../lib/llm/OpenAICompatible` | Yes | Enables mocking and testing of OpenAICompatible providers. |
+| `../../lib/Config` | Yes | Provides expensive and cheap model names for testing. |
+| `../../lib/llm/OpenAICompatible` | Yes | Provides the OpenAICompatible class with generate method to be tested by LLM Dual Model Factory. |
+
+## Side Effects
+None detected.
 
 ## Dependents
 No known dependents.

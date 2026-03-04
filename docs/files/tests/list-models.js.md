@@ -1,7 +1,7 @@
 ---
 source_hash: 341528a91786b993
-facts_hash: d2ed315cb22fd124
-generated_at: 2026-03-03T07:32:16.987Z
+facts_hash: dfb7acd098f093cb
+generated_at: 2026-03-04T05:51:24.866Z
 generator_version: 1.0.0
 model: cheap
 quality_score: 100
@@ -9,36 +9,29 @@ quality_score: 100
 # File: tests/list-models.js
 
 ## Purpose
-This file tests the functionality of the GoogleProvider class, which fetches available models from a Google token. It logs the profiles found in the AuthStore and uses the preferred argon-stock-s9hpx profile to acquire a valid token, then fetches the available models using the GoogleProvider class.
+This file, tests/list-models.js, is a test script that demonstrates how to fetch available models for the argon-stock-s9hpx device using the Google authentication provider. It uses the AuthStore and GoogleAuth classes from other modules to authenticate with Google and retrieve the list of available models. The test logs various messages to the console to track its progress.
 
 ## Exports / API Surface
 | Symbol | Type | Params | Description |
 |--------|------|--------|-------------|
-| `GoogleAuth` | function |  | Gets a valid token from a Google profile. |
-| `Config` | object |  | Holds project configuration settings. |
-| `GoogleProvider` | class |  | Fetches available models from a Google token. |
-| `AuthStore` | object |  | Manages authentication profiles. |
+| `googleProfiles` | array |  | Returns an array of profile objects from the AuthStore |
+| `GoogleAuth.getValidToken` | function | `profile.id` | Returns a valid token for authentication with Google |
+| `GoogleProvider.fetchModels` | function | `token` | Fetches available models using the provided token |
 
 ## Internal Logic
-The main execution flow of this file is as follows:
-
-1. It fetches all the available Google profiles from the AuthStore using `AuthStore.findProfilesByProvider('google')`.
-2. If a preferred argon-stock-s9hpx profile exists, it uses that; otherwise, it falls back to the first found profile.
-3. It logs the used profile and attempts to acquire a valid token from the profile using `GoogleAuth.getValidToken(profile.id)`.
-4. Once a valid token is acquired, it fetches available models from the GoogleProvider class using `GoogleProvider.fetchModels(token)`.
-5. The file catches any errors that occur during these steps.
+The test script starts by finding the list of profiles from the AuthStore, then filters for the argon-stock-s9hpx project if possible. It prefers the profile from the argon-stock-s9hpx project if one is found. The test then logs messages to track its progress and authenticates with Google using the `GoogleAuth.getValidToken` method. Finally, it fetches the list of available models using the `GoogleProvider.fetchModels` method.
 
 ## Dependencies
 | Module | Local | Why |
 |--------|-------|-----|
-| `GoogleAuth` | Yes | Provides functionality for getting valid tokens from profiles. |
-| `AuthStore` | Yes | Manages authentication profiles, including those for Google. |
-| `Config` | Yes | Holds project configuration settings that may be used to filter profiles. |
-| `GoogleProvider` | Yes | Fetches available models from a Google token based on the acquired credentials. |
+| `../lib/auth/auth-store` | Yes | Provides a store for authentication data |
+| `../lib/auth/google` | Yes | Provides classes and utilities for Google authentication |
+| `../lib/Config` | Yes | Provides configuration settings for the test script |
+| `../lib/models/providers/google` | Yes | Provides a class for fetching models using the Google provider |
 
 ## Side Effects
-- console_output: The file logs various messages to the console, including successful profile finds, token acquisitions, and model fetchings.
-- process_control: The file exits the process with an error code of 1 if no preferred argon-stock-s9hpx profile is found in the AuthStore.
+- console_output: The script logs various messages to the console, including progress updates and error messages.
+- process_control: If no profile is found in the AuthStore, the script exits with an error code.
 
 ## Dependents
 No known dependents.

@@ -1,26 +1,26 @@
 ---
 source_hash: 844e8e99bc48a135
 facts_hash: 844e8e99bc48a135
-generated_at: 2026-03-03T08:00:40.640Z
+generated_at: 2026-03-04T06:18:36.500Z
 generator_version: 1.0.0
 model: cheap
-quality_score: 94
+quality_score: 87
 ---
 # Folder: skills/drishti-vision/scripts
 
 ## Purpose
-This folder contains a single script file named `capture.js`, which is responsible for capturing screenshots of web pages and saving them to specific output paths. The purpose of this folder exists to provide a centralized location for the capture functionality, making it easily accessible throughout the codebase.
+This folder contains a single JavaScript file responsible for capturing screenshots of given URLs and saving them to specified output paths, serving as the primary entry point for screenshot capture in the Drishti-Vision system.
 
-## Key Files
 | File | Role |
 |------|------|
-| capture.js | Captures screenshots of web pages and saves them to specified output paths |
+| `capture.js` | Provides a function to take screenshots of URLs and save them to specified paths. |
 
 ## Ownership
 Not yet assigned.
 
 ## Invariants / Rules
-Likely: The `capture.js` file should use a consistent naming convention for output files, including the date and time in the filename.
+Likely: Follows best practices for error handling and logging to ensure robustness.
+Likely: Adheres to the conventional camelCase naming convention for JavaScript file names.
 
 ## Cross-References
 - [capture.js](../../../../files/skills/drishti-vision/scripts/capture.js.md)

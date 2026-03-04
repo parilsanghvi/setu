@@ -1,47 +1,48 @@
 ---
-source_hash: ddb2361c15c549e8
-facts_hash: ddb2361c15c549e8
-generated_at: 2026-03-03T08:01:51.424Z
+source_hash: d2ad4e9315ce7c87
+facts_hash: d2ad4e9315ce7c87
+generated_at: 2026-03-04T10:15:28.896Z
 generator_version: 1.0.0
 model: cheap
-quality_score: 75
+quality_score: 77
 ---
 # Folder: tests
 
 ## Purpose
-This folder contains a comprehensive set of tests for various components and modules within the project, ensuring their functionality, security, and performance are thoroughly validated. It provides a robust testing framework to catch bugs early on, guaranteeing the stability and reliability of the system.
+This folder contains test scripts that ensure the correct functioning and security of the system, covering topics such as user authentication, authorization, error handling, logging, and more. Its primary purpose is to validate that individual components or features behave as expected under different scenarios, helping to identify and fix issues before they affect the entire system.
 
 ## Key Files
+This folder contains test files for various specific functionalities within the larger system:
 
-| File | Role |
-|------|------|
-| `agent.js` | Handles communication between agents and the bus |
-| `auth-test.js` | Verifies authentication mechanisms |
-| `business-logic-tests.js` | Tests business logic and workflows |
-| `client-side-tests.js` | Ensures client-side functionality is correct |
-| `core-agent-upgrade.test.js` | Tests upgrades to core agent versions |
-| `database-integration-tests.js` | Integrates with database for data persistence tests |
-| `drona-parser-test.js` | Verifies drona parsing logic accuracy |
-| `events-test.js` | Validates events handling and routing |
-| `google-auth-binding-test.js` | Tests Google authentication binding functionality |
-| `google-provider-security-test.js` | Ensures Google provider security measures are in place |
-| `index-broadcast-test.js` | Verifies index broadcast mechanism correctness |
-| `integrated-tests.js` | Integrates multiple components for comprehensive testing |
-| `integration-tests.js` | Tests integration between different components and systems |
-| `llm-connection-test.js` | Verifies Large Language Model connection stability |
-| `log-watch-test.js` | Ensures log watching functionality is correct |
-| `models-config-test.js` | Validates models configuration and data accuracy |
-| `onboarding-metrics-test.js` | Tests onboarding metrics correctness and completeness |
-| `path-traversal-test.js` | Verifies path traversal prevention mechanisms |
-| `proto-pollution-test.js` | Ensures object safety against prototype pollution attacks |
-| `rackshak-tests.js` | Tests Rakshak agent functionality and presence |
-| `security-header-test.js` | Verifies security headers are correctly set on the server |
-| `server-error-handling-test.js` | Tests server error handling mechanisms |
-| `steering-agent-test.js` | Validates steering agent behavior and decision-making |
-| `swarm-protocol-test.js` | Ensures swarm protocol correctness and stability |
+- **Test Cases**: 
+  - `minimal-auth-test.js`: Verifies basic authentication functionality.
+  - `test-api-auth.js`: Ensures API-level authentication is working correctly.
+  - `test-auth-store-save-failure.js`: Tests how the system handles saving authentication data in case of failure.
+  - `test-core-agent-loop.js`: Validates the loop behavior of core agents.
+- **Security and Authorization**:
+  - `verify-auth-malformed-header.js`: Checks for malformed headers that could lead to security issues.
+  - `verify-auth-rate-limit.js`: Tests rate limiting for authentication attempts.
+  - `verify-auth-weak-default.js`: Verifies default authentication settings are secure.
+- **Performance and Optimization**:
+  - `verify-agent-broadcast-optimization.js`: Ensures broadcasting optimization within agents is effective.
+  - `verify-index-broadcast.js`: Validates indexing broadcasts in the system's database.
+- **Feature-Specific Tests**:
+  - `test-core-db-stress.js` and `test-core-server-routes.js`: Test the stress resistance of core database interactions and routes, respectively.
+  - `test-llm-connection.js`: Verifies connections to large language models (LLMs) are successful.
+  - `verify-log-watch.js`: Ensures log watching functionality is working as expected.
 
 ## Ownership
-This folder is maintained by the Quality Assurance team, responsible for ensuring the project's quality, security, and performance are met through rigorous testing and validation.
+Not yet assigned.
+
+## Invariants / Rules
+This folder adheres to the following architectural constraints and coding conventions:
+
+1. **Separation of Concerns**: Tests are organized into categories based on specific functionalities or components, ensuring each test focuses on a single aspect without unnecessary dependencies.
+2. **Reusability**: Many tests leverage existing setup and teardown scripts to minimize duplicated code and enhance reusability across different test suites.
+3. **Clear Naming Conventions**: File names are descriptive and follow a consistent naming scheme, making it easier for developers to quickly identify the purpose of each test file.
+4. **Consistent Testing Framework Usage**: A standardized testing framework is used throughout the folder, ensuring consistency in how tests are written, executed, and interpreted by the testing infrastructure.
+
+Likely, this folder also follows best practices such as writing unit tests for individual components, integration tests to ensure how components interact, and end-to-end tests to validate the entire system's functionality.
 
 ## Cross-References
 - [lib/](./lib/SUMMARY.md)

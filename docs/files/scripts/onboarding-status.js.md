@@ -1,7 +1,7 @@
 ---
 source_hash: 302df958454370e1
-facts_hash: b3ffa7d5926f9fbf
-generated_at: 2026-03-03T07:29:33.047Z
+facts_hash: 4c9fa816934a5e6a
+generated_at: 2026-03-04T05:48:50.395Z
 generator_version: 1.0.0
 model: cheap
 quality_score: 100
@@ -9,41 +9,34 @@ quality_score: 100
 # File: scripts/onboarding-status.js
 
 ## Purpose
-This file generates an onboarding status report and writes it to a log file, while also handling errors silently in CI/GitHub Actions environments.
+This file is responsible for checking the onboarding status of a system, generating a log entry with the current status, and updating the log file accordingly. It utilizes functions from the `onboarding/status` module to retrieve the onboarding status and determine the completeness of the artifacts present in the system. The resulting log entry is then written to a file named "onboarding-history.jsonl".
 
 ## Exports / API Surface
 | Symbol | Type | Params | Description |
 |--------|------|--------|-------------|
-| `getOnboardingStatus` | function | Object | Retrieves the current onboarding status. |
-| `fs.readFileSync` | function | String | Reads the contents of a file asynchronously. |
-| `fs.writeFileSync` | function | String | Writes the contents of a string to a file synchronously. |
-| `process.exit` | method | Number | Exits the process with a specified exit code. |
+| `getOnboardingStatus` | function |  | Retrieves the onboarding status of the system. |
+| `getActiveProfile` | function |  | Returns the active governance profile. |
 
 ## Internal Logic
-The main execution flow of this script involves:
-1. Retrieving the current onboarding status using the `getOnboardingStatus` function.
-2. Checking if the log file exists and reading its contents.
-3. Filtering out old records based on the maximum number of days and records.
-4. Creating a new snapshot with the current timestamp and onboarding status data.
-5. Writing the updated log lines to the file.
-
-Key functions include:
-- `getOnboardingStatus`: Retrieves the current onboarding status from the `onboarding/status` module.
-- `fs.readFileSync` and `fs.writeFileSync`: Read and write files asynchronously and synchronously, respectively.
+The main execution flow of this file involves:
+- Retrieving the onboarding status using the `getOnboardingStatus` function.
+- Validating and filtering existing log entries based on a maximum record count and time threshold.
+- Generating a new snapshot with the current timestamp, completeness, artifacts present, artifacts missing, missing documents count, and ok status.
+- Writing the updated log entry to the "onboarding-history.jsonl" file.
 
 ## Dependencies
 | Module | Local | Why |
 |--------|-------|-----|
-| `../lib/onboarding/governance-profiles` | Yes | Provides access to governance profiles for setting max records and days. |
-| `../lib/onboarding/paths` | Yes | Offers a utility function to get the setup path for log file management. |
-| `../lib/onboarding/status` | Yes | Supplies the onboarding status data used in the script. |
+| `../lib/onboarding/governance-profiles` | Yes | Provides access to the active governance profile. |
+| `../lib/onboarding/paths` | Yes | Supplies the path for writing to the log file. |
+| `../lib/onboarding/status` | Yes | Imports the necessary functions for retrieving and processing onboarding status. |
 
 ## Side Effects
-- console_output: The script logs the onboarding status report to the console using `console.log`.
-- env_access: The script accesses environment variables such as `SETU_DRIFT_HISTORY_MAX`, `SETU_DRIFT_HISTORY_DAYS`, and `CI` or `GITHUB_ACTIONS` for conditional logic.
-- filesystem_read: The script reads the contents of the log file using `fs.readFileSync` and writes new data to it using `fs.writeFileSync`.
-- filesystem_write: New lines are written to the log file in append mode.
-- process_control: The script exits the process with a specified code (0 for success, 1 for failure) using `process.exit`.
+- console_output: The script logs the onboarding status to the console using `console.log`.
+- env_access: The script accesses environment variables such as `SETU_DRIFT_HISTORY_MAX`, `SETU_DRIFT_HISTORY_DAYS`, and `CI` or `GITHUB_ACTIONS`.
+- filesystem_read: The script reads the contents of the "onboarding-history.jsonl" file using `fs.readFileSync`.
+- filesystem_write: The script writes to the "onboarding-history.jsonl" file using `fs.writeFileSync`.
+- process_control: The script uses `process.exit` to control the program's exit status based on the onboarding status.
 
 ## Dependents
 No known dependents.

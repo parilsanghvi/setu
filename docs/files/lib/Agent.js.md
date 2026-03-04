@@ -1,40 +1,33 @@
 ---
 source_hash: 941a0fe19169bc9d
-facts_hash: b690555c5a97cc4c
-generated_at: 2026-03-03T07:13:52.560Z
+facts_hash: 5160c899bed32c8f
+generated_at: 2026-03-04T05:33:29.927Z
 generator_version: 1.0.0
 model: cheap
-quality_score: 84
+quality_score: 87
 ---
 # File: lib/Agent.js
 
 ## Purpose
-The Agent.js file defines a persistent worker class in the swarm, responsible for handling messages and updates from the Orchestrator while maintaining its own state and heartbeat.
+This file exports the `Agent` class, which represents a persistent worker in the swarm and is responsible for booting up, handling incoming messages, and sending responses to other agents.
 
 | Export | Type | Description |
 |--------|------|-------------|
-| `Agent` | cjs_default | Exports the Base Agent Class |
+| `Agent` | cjs_default | 
 
 ## Internal Logic
-The main execution flow of the Agent class involves:
-- Initializing the agent's state in the constructor
-- Booting up the agent by registering itself with the bus, setting up heartbeat intervals, and listening for messages
-- Listening for new messages from the Orchestrator, processing them, and updating its status accordingly
-
-Key functions include:
-- `boot()`: Initializes the agent's state and sets up the necessary listeners and intervals
-- `listen()`: Sets up the IPC handler and initial checks for messages
-- `checkForMessages()`: Polls for new messages from the Orchestrator at regular intervals
-- `_setIdle()`: Resets the agent's status to idle when no messages are found
+The main execution flow of this file begins with the constructor, which initializes the agent's properties, sets up event listeners, and starts the boot process. The key functions include `boot()`, `listen()`, `checkForMessages()`, and `processMessage(msg)`. The `boot()` method registers the agent on the event bus, sets up heartbeat intervals, and listens for incoming messages. The `listen()` method optimizes polling by waiting for a 'new_message' signal from the Orchestrator and using IPC (Inter-Process Communication). The `checkForMessages()` function polls for unread messages every 60 seconds and processes them when received. The `processMessage(msg)` function handles system events, user messages, and sends responses to other agents.
 
 ## Dependencies
 | Module | Local | Why |
 |--------|-------|-----|
-| `./Logger` | Yes | Provides logging functionality for the agent |
-| `events` | No | Enables event handling capabilities |
-| `path` | No | Provides path manipulation utilities |
+| ./Logger | Yes | Provides logging functionality |
+| db | No | 
+| events | No | 
+| path | No | 
 
 ## Side Effects
+None detected.
 
 ## Dependents
 - [CoreAgent.js](./CoreAgent.js.md)

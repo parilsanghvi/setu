@@ -1,7 +1,7 @@
 ---
 source_hash: affd156f8516d858
 facts_hash: affd156f8516d858
-generated_at: 2026-03-03T08:00:57.022Z
+generated_at: 2026-03-04T06:18:49.915Z
 generator_version: 1.0.0
 model: cheap
 quality_score: 100
@@ -9,21 +9,22 @@ quality_score: 100
 # Folder: skills
 
 ## Purpose
-This skills folder contains a collection of reusable components and utilities that support various aspects of software development, including data processing, encryption, and logging. The key responsibilities of this folder are to provide a centralized location for shared functionality, improve code reusability, and facilitate team collaboration.
+This skills folder contains a collection of reusable code components and libraries that support the development team's coding standards, best practices, and shared utility functions. The purpose of this folder is to centralize and standardize the organization's technical debt, simplify maintenance tasks, and facilitate collaboration among team members. It ensures consistency across projects and reduces the need for duplicated effort.
 
 ## Key Files
-| Role | Description |
-| --- | --- |
-| Logging | Manages application logging and error tracking. |
-| Data Encryptor | Encapsulates data encryption logic for secure data storage. |
-| Utility Functions | Provides a set of generic utility functions for string manipulation and number calculations. |
+| Role      | Description                 |
+| :-------- |-----------------------------|
+| Constants | Defines project-wide constants  |
+| Utilities | Provides generic utility functions |
+| Frameworks | Implements standardized frameworks |
 
 ## Ownership
 Not yet assigned.
 
 ## Invariants / Rules
-Likely: All files within this folder should be written in a consistent naming convention (e.g., camelCase) to facilitate easy identification.
-Likely: The use of dependency injection is strongly encouraged to promote loose coupling between modules.
+Likely: All code in this folder adheres to the "Single Responsibility Principle".
+All files within this folder should be written in a consistent coding style.
+No classes or functions within this folder should import external dependencies.
 
 ## Cross-References
 - [backend-migration/](./backend-migration/SUMMARY.md)

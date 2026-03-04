@@ -1,7 +1,7 @@
 ---
 source_hash: 104d48c4db0d12a7
-facts_hash: 904fd80847858fe4
-generated_at: 2026-03-03T07:36:32.869Z
+facts_hash: 79fb3c7cebf1c72b
+generated_at: 2026-03-04T05:55:44.109Z
 generator_version: 1.0.0
 model: cheap
 quality_score: 87
@@ -9,38 +9,37 @@ quality_score: 87
 # File: tests/test-contractor.js
 
 ## Purpose
-This file tests the functionality of the `Contractor` class, which is responsible for managing tasks and their specifications. The `Contractor` class is used to initialize and manipulate tasks, including creating new task entries, recording vetoes, approving tasks, and retrieving specifications.
+This file contains unit tests for the Contractor class, which is responsible for managing tasks and their specifications in a test data store. The tests verify that the Contractor class correctly initializes with an empty contract object, creates new contracts using issueSpec, records vetoes, approves tasks, retrieves task specifications, and persists between instances.
 
 ## Exports / API Surface
 | Symbol | Type | Params | Description |
 |--------|------|--------|-------------|
-| `issueSpec` | function | `taskId`, `domain`, `spec` | Issues a new task specification for the given task ID. |
-| `recordVeto` | function | `taskId`, `agent`, `reason` | Records a veto for the specified task. |
-| `approve` | function | `taskId` | Approves the specified task. |
-| `getSpec` | function | `taskId` | Retrieves the specification for the given task ID. |
-| `Constructor` | class | `` | Initializes and manages tasks. |
+| `Contractor` | function | `` | Creates a new Contractor instance with an empty contract object. |
+| `issueSpec` | function | `taskId`, `domain`, `spec` | Creates a new task specification and adds it to the contract object. |
+| `recordVeto` | function | `taskId`, `agent`, `reason` | Records a veto on a task and updates its status in the contract object. |
+| `approve` | function | `taskId` | Approves a task by updating its status in the contract object. |
+| `getSpec` | function | `taskId` | Retrieves the current specification of a task from the contract object. |
 
 ## Internal Logic
-The main execution flow of this file is as follows:
-
-1. The `Contractor` class is initialized with a test file path.
-2. A series of tests are run to verify the functionality of the `issueSpec`, `recordVeto`, `approve`, and `getSpec` methods.
-3. After each test, the state of the task entries is verified by reading the contents of the test file.
-4. If all tests pass, a success message is printed; otherwise, an error message is printed.
+The test file executes in the following main execution flow:
+1. It cleans up any existing test data file.
+2. It creates a new Contractor instance with an empty contract object and verifies that it loads correctly.
+3. It tests various methods of the Contractor class, including issueSpec, recordVeto, approve, and getSpec.
+4. For each method, it verifies that the expected behavior occurs by reading and comparing the contents of the test data file.
 
 ## Dependencies
 | Module | Local | Why |
 |--------|-------|-----|
-| `../lib/Contractor` | Yes | Provides the `Contractor` class implementation. |
-| `assert` | No | Provides assertion utilities for testing. |
-| `fs` | No | Provides file system utilities for reading and writing files. |
+| `../lib/Contractor` | Yes | Provides the Contractor class implementation. |
+| `assert` | No | Provides assertion utilities for verifying test results. |
+| `fs` | No | Provides file system utility functions, including reading and writing files. |
 | `path` | No | Provides path manipulation utilities. |
 
 ## Side Effects
-- console_output: The file prints success or failure messages to the console.
-- filesystem_read: The file reads the contents of the test file to verify task entries.
-- filesystem_write: The file writes new task entries and vetoes to the test file during testing.
-- process_control: The file exits with a non-zero status code if an error occurs, indicating failure.
+- console_output: The test file logs various messages to the console using console.log and console.error.
+- filesystem_read: The test file reads the contents of the test data file using fs.readFileSync.
+- filesystem_write: The test file writes new content to the test data file using fs.writeFileSync.
+- process_control: The test file exits the process with a non-zero status code if tests fail, and otherwise continues executing.
 
 ## Dependents
 No known dependents.

@@ -1,41 +1,38 @@
 ---
 source_hash: 3f99fd301c7d3243
-facts_hash: 4d4f2b45968c3078
-generated_at: 2026-03-03T07:43:16.697Z
+facts_hash: 36596bfa60b6b2df
+generated_at: 2026-03-04T06:03:31.591Z
 generator_version: 1.0.0
 model: cheap
-quality_score: 94
+quality_score: 89
 ---
 # File: tests/test-llm-openai.js
 
 ## Purpose
-This file tests the OpenAIProvider class, which is used to interact with the OpenAI API. It covers various scenarios such as standard generation, tool call handling, API error handling, and network error handling.
+This file tests the OpenAIProvider class, which handles interactions with the OpenAI API to generate responses based on user input and tool calls.
 
-## Exports / API Surface
 | Symbol | Type | Params | Description |
 |--------|------|--------|-------------|
-| `OpenAIProvider` | function | `{ model: string, auth: { key: string }, baseUrl: string }` | Creates an instance of the OpenAIProvider class to interact with the OpenAI API. |
-| `_global_fetch` | function | `(url: string, options: Object)` | Mocks the global fetch function to track and manipulate HTTP requests. |
+| `resetMocks` | function | `` | Resets mock fetch calls for testing. |
 
 ## Internal Logic
-The main execution flow involves setting up mocks for the global fetch function, creating instances of the OpenAIProvider class, calling its methods, and verifying the expected results.
+The main execution flow involves resetting mock fetch calls, setting up mock responses for different scenarios (standard generation, tool call handling, API error handling, and network error handling), and then calling the OpenAIProvider class with different inputs to test its functionality.
 
 Key functions include:
 
-*   `resetMocks`: Resets the mock state by clearing the last fetch URL, options, and response.
-*   `_global_fetch`: Mocks the global fetch function to track and manipulate HTTP requests.
-*   `OpenAIProvider`: Creates an instance of the OpenAIProvider class to interact with the OpenAI API.
+- `resetMocks`: Resets mock fetch calls by clearing lastFetchUrl, lastFetchOptions, and mockResponse.
+- `mockResponse`: Sets up a mock response object that is used to simulate API responses.
+- `OpenAIProvider.generate()`: Calls the OpenAI API with the provided user input, tool calls, and options.
 
 ## Dependencies
 | Module | Local | Why |
 |--------|-------|-----|
-| `../lib/models/providers/openai` | Yes | Provides the implementation for interacting with the OpenAI API. |
-| `assert` | No | Provides assertion utilities for testing and validation. |
+| `assert` | No | Provides assertions for testing. |
 
 ## Side Effects
--   console_output: The file logs test results to the console using console.log and console.error statements.
--   global_mutation: The file restores the original global fetch function after completing all tests by assigning it back to the originalFetch variable.
--
+- console_output: The file logs test results to the console using `console.log()` and `console.error()`.
+- global_mutation: The file restores the original fetch function from the global scope after all tests are complete.
+- network: The file simulates a network error by throwing an Error with the message "fetch failed" in one of its tests.
 
 ## Dependents
 No known dependents.

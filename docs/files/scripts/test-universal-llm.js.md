@@ -1,7 +1,7 @@
 ---
 source_hash: c8fb6389cca5c7da
-facts_hash: 6b805c02fccf998e
-generated_at: 2026-03-03T07:30:26.300Z
+facts_hash: 82a7091809a837ad
+generated_at: 2026-03-04T05:49:43.528Z
 generator_version: 1.0.0
 model: cheap
 quality_score: 89
@@ -9,28 +9,28 @@ quality_score: 89
 # File: scripts/test-universal-llm.js
 
 ## Purpose
-This file contains a test function that exercises the LLM's generate method using both an expensive and a cheap model. The test logs output to the console, displaying the configuration of the models being used.
+This file tests the Universal LLM model by generating responses using both expensive and cheap models, logging the results to the console.
 
 | Symbol | Type | Params | Description |
 |--------|------|--------|-------------|
-| `test` | function | `` | Runs tests for the LLM |
+| `test` | function | `` | Runs the test function |
 
 ## Internal Logic
-The test function executes in the following flow: it logs the configuration of the expensive and cheap models, then attempts to generate responses using each model. The response from each generation attempt is logged to the console with a success or failure indicator.
-
-Key functions:
-
-- `LLM.generate`: generates a response based on the input prompts and model type
-- `test`: runs the test function
+The main execution flow of this file is as follows:
+- The `test` function logs configuration details and test messages to the console.
+- It then tests the expensive model by generating a response using `LLM.generate()`.
+- If successful, it logs the response to the console. Otherwise, it catches any errors and logs an error message.
+- Next, it tests the cheap model by calling `LLM.generate()` with a different configuration.
+- Finally, it logs the result of the cheap model's generation to the console.
 
 ## Dependencies
 | Module | Local | Why |
 |--------|-------|-----|
-| `../lib/Config` | Yes | Provides configuration settings for models |
-| `../lib/LLM` | Yes | Defines the LLM's generate method |
+| `../lib/Config` | Yes | Provides configuration settings for the test. |
+| `../lib/LLM` | Yes | Enables the Universal LLM model functionality. |
 
 ## Side Effects
-- console_output: The test function logs output to the console, displaying the model configurations and generation results.
+- `console_output`: The file logs messages to the console, including test details and generation results, using `console.log()` and `console.error()`.
 
 ## Dependents
 No known dependents.

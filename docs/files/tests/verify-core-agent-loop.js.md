@@ -1,52 +1,45 @@
 ---
 source_hash: a5667230d6ed4c1d
-facts_hash: 27ab96b8e6545ba9
-generated_at: 2026-03-03T07:52:08.962Z
+facts_hash: d14d1ec348aa1ee6
+generated_at: 2026-03-04T06:11:46.862Z
 generator_version: 1.0.0
 model: cheap
-quality_score: 94
+quality_score: 85
 ---
 # File: tests/verify-core-agent-loop.js
 
 ## Purpose
-This file contains a test suite for the CoreAgent, specifically testing its run loop logic with various scenarios.
+This file contains test cases for the CoreAgent's RunLoop logic, specifically testing its ability to handle standard turns, tool execution, interruptions (STOP and REDIRECT), and other scenarios.
 
 ## Exports / API Surface
 | Symbol | Type | Params | Description |
 |--------|------|--------|-------------|
-| `mockBus` | arrow | `{
-    heartbeat: (name, role, pid, status` | Mocks a database bus for testing purposes.
-| `mockLLM` | arrow | `{
-    generate: async (prompt, messages, type, tools` | Provides a mock LLM implementation for testing tool execution.
-| `mockSkillLoader` | arrow | `{
-    load: (` | Mocks a skill loader for testing purposes.
-| `MockZodType` | class | `` | 
-| `TestAgent` | class | `` |
-| `runTest` | function | `` |
+| `mockBus` | arrow | `{ heartbeat: (name, role, pid, status) => {...}, ... }` | Mocks the bus for testing purposes. |
+| `mockLLM` | arrow | `{ generate: async (prompt, messages, type, tools) => {...}, registerProvider: () => {...}, getProvider: () => {...} }` | Mocks an LLM for testing purposes. |
+| `mockSkillLoader` | arrow | `{ load: () => new Map() }` | Mocks a skill loader for testing purposes. |
+| `MockZodType` | class | `` | An empty class used to mock Zod type definitions. |
 
 ## Internal Logic
-The main execution flow of this file is as follows:
+The main execution flow of this file involves creating instances of the TestAgent and CoreAgent classes, setting up mocks for dependencies, and running test cases using the runTest function.
 
-- The file starts by mocking various dependencies, including a database bus, LLM, skill loader, and config.
-- It then defines a TestAgent class that extends the CoreAgent, overriding its executeTool method to simulate tool execution.
-- The runTest function is called, which creates an instance of TestAgent and sets up mock implementations for session logging and speech output.
-- The test suite consists of four tests:
-  - Test 1: Standard Turn - Tests basic conversation flow with a standard response from the LLM.
-  - Test 2: Tool Execution (Multi-turn) - Tests tool execution in a multi-turn conversation, where the bot echoes back the user's input.
-  - Test 3: Interrupt (STOP) - Tests interrupt handling when the bot receives a STOP signal during thinking.
-  - Test 4: Interrupt (REDIRECT) - Tests redirect handling when the bot receives a REDIRECT signal with a new task.
+- The runTest function creates a new instance of the TestAgent and sets up mocks for the LLM and skill loader. It then runs multiple test cases, each testing a specific scenario:
+  - Standard turn: Verifies that the agent responds correctly to a standard input message.
+  - Tool execution (Multi-turn): Tests the agent's ability to execute tools in multi-turn conversations.
+  - Interrupt (STOP): Verifies that the agent handles interruptions correctly and stops processing messages.
+  - Interrupt (REDIRECT): Tests the agent's ability to redirect context during tool execution.
+
+- The constructor of the TestAgent class initializes its properties, including its name, role, and tools. It also sets up a session logger and a speak handler for capturing output.
 
 ## Dependencies
 | Module | Local | Why |
 |--------|-------|-----|
-| `module` | Yes | Provides functionality for mocking dependencies.
-| `path` | No | 
-| `fs` | No | 
+| `../lib/CoreAgent` | Yes | Provides the core logic for the CoreAgent class. |
+| `module` | No | Provides helper utilities, such as requiring modules. |
 
 ## Side Effects
-- console_output: The test suite logs various messages to the console, including test results and expected values.
-- database: None - The mock database bus does not interact with any actual databases.
-- process_control: The bot's process is controlled through its handleControlSignal method, which receives STOP and REDIRECT signals.
+- console_output: The code logs various messages to the console during testing.
+- database: There are no database interactions in this test file.
+- process_control: The code simulates control signals (STOP and REDIRECT) to test the agent's behavior under different scenarios.
 
 ## Dependents
 No known dependents.

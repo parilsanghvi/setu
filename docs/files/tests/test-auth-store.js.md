@@ -1,7 +1,7 @@
 ---
 source_hash: 93af5334a289f4f6
-facts_hash: 92974ac157f0a4d5
-generated_at: 2026-03-03T07:34:19.176Z
+facts_hash: 959d591118bb7fd1
+generated_at: 2026-03-04T05:53:25.947Z
 generator_version: 1.0.0
 model: cheap
 quality_score: 94
@@ -9,45 +9,38 @@ quality_score: 94
 # File: tests/test-auth-store.js
 
 ## Purpose
-This file contains unit tests for the `AuthStore` class, ensuring it functions correctly by verifying its initialization, profile management, and error handling capabilities.
+This file contains test cases for the AuthStore class, which manages user profiles and provides methods for adding, retrieving, listing, and removing profiles.
 
 ## Exports / API Surface
-
 | Export | Description |
 |--------|-------------|
-| `authStore` | Provides access to the AuthStore instance. |
-| `addProfile` | Adds a new profile to the AuthStore. |
-| `getProfile` | Retrieves a profile from the AuthStore by ID. |
-| `listProfiles` | Returns an array of all profiles in the AuthStore. |
-| `findProfilesByProvider` | Finds all profiles with a specific provider in the AuthStore. |
-| `removeProfile` | Removes a profile from the AuthStore and returns its existence status. |
+| authStore | Exposes the AuthStore class with its methods for managing user profiles. |
 
 ## Internal Logic
+The main execution flow of this file is as follows:
+1. The test environment is set up using a mock `os.homedir` function to point to a temporary directory.
+2. The AuthStore class is required and used to perform various tests on its methods.
+3. Each test method exercises a specific feature of the AuthStore class, such as adding a profile or listing profiles.
+4. After each test, assertions are made to verify that the expected behavior was observed.
 
-1. The test suite initializes a mock environment by setting up a temporary directory and modifying the `os.homedir` function to return this directory.
-2. It then requires the `AuthStore` class, which is expected to use the mocked homedir.
-3. The test suite verifies the AuthStore's initialization by checking if the authentication directory and file exist and are empty.
-4. It adds a profile to the AuthStore using the `addProfile` method and verifies that the profile is saved correctly.
-5. It retrieves a profile from the AuthStore using the `getProfile` method and verifies its existence and provider information.
-6. It lists all profiles in the AuthStore using the `listProfiles` method and verifies the list's contents.
-7. It finds all profiles with a specific provider in the AuthStore using the `findProfilesByProvider` method and verifies the results.
-8. It removes a profile from the AuthStore using the `removeProfile` method and verifies that the profile is gone.
-9. It tests error handling by creating a corrupt JSON file and verifying that the AuthStore's `getProfile` and `listProfiles` methods return null or an empty list when encountering this error.
+Key functions in this file include:
+- `addProfile`: Adds a new user profile to the AuthStore.
+- `getProfile`: Retrieves an existing user profile from the AuthStore.
+- `listProfiles`: Returns a list of all user profiles in the AuthStore.
+- `removeProfile`: Removes an existing user profile from the AuthStore.
 
 ## Dependencies
-
 | Module | Local | Why |
 |--------|-------|-----|
-| assert | Yes | Provides assertion functions for testing. |
-| fs | No | Provides file system utilities used by the AuthStore. |
-| os | No | Provides operating system utilities used by the AuthStore. |
-| path | No | Provides path manipulation utilities used by the AuthStore. |
+| assert | Yes | Provides assertions for testing. |
+| fs | No | Provides file system utilities used in tests. |
+| os | No | Provides operating system utilities used in setup. |
+| path | No | Provides path manipulation utilities used in setup. |
 
 ## Side Effects
-
-- console_output: The test suite logs various messages to the console during its execution.
-- filesystem_read: The test suite reads and parses files from the authentication directory using `fs.readFileSync` and `JSON.parse`.
-- filesystem_write: The test suite writes JSON data to a file in the authentication directory using `fs.writeFileSync`.
+- console_output: The test output is logged to the console, including success messages and error messages.
+- filesystem_read: The file system is read to verify the existence of directories and files.
+- filesystem_write: The file system is written to create or modify a temporary directory and a JSON file used in testing.
 
 ## Dependents
 No known dependents.

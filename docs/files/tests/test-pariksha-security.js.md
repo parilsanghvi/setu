@@ -1,40 +1,50 @@
 ---
 source_hash: bfc84c2444c90865
-facts_hash: bd1f872ee219e901
-generated_at: 2026-03-03T07:45:06.055Z
+facts_hash: f62497a097fee729
+generated_at: 2026-03-04T06:05:28.320Z
 generator_version: 1.0.0
 model: cheap
-quality_score: 77
+quality_score: 88
 ---
 # File: tests/test-pariksha-security.js
 
 ## Purpose
-This file contains tests for the Pariksha class, specifically its security features, including preventing shell injection and correctly parsing arguments with quotes.
+This file tests the Pariksha class for security vulnerabilities, specifically shell injection and argument parsing.
 
 ## Exports / API Surface
-| Export | Description |
-|--------|-------------|
-| `Pariksha` | Exposes the Pariksha class, which provides methods for running tests. |
-| `runTest` | Exposes a method that runs a test command in a temporary directory. |
+
+
+| Name | Description |
+|------|-------------|
+| `runTest` | Executes a command with test arguments in a sandboxed environment. |
+| `Pariksha` | A class providing a secure way to execute commands and tests. |
 
 ## Internal Logic
-The main execution flow of this file involves creating instances of the Pariksha class and testing its security features.
+The main execution flow of this file is as follows:
+1. The test suite uses the `describe` and `it` functions from Node's testing module.
+2. Each test creates a temporary directory using `fs.mkdtempSync`.
+3. A new instance of the Pariksha class is created for each test.
+4. The `runTest` function is called with a command string containing test arguments.
+5. The test verifies that the expected output was generated and that no security vulnerabilities were exploited.
 
-Key functions:
-- `describe`: A function from the node:test module used to define test suites.
-- `it`: A function from the node:test module used to define individual tests within a suite.
-- `new Pariksha()`: The constructor for the Pariksha class, which initializes a new instance of the class.
-- `runTest`: A method on the Pariksha class that executes a test command in a temporary directory.
+The key functions in this file are:
+1. `fs.mkdtempSync`: Creates a temporary directory for isolating tests.
+2. `Pariksha.runTest`: Executes a command with test arguments in a sandboxed environment.
+3. `assert.strictEqual` and `assert.match`: Verify that the expected output was generated.
 
 ## Dependencies
+
+
 | Module | Local | Why |
 |--------|-------|-----|
-| `../lib/Pariksha` | Yes | Implements security testing functionality. |
+| `../lib/Pariksha` | Yes | Provides the Pariksha class for testing. |
+| `node:test` | No | Provides the testing framework functions. |
+| `node:assert` | No | Provides assertion functions. |
 
 ## Side Effects
-- console_output: The file logs output from tests to the console, including success or failure messages.
-- filesystem_read: The file reads files into memory during tests, checking for creation of sentinel files.
-- filesystem_write: The file writes files to disk during tests, creating temporary directories and files as needed.
+- console_output: The file logs test results to the console.
+- filesystem_read: The file reads temporary directories and files from the file system.
+- filesystem_write: The file writes temporary files to the file system.
 
 ## Dependents
 No known dependents.

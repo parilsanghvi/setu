@@ -1,7 +1,7 @@
 ---
 source_hash: b3867e7d47dafe30
-facts_hash: 5d1660d4caf976d8
-generated_at: 2026-03-03T07:54:21.245Z
+facts_hash: 7d0a4a5d7d51eee3
+generated_at: 2026-03-04T06:13:38.918Z
 generator_version: 1.0.0
 model: cheap
 quality_score: 94
@@ -9,37 +9,42 @@ quality_score: 94
 # File: tests/verify-onboarding-metrics.js
 
 ## Purpose
-This file contains a test suite for verifying the enforceability of onboarding metrics in a project. The `runTest` function simulates various scenarios, such as adding and removing undocumented files, to ensure that the system correctly detects missing documentation and updates its completeness score accordingly.
+This file contains a test suite for the onboarding metrics verification system, specifically testing the `getOnboardingStatus` function's ability to detect missing and valid documentation.
 
 ## Exports / API Surface
 | Symbol | Type | Params | Description |
 |--------|------|--------|-------------|
-| getOnboardingStatus | function | `` | Returns the current onboarding status of the project. |
-| runTest | function | `` | Runs a test suite for verifying onboarding metrics enforceability. |
+| getOnboardingStatus | function | `` | Returns the onboarding status of a given file. |
+| assert | global | `` | Provides assertion functions for testing. |
 
 ## Internal Logic
-The `runTest` function is an asynchronous function that simulates various scenarios to verify the behavior of the `getOnboardingStatus` function. The main execution flow is as follows:
+The test suite runs in an async manner, starting with an initial check of the onboarding status before performing various operations to test its enforcement.
 
-1. It calls `getOnboardingStatus` to retrieve the initial onboarding status.
-2. If the initial status is not 100% green, it proceeds with the test.
-3. It adds an undocumented file and verifies that the system correctly detects its missing documentation.
-4. It adds valid documentation and verifies that the system updates its completeness score accordingly.
-5. It adds placeholder documentation and verifies that the system correctly rejects it.
-6. It adds short documentation and verifies that the system correctly rejects it.
+Key functions include:
+
+- `runTest`: The main test function that orchestrates the entire test process.
+- `getOnboardingStatus`: Retrieves and returns the onboarding status for a given file.
+
+The execution flow involves:
+
+1. Initial state check
+2. Adding an undocumented file
+3. Adding valid documentation
+4. Adding placeholder documentation
+5. Adding short documentation
 
 ## Dependencies
 | Module | Local | Why |
 |--------|-------|-----|
-| fs | No | Provides file system utilities. |
-| path | No | Provides path manipulation utilities. |
-| assert | No | Provides assertion utilities. |
-| ../lib/onboarding/status | Yes | Implements the onboarding status logic. |
+| assert | Yes | Provides assertions for testing |
+| fs | No | Provides file system operations utilities |
+| path | No | Provides file system paths utilities |
 
 ## Side Effects
-- console_output: The function prints various messages to the console, including test outcomes and error messages.
-- filesystem_read: The function reads files from disk using `fs.readFileSync` or `fs.writeFileSync`.
-- filesystem_write: The function writes files to disk using `fs.writeFileSync`.
-- process_control: The function uses `process.exit(1)` to exit the process with a non-zero status code if the test fails.
+- console_output: The test suite logs various messages to the console, including success and failure indicators.
+- filesystem_read: The test suite reads files from disk using `fs.writeFileSync` and checks their existence before writing.
+- filesystem_write: The test suite writes files to disk using `fs.writeFileSync`, adding new content or deleting existing files.
+- process_control: The test suite exits the process with a non-zero status code if the tests fail, or continues running with success.
 
 ## Dependents
 No known dependents.

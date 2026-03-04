@@ -1,41 +1,43 @@
 ---
-source_hash: 2a951777516e23fd
-facts_hash: ea04e145180ea4e6
-generated_at: 2026-03-03T07:10:16.726Z
+source_hash: 355be5cca6c86820
+facts_hash: 7d774b27c312e6a9
+generated_at: 2026-03-04T05:29:23.514Z
 generator_version: 1.0.0
 model: cheap
-quality_score: 94
+quality_score: 100
 ---
 # File: frontend/app/src/App.jsx
 
 ## Purpose
-The App.jsx file is the main entry point of the application, responsible for rendering the UI and managing the state of the application's components. It fetches data from the socket API and uses it to render the agent list, kanban board, logs, chat box, and onboarding status. The app also updates its active agents count in real-time.
+The App file is the main entry point of the frontend application, rendering the user interface and handling interactions between various components.
 
 ## Exports / API Surface
 | Export | Type | Description |
 |--------|------|-------------|
-| `App` | esm_default | Exports the App component as the default export |
+| `App` | esm_default | Exports the App component as the default export. |
 
 ## Internal Logic
-The main execution flow of the App.jsx file is as follows:
-- The app uses the `useSocket` hook to fetch data from the socket API, which returns the agents, tasks, and logs.
-- The app then uses these values to render its components, including the agent list, kanban board, logs, chat box, and onboarding status.
-- The app also updates its active agents count in real-time using the `useMemo` hook.
+The App file initializes state using `useState`, fetches onboarding data in the effect hook, and defines several utility functions:
+- `activeAgentsCount`: calculates the number of active agents.
+- `handleGitCommit`: commits to Git when the button is clicked.
+- `handleTaskCreateRequest`: opens the task creation modal.
 
 ## Dependencies
 | Module | Local | Why |
 |--------|-------|-----|
-| `./App.module.scss` | Yes | Defines the styles for the application's grid layout |
-| `./components/AgentCard` | Yes | Provides a reusable component for displaying individual agents |
-| `./components/ChatBox` | Yes | Offers a chat box functionality that displays messages and updates in real-time |
-| `./components/LogViewer` | Yes | Displays logs from the application's activity |
-| `./components/OnboardingStatus` | Yes | Renders the onboarding status of the application to the user |
-| `./components/TaskBoard` | Yes | Provides a kanban board functionality for managing tasks |
-| `./hooks/useSocket` | Yes | Fetches data from the socket API and provides it to the app's components |
-| `./index.scss` | Yes | Defines global styles for the application |
+| `useSocket` | Yes | Provides a hook for interacting with the socket connection. |
+| `./App.module.scss` | Yes | Imports CSS styles for the application. |
+| `./components/AgentCard` | Yes | Imports a reusable AgentCard component. |
+| `./components/ChatBox` | Yes | Imports a reusable ChatBox component. |
+| `./components/LogViewer` | Yes | Imports a reusable LogViewer component. |
+| `./components/OnboardingStatus` | Yes | Imports a reusable OnboardingStatus component. |
+| `./components/TaskBoard` | Yes | Imports a reusable TaskBoard component. |
+| `./components/TaskCreationModal` | Yes | Imports a reusable TaskCreationModal component. |
+| `./hooks/useSocket` | Yes | Provides a hook for interacting with the socket connection. |
+| `./index.scss` | Yes | Imports CSS styles for the application index page. |
 
 ## Side Effects
-- network: The app fetches data from the `/api/onboarding` endpoint when the component mounts, which makes a GET request to the server.
+- network: The App file fetches onboarding data from the server when it mounts, and performs a Git commit when the "Commit to Git" button is clicked.
 
 ## Dependents
 No known dependents.
@@ -47,5 +49,6 @@ No known dependents.
 - [LogViewer.jsx](./components/LogViewer.jsx.md)
 - [OnboardingStatus.jsx](./components/OnboardingStatus.jsx.md)
 - [TaskBoard.jsx](./components/TaskBoard.jsx.md)
+- [TaskCreationModal.jsx](./components/TaskCreationModal.jsx.md)
 - [useSocket.js](./hooks/useSocket.js.md)
 - [index.scss](./index.scss.md)

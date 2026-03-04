@@ -1,7 +1,7 @@
 ---
-source_hash: 726611f30fde23a2
-facts_hash: 726611f30fde23a2
-generated_at: 2026-03-03T08:00:11.854Z
+source_hash: e46bf2405abf1013
+facts_hash: e46bf2405abf1013
+generated_at: 2026-03-04T10:14:34.709Z
 generator_version: 1.0.0
 model: cheap
 quality_score: 100
@@ -9,39 +9,40 @@ quality_score: 100
 # Folder: lib
 
 ## Purpose
-This folder contains various utilities and classes that form the core of a swarm-based system, responsible for managing tasks, agents, and data. It provides essential functionality for handling messages, updates, and database interactions.
+This folder contains a collection of modules that form the backbone of a swarm system, responsible for managing agents, tools, budgets, cameras, and other essential components. The key responsibilities include handling user authentication, session management, tool execution, budget tracking, camera automation, configuration loading, context management, contract specification management, core agent creation, database interaction, Docker management, LLM generation, logging, TDD cycle validation, route setup, server initialization, session logging, skill loading, WebSocket connection establishment, and standardized workflow handoff protocol implementation.
 
 ## Key Files
 | File | Role |
-| Agent.js | Defines a persistent worker class in the swarm, handling messages and updates from the Orchestrator. |
-| AgentContextManager.js | Manages the context of an agent, compacting and summarizing conversations to reduce memory usage. |
-| AgentToolExecutor.js | Executes tools for CoreAgent instances, including built-in file tools and dynamically loaded skills. |
-| Budget.js | Manages task budgets in an application, providing methods to check and record budget usage. |
-| Camera.js | Manages browser instances and takes screenshots of URLs, storing them in a directory with task IDs as subdirectories. |
-| Config.js | Loads and validates configuration settings from environment variables and a .env file, providing centralized access to these settings. |
-| Context.js | Manages the context of an application, including reading and writing to files, logging activities, and enforcing permissions. |
-| Contractor.js | Manages contracts, allowing users to issue new specs, record vetoes, and approve current specs. |
-| CoreAgent.js | Represents an AI agent in a swarm environment, handling incoming requests, executing tasks, and interacting with other agents. |
-| db.js | Serves as an event bus wrapper, managing database interactions and emitting events to various parts of the system. |
-| Docker.js | Manages the Docker engine on a system, ensuring its availability and configuration. |
-| LLM.js | Manages multiple language models, generating content using them through cascading fallbacks and rate limiting. |
-| Logger.js | Provides logging functionality for different log levels and optional data, outputting logs to the console. |
-| Pariksha.js | Runs test commands and enforces the TDD cycle, validating that code changes meet test requirements. |
-| routes.js | Sets up routing configuration for an Express.js application, handling incoming requests and returning responses for various API endpoints. |
-| server.js | Creates an Express.js server with Socket.IO support, setting up dashboard functionality and logging. |
-| SessionLogger.js | Logs events asynchronously to a JSONL formatted file, ensuring consistent session IDs across the process lifetime. |
-| SkillLoader.js | Loads and caches skills from a directory structure, filtering by tags and providing methods to retrieve individual skills. |
-| socket.js | Sets up a socket connection for real-time communication between the client and server, emitting log history and forwarding chat messages. |
-| SwarmProtocol.js | Defines a standardized workflow for task orchestration, including message types and constants used by the SwarmProtocol class. |
-| utils.js | Provides functions to efficiently read the last N lines of a file without loading the entire file into memory, and estimate JSON string length of a value without serialization. |
+|------|------|
+| Agent.js | Manages agent persistence, incoming message handling, and response sending |
+| AgentContextManager.js | Estimates token count and compacts context for Core Agents |
+| AgentToolExecutor.js | Executes tools for CoreAgents with schema validation and delegation |
+| Budget.js | Tracks task budgets, usage, and cost alerts |
+| Camera.js | Automates screenshots of web pages using Chromium browser |
+| Config.js | Loads environment variables from .env file for configuration |
+| Context.js | Manages context files, logs agent activities, and enforces permissions |
+| Contractor.js | Issues new contracts, records vetoes, and approves specs |
+| CoreAgent.js | Creates, manages, and processes Core Agent instances |
+| db.js | Serves as an event bus wrapper with database interactions |
+| Docker.js | Manages the Docker engine, detecting presence, checking availability |
+| LLM.js | Implements cascading fallback mechanism for AI model generation |
+| Logger.js | Logs events in various levels with customizable messages and arguments |
+| Pariksha.js | Validates TDD cycles by running test commands and ensuring tests pass |
+| routes.js | Sets up Express.js application routes for onboarding, historical trend, etc. |
+| server.js | Initializes an Express.js server with Socket.IO connection establishment |
+| SessionLogger.js | Logs events in asynchronous manner, storing them in JSONL format |
+| SkillLoader.js | Loads, caches, and filters skills from the skills directory |
+| socket.js | Establishes WebSocket connections for log streaming and message forwarding |
+| SwarmProtocol.js | Defines standardized workflow handoff protocol constants and messages |
+| utils.js | Provides efficient file reading and JSON length estimation functions |
 
 ## Ownership
 Not yet assigned.
 
 ## Invariants / Rules
-Likely: Follows single responsibility principle (SRP), where each file has one primary responsibility.
-Likely: Adheres to modular design patterns, encapsulating related functionality within separate modules or files.
-Likely: Utilizes standardized naming conventions for imports, exports, and variables to maintain consistency throughout the codebase.
+Likely: Follows the principle of Separation of Concerns (SoC) in each module to minimize dependencies.
+Likely: Adheres to standard JavaScript coding conventions for variable naming, indentation, and formatting.
+Likely: Utilizes modular design patterns such as encapsulation and abstraction to maintain code organization.
 
 ## Cross-References
 - [auth/](./auth/SUMMARY.md)

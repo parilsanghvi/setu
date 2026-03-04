@@ -1,39 +1,38 @@
 ---
 source_hash: b033396e13a2720f
-facts_hash: be299bd173e9b36c
-generated_at: 2026-03-03T07:39:17.838Z
+facts_hash: 7a3c4dd600486487
+generated_at: 2026-03-04T05:59:26.722Z
 generator_version: 1.0.0
 model: cheap
-quality_score: 72
+quality_score: 77
 ---
 # File: tests/test-dead-agents.js
 
 ## Purpose
-This file tests the functionality of the `getDeadAgents` method in the database connection, verifying that it correctly identifies dead agents and returns their names.
+This file tests the functionality of the `getDeadAgents` function in the system, which returns a list of dead agents. It inserts two agents, one live and one dead, and then verifies that the `getDeadAgents` function correctly identifies the dead agent. The test also ensures that the returned agent has the expected properties.
 
+## Exports / API Surface
 | Symbol | Type | Params | Description |
 |--------|------|--------|-------------|
-| `bus` | object | - | Provides a database connection interface |
-| `assert` | module | - | Assists with assertions and testing |
+| bus    | object | -       | Provides database operations  |
+| assert | function | -       | Verifies assertions in tests |
 
 ## Internal Logic
-The main execution flow of this file is as follows:
-- The script connects to the database using the `bus` object.
-- It inserts two agents into the database: one live agent with a recent heartbeat and one dead agent with an old timestamp.
-- It calls the `getDeadAgents` method on the `bus` object, specifying a timeout of 30 seconds.
-- The resulting list of dead agents is printed to the console and its names are extracted using the `map` function.
-- Assertions are used to verify that the correct dead agent was found and that the live agent was not included in the result.
-- After the test, the script deletes the inserted agents from the database.
+The test file first logs a message to the console to indicate that it is running. It then inserts two agents into the database: one live agent with a heartbeat timestamp of the current time, and one dead agent with an old heartbeat timestamp set manually. The `getDeadAgents` function is called with a timeout of 30 seconds, and the returned list of dead agents is stored in the `dead` variable.
+
+The test then extracts the names from the dead agents and asserts that one of them is "TestDead" and not "TestLive". It also verifies that each dead agent has the expected properties.
+
+Finally, the test cleans up by deleting the live and dead agents from the database.
 
 ## Dependencies
 | Module | Local | Why |
 |--------|-------|-----|
-| bus    | Yes  | Provides a database connection interface |
-| assert | No   | Assists with assertions and testing |
+| assert | Yes  | Used for assertions in tests |
+| bus    | Yes  | Provides database operations |
 
 ## Side Effects
-- console_output: The script logs messages to the console, including a test prefix, a pass message after successful execution, and error messages if any assertions fail.
-- database: The script inserts two agents into the database, deletes them afterwards, and retrieves data from the `agents` table.
+- console_output: The file logs two messages to the console, one before running the test and another after it passes.
+- database: The file inserts two agents into the database and then deletes them after the test is complete.
 
 ## Dependents
 No known dependents.

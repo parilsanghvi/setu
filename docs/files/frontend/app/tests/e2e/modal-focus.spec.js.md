@@ -1,7 +1,7 @@
 ---
 source_hash: 5f3b9ccc71d5af6e
-facts_hash: 9400960e68bb1d0a
-generated_at: 2026-03-03T07:12:56.419Z
+facts_hash: a097875575366229
+generated_at: 2026-03-04T05:32:31.290Z
 generator_version: 1.0.0
 model: cheap
 quality_score: 85
@@ -9,37 +9,38 @@ quality_score: 85
 # File: frontend/app/tests/e2e/modal-focus.spec.js
 
 ## Purpose
-This file, `modal-focus.spec.js`, contains an end-to-end test for the modal focus functionality in a web application. It tests that the task button is focused before opening and closing the modal, and that focus is restored to the task button after closing the modal. This ensures that the modal does not interfere with keyboard navigation.
+This file, modal-focus.spec.js, contains an end-to-end test for the focus management of a modal in a web application. The test verifies that when a modal is opened and closed, the focus is properly trapped and restored to its original location. The test uses the Playwright library to simulate user interactions with the application.
 
 ## Exports / API Surface
-
 | Export | Description |
 |--------|-------------|
-| `test` | Runs a test case in the test framework. |
-| `expect` | Verifies an assertion in the test case. |
+| `test` | Defines an asynchronous test function for testing web applications. |
+| `expect` | Verifies expected conditions in the application's UI after a test step has been executed. |
 
 ## Internal Logic
-The main execution flow of this file is to:
-1. Authenticate with the application by setting HTTP credentials.
-2. Create a new task on the dashboard and verify that it appears.
-3. Focus the task button, open the modal, and verify that focus is inside the modal.
-4. Close the modal via Escape key press and verify that focus is restored to the task button.
+The main execution flow of this file consists of 6 steps:
 
-The main functions used in this file are:
-- `test`: Runs a test case in the test framework.
-- `expect`: Verifies an assertion in the test case.
-- `page.goto()`: Navigates to a URL in the page context.
-- `page.getByPlaceholder()`, `page.getByRole()`, and other similar functions: Retrieves elements on the page by their placeholder, role, or other properties.
-- `await taskButton.first().focus()`: Focuses an element using keyboard navigation.
-- `page.keyboard.press()`: Simulates a key press event.
+1. Authenticate the user with the application.
+2. Create a new task to ensure that one exists for focus testing.
+3. Simulate keyboard navigation to focus on the task button.
+4. Open the modal by clicking the task button.
+5. Close the modal via escape key press.
+6. Verify that the focus is properly restored to the task button after closing the modal.
+
+Key functions:
+
+* `page.goto()`: Navigates the application's context to a specific URL.
+* `page.getByPlaceholder()`, `page.getByRole()`, `page.keyboard.press()`: Selects HTML elements in the application's UI and simulates user interactions with them.
+* `expect(pageBy).toBeVisible()` / `expect(pageBy).toBeFocused()`: Verifies that an element in the application's UI is visible or focused.
 
 ## Dependencies
-
 | Module | Local | Why |
 |--------|-------|-----|
-| `@playwright/test` | No | Provides a test framework for end-to-end testing. |
+| `@playwright/test` | No | Provides test automation utilities. |
+| `page context().setHTTPCredentials()` | Yes | Allows setting HTTP credentials for the application context. |
 
 ## Side Effects
+None detected.
 
 ## Dependents
 No known dependents.

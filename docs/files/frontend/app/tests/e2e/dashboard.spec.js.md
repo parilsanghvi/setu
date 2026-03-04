@@ -1,7 +1,7 @@
 ---
 source_hash: 92d9fcfff857e536
-facts_hash: 5b8e5c6751703927
-generated_at: 2026-03-03T07:12:45.591Z
+facts_hash: ee1a18bf00961b05
+generated_at: 2026-03-04T05:32:19.902Z
 generator_version: 1.0.0
 model: cheap
 quality_score: 80
@@ -9,25 +9,27 @@ quality_score: 80
 # File: frontend/app/tests/e2e/dashboard.spec.js
 
 ## Purpose
-This file contains two end-to-end tests for visual regression, ensuring that the legacy and new dashboard components match their expected layouts. The first test, "Visual Regression: Legacy Dashboard Snapshot", verifies the layout of the legacy server, while the second test, "Visual Regression: New Dashboard Snapshot", verifies the layout of the new server. These tests are crucial in detecting any regressions in the UI.
+This file contains two e2e tests for visual regression, ensuring that the legacy and new dashboard components match their expected screenshots. The `dashboard.spec.js` test suite is used to verify the consistency of the UI between different environments. These tests are crucial in maintaining the quality and stability of the application.
 
 ## Exports / API Surface
 | Export | Description |
 |--------|-------------|
-| `test` | Runs a test case with the given configuration and callback function. |
-| `expect` | Verifies that a certain condition is met, throwing an error if not. |
+| `test` | Defines an e2e test case. |
+| `expect` | Verifies expected conditions during testing. |
 
 ## Internal Logic
-The main execution flow of this file is as follows:
-- The first test navigates to the legacy server, waits for initial load, and captures a screenshot.
-- The second test navigates to the new server, waits for initial load, and captures a screenshot.
+The main execution flow involves two separate tests for the legacy and new dashboard components.
 
-Key functions include `page.goto()`, which navigates to a URL, `page.waitForLoadState()`, which waits for a specific load state, and `expect(page).toHaveScreenshot()`, which verifies that a certain condition is met (in this case, the presence of a screenshot).
+- The first test (`Visual Regression: Legacy Dashboard Snapshot`) visits the legacy server, waits for initial load, captures a screenshot, and asserts that it matches an expected snapshot.
+- The second test (`Visual Regression: New Dashboard Snapshot`) does similar steps but for the new dashboard component.
+
+No specific functions are defined in this file; instead, it leverages utility functions from other modules.
 
 ## Dependencies
 | Module | Local | Why |
 |--------|-------|-----|
-| `@playwright/test` | No | Provides testing utilities.
+| `@playwright/test` | No | Provides the test framework. |
+| `example` | Yes | Importing necessary helper utilities.
 
 ## Dependents
 No known dependents.

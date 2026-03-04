@@ -1,39 +1,45 @@
 ---
 source_hash: ae6e8b17f7f2f87f
-facts_hash: d060c957cdae88cb
-generated_at: 2026-03-03T07:47:18.501Z
+facts_hash: 25de5ee1a6fd31b9
+generated_at: 2026-03-04T06:07:30.067Z
 generator_version: 1.0.0
 model: cheap
-quality_score: 80
+quality_score: 87
 ---
 # File: tests/test-session-logger.js
 
 ## Purpose
-This file tests the functionality of the `SessionLogger` class, specifically its async logging capabilities. It creates a logger instance, logs messages, and verifies that the log entries are written to disk. The test also checks multiple log entries.
+This file tests the functionality of the `SessionLogger` class, specifically its asynchronous logging capabilities. It creates a logger instance and logs messages to ensure that the log file is created correctly and contains the expected content. The test also verifies that multiple logs can be written to the same file without overwriting previous entries.
 
 ## Exports / API Surface
 | Symbol | Type | Params | Description |
 |--------|------|--------|-------------|
-| `SessionLogger` | function |  | Creates a new instance of the SessionLogger class. |
-| `log` | function | `message` | Logs a message to the log file. |
-| `end` | function | `callback` | Ends the logger's stream and flushes any pending data. |
+| `SessionLogger` | function | `name` | Creates a new logger instance with the specified name. |
+| `log` | method | `message` | Logs a message to the underlying log file. |
+| `end` | method | `callback` | Closes the log stream and flushes any buffered output, allowing for the retrieval of the log contents. |
 
 ## Internal Logic
-The main execution flow starts by creating a new instance of the `SessionLogger` class, passing the `AGENT_NAME` as an argument. The `log` method is then used to log a message to the log file, followed by calling the `end` method to flush any pending data and wait for the file creation to complete.
+The main execution flow of this file is as follows:
 
-The test creates a second logger instance with a suffix (`_2`) and logs multiple messages using the `log` method. After all log messages have been written, the `end` method is called on both logger instances to ensure that any remaining data is flushed to disk.
+1. The script creates a cleanup function that removes any existing log files from the specified directory to ensure a clean slate for testing.
+2. It sets up logging by creating a new `SessionLogger` instance with the name "TestAgentAsync".
+3. The script logs a single message using the `log` method and waits for the file creation (stream open) process to complete, which is typically synchronous on most systems.
+4. After logging the initial message, it uses the `end` method to flush the stream and retrieve the contents of the log file.
+5. It verifies that the retrieved content contains a single entry with the expected message and then logs another message using the same logger instance but with a different name ("TestAgentAsync_2").
+6. The script logs multiple messages using the new logger instance and verifies that each entry is written to the log file correctly.
 
 ## Dependencies
 | Module | Local | Why |
 |--------|-------|-----|
-| `../lib/SessionLogger` | Yes | Provides the functionality for logging and flushing data. |
-| `fs` | No | Used for interacting with the file system, including reading and writing log files. |
+| `SessionLogger` | Yes | Provides asynchronous logging functionality for session data. |
+| `assert` | No | Provides assertion functionality for testing purposes. |
+| `fs` | No | Provides file system functionality, including reading and writing file contents. |
 
 ## Side Effects
-- console_output: The test logs messages to the console using `console.log`, which displays the log output.
-- filesystem_read: The test reads the contents of a log file using `fs.readFileSync` to verify its contents match expectations.
-- filesystem_write: The test writes data to a log file using `logger.log` and `fs.writeFileSync` (not shown in this code snippet).
-- process_control: The test exits the process with an error code of 1 if the log file is not found, using `process.exit`.
+- console_output: The script logs messages to the console during execution.
+- filesystem_read: The script reads the contents of the log file using `fs.readFileSync`.
+- filesystem_write: The script writes data to the log file using the underlying logging stream created by the `SessionLogger` instance.
+- process_control: The script uses `process.exit` to terminate the process if a log file is not found, indicating an error.
 
 ## Dependents
 No known dependents.

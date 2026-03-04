@@ -1,7 +1,7 @@
 ---
 source_hash: b0fc970f7b65a430
 facts_hash: b0fc970f7b65a430
-generated_at: 2026-03-03T07:58:35.432Z
+generated_at: 2026-03-04T06:16:58.163Z
 generator_version: 1.0.0
 model: cheap
 quality_score: 100
@@ -9,22 +9,24 @@ quality_score: 100
 # Folder: lib/auth
 
 ## Purpose
-This `lib/auth` folder contains a set of classes and functions for managing user authentication, profile management, and OAuth flows with Google APIs. It provides essential tools for handling user authentication and session management, while also encapsulating the complexity of authenticating users across multiple APIs. The key responsibilities include handling user authentication and session management.
+This `lib/auth` folder contains essential modules for managing user authentication and profile data, ensuring a secure and centralized way to handle credentials and API keys across the application.
 
 ## Key Files
 | File | Role |
 |------|------|
-| auth-store.js | Manages authentication data in a JSON file at user's home directory |
-| basic.js | Validates user credentials using dashboard authentication configuration |
-| google.js | Handles OAuth flows and fetches user information from Google APIs |
-| profile-mgr.js | Resolves API keys based on environment variables and Auth Store profiles |
+| auth-store.js | Manages user profiles and credentials utilizing file system operations. |
+| basic.js | Verifies user credentials through password hashing verification. |
+| google.js | Handles Google authentication, including OAuth flow and token management. |
+| profile-mgr.js | Resolves API keys, retrieves profiles, and lists available profiles. |
 
 ## Ownership
 Not yet assigned.
 
 ## Invariants / Rules
-Likely: The `AuthStore` class loads and saves authentication profiles in a JSON file at the user's home directory.
-Likely: The `ProfileManager` class resolves API keys based on environment variables and Auth Store profiles to handle complex authentications.
+| Rule | Description |
+|------|-------------|
+| Likely: Unique Store Path | The `auth-store.js` module ensures a unique store path for each instance. |
+| Likely: Password Hashing Verification | The `basic.js` file uses password hashing verification to protect user credentials.
 
 ## Cross-References
 - [auth-store.js](../../../files/lib/auth/auth-store.js.md)

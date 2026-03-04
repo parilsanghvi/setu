@@ -1,37 +1,38 @@
 ---
 source_hash: 851598533a773ce0
-facts_hash: 46db8a2a47deb1bb
-generated_at: 2026-03-03T07:41:00.749Z
+facts_hash: 9820e40570081aeb
+generated_at: 2026-03-04T06:01:20.566Z
 generator_version: 1.0.0
 model: cheap
-quality_score: 84
+quality_score: 89
 ---
 # File: tests/test-google-auth-binding.js
 
 ## Purpose
-This file tests the functionality of the `GoogleAuth` class, specifically its ability to bind to a local server when logging in. It creates mock dependencies to isolate the test environment and verifies that the login method correctly triggers the server to listen on localhost:51121.
+This file tests the GoogleAuth module, which binds to localhost by starting an HTTP server and listening on port 51121 with the specified redirect URI.
 
 ## Exports / API Surface
 | Symbol | Type | Params | Description |
 |--------|------|--------|-------------|
-| `login` | function |  | Logs in using Google authentication |
-| `__export__` | object |  | Exports the GoogleAuth class |
+| `googleAuth` | function | - | Starts an HTTP server and listens on port 51121 with the specified redirect URI. |
+| `login` | method | - | Triggers the server to start listening when called. |
 
 ## Internal Logic
-The test file sets up mock dependencies for the `Module`, `child_process`, and `http` modules to isolate the test environment. It then requires the `GoogleAuth` module and calls its `login` method, verifying that it correctly triggers the server to listen on localhost:51121.
-
-The key function is `login()`, which logs in using Google authentication. However, the exact implementation of this method is not shown in this file due to redacted content.
+The main execution flow of this file involves mocking dependencies, requiring the GoogleAuth module, testing its behavior, and restoring original mocks. The key functions include:
+- `googleAuth.login()`: Triggers the server to start listening.
+- `googleAuth.listenArgs`: Stores the arguments passed to the `listen` method of the HTTP server.
 
 ## Dependencies
 | Module | Local | Why |
 |--------|-------|-----|
-| `GoogleAuth` | Yes | Implements Google authentication functionality |
-| `child_process` | No | Provides a way to spawn new processes |
-| `http` | No | Handles HTTP requests and responses |
+| `node:test` | Yes | Provides testing utilities |
+| `module` | No | Provides require function for importing modules |
+| `child_process` | No | Provides spawn function for running subprocesses |
+| `http` | No | Provides HTTP server functionality |
 
 ## Side Effects
-- console_output: The test file logs some output to the console, including the listen args and port number.
-- subprocess: None
+- console_output: The file logs the listen arguments to the console using `console.log('Listen args:', listenArgs);`.
+- subprocess: The file mocks the `spawn` method of the child_process module by replacing it with a mock function that does nothing.
 
 ## Dependents
 No known dependents.

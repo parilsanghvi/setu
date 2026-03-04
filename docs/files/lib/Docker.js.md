@@ -1,37 +1,41 @@
 ---
 source_hash: a0ac0f3afa104b15
-facts_hash: 8f00a7e7e37032d0
-generated_at: 2026-03-03T07:16:01.397Z
+facts_hash: de3a28cc7fc6395f
+generated_at: 2026-03-04T05:35:54.039Z
 generator_version: 1.0.0
 model: cheap
-quality_score: 90
+quality_score: 89
 ---
 # File: lib/Docker.js
 
 ## Purpose
-The Docker.js file is responsible for managing the Docker engine on a system, ensuring its availability and configuration. The `Docker` class handles the detection of the Docker executable, checks its availability, and provides a method to run processes inside containers. This class plays a crucial role in enabling or disabling sandboxing based on the Docker engine's status.
+This file defines a class named Docker, which is responsible for managing the Docker engine on the system. The class has methods to detect the presence of Docker, check its availability, and run processes inside containers. It also exports an instance of the Docker class.
 
-## Exports / API Surface
 | Export | Type | Description |
 |--------|------|-------------|
-| `run` | function | Runs a process inside a container using the Docker engine. |
-| `detectDocker` | function | Detects the path to the Docker executable on the system. |
+| constructor | cjs_default | Initializes the Docker instance and detects the Docker path |
+| detectDocker | function | Attempts to find the Docker executable using the 'which' command |
+| checkAvailability | function | Verifies that Docker is available by running the '--version' command |
+| run | function | Spawns a process inside a container with specified image, command, and options |
 
 ## Internal Logic
-The main execution flow of the Docker.js file begins with the constructor, which initializes the logger and checks for the DOCKER_PATH configuration setting. If the DOCKER_PATH is set, it validates the executable's name; otherwise, it attempts to detect the Docker executable using the `detectDocker` method.
+The main execution flow of the Docker class begins in its constructor. The constructor initializes a new Logger instance, detects the Docker path, and checks its availability using the checkAvailability method.
 
-Upon successful detection or if the DOCKER_PATH is invalid, the `checkAvailability` method is called to verify the Docker engine's availability by spawning a process that checks for the version. This method sets the `enabled` property based on the return code of the spawned process and logs the result accordingly.
+The detectDocker method uses the 'which' command to find the Docker executable on the system.
 
-The `run` method takes an image, command, and options as input and generates the necessary arguments to run a container with the specified configuration. It then spawns a new process using the Docker engine and returns the child process object.
+The checkAvailability method spawns the '--version' command using the child_process module and listens for the 'error', 'close', and 'exit' events. If Docker is not available, it sets the enabled flag to false.
+
+The run method takes an image, command, and options as parameters. It creates a list of arguments by merging the default network disablement with the specified mounts and env vars. The method then spawns a new process using the detected Docker executable.
 
 ## Dependencies
 | Module | Local | Why |
 |--------|-------|-----|
-| `./Config` | Yes | Provides access to system-wide configuration settings, including DOCKER_PATH. |
-| `./Logger` | Yes | Handles logging operations for the Docker engine's status and events. |
+| Config | Yes | Provides configuration settings for the Docker path |
+| Logger | Yes | Logs events and warnings during the initialization of the Docker instance |
+| child_process | No | Enables the execution of system commands to detect and check Docker availability |
 
 ## Side Effects
-- Subprocess: The `detectDocker`, `checkAvailability`, and `run` methods spawn subprocesses to interact with the Docker engine.
+- subprocess: The Docker instance spawns a new process using the detected Docker executable when running a container, which may lead to resource utilization and potentially cause issues if not managed properly.
 
 ## Dependents
 No known dependents.

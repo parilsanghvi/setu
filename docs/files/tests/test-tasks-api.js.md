@@ -1,7 +1,7 @@
 ---
 source_hash: 70502a88746ef846
-facts_hash: bd111046fe857b4a
-generated_at: 2026-03-03T07:48:44.754Z
+facts_hash: d5616a1705fe268e
+generated_at: 2026-03-04T06:08:49.611Z
 generator_version: 1.0.0
 model: cheap
 quality_score: 94
@@ -9,35 +9,36 @@ quality_score: 94
 # File: tests/test-tasks-api.js
 
 ## Purpose
-This file tests the /api/tasks endpoint of a dashboard server, sending a POST request with sample task data and verifying the response status and contents.
+This file tests the /api/tasks endpoint of the DashboardServer class, which handles incoming requests and sends responses with specific headers and body content.
 
 ## Exports / API Surface
 | Symbol | Type | Params | Description |
 |--------|------|--------|-------------|
-| `DashboardServer` | class | - | Creates a new dashboard server instance |
-| `statusModule` | module | - | Provides mock onboarding status functionality |
+| req    | arrow | `http.request(options, (res` | Handles incoming HTTP requests to the /api/tasks endpoint. |
+| options| object | `hostname: 'localhost', ...` | Defines the request options for sending data to the server. |
+| res    | arrow | `'data', (chunk` | Processes and sends responses from the server. |
 
 ## Internal Logic
-The main execution flow involves:
-1. Creating a new dashboard server instance using the `DashboardServer` class.
-2. Starting the server and capturing its stderr output to detect any errors.
-3. Defining a POST request options object with sample task data and headers.
-4. Creating an HTTP request using the options object.
-5. Handling the response data and verifying its status and contents using assertions.
-6. Closing the server instance when finished.
+The file executes the following main flow:
+1. The DashboardServer class is instantiated with a port number, starting the server.
+2. A POST request is sent to the /api/tasks endpoint with a JSON payload using the http.request function.
+3. The response data is captured and parsed from the server.
+4. Assertions are used to verify the status code and expected values in the response.
+5. If an error occurs during assertion, the test exits with a failure message.
 
 ## Dependencies
 | Module | Local | Why |
 |--------|-------|-----|
-| `../lib/onboarding/status` | Yes | Mocks onboarding status for testing purposes |
-| `../lib/server` | Yes | Provides the server class to create and manage a dashboard server |
-| `http` | No | Used to create an HTTP request object |
+| `../lib/server` | Yes | Provides the DashboardServer class for testing. |
+| `../lib/onboarding/status` | Yes | Mocks the onboarding status to pass the hard gate during testing. |
+| `assert` | No | Provides assertion utilities for verifying response values. |
+| `http` | No | Provides HTTP request functionality for sending data to the server. |
 
 ## Side Effects
-- console_output: The script logs console messages indicating test success or failure, as well as any error messages.
-- env_access: The script accesses the `DASHBOARD_PASS` environment variable to set a mock authentication token for testing purposes.
-- network: The script establishes an HTTP connection to the dashboard server instance at the specified port.
-- process_control: The script captures and restores process stderr output to detect any errors that might be reported in the standard error stream.
+- console_output: The test logs success or failure messages to the console using console.error and console.log.
+- env_access: The test sets an environment variable DASHBOARD_PASS to a secret value during testing.
+- network: The test sends an HTTP request to the localhost server at port 4002.
+- process_control: The test captures and restores the original stderr write function to detect any "headers already sent" errors.
 
 ## Dependents
 No known dependents.

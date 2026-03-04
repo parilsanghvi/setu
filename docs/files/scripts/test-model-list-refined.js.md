@@ -1,7 +1,7 @@
 ---
 source_hash: 6e6cdbc10531933b
-facts_hash: 5711140c3bb75d2b
-generated_at: 2026-03-03T07:30:08.949Z
+facts_hash: c2922337e216a25b
+generated_at: 2026-03-04T05:49:25.636Z
 generator_version: 1.0.0
 model: cheap
 quality_score: 94
@@ -9,28 +9,30 @@ quality_score: 94
 # File: scripts/test-model-list-refined.js
 
 ## Purpose
-This file, `test-model-list-refined.js`, tests the functionality of listing available models using the Antigravity API. The `main` function sends a request to fetch available models with an empty body and specific headers to verify its correctness. Additionally, it retrieves user profiles from the AuthStore to obtain a valid Google authentication token.
+This file tests the `listProfiles` method of the `AuthStore` class to retrieve a Google profile ID, then uses this ID to fetch available models with an empty body and Antigravity headers from the Cloud Code API.
 
 ## Exports / API Surface
 | Symbol | Type | Params | Description |
 |--------|------|--------|-------------|
-| `main` | function | `` | Handles testing of Antigravity API model listing functionality. |
+| `main` | function | `` | Handles the main execution flow of the test. |
 
 ## Internal Logic
-The main execution flow in this file involves the following key functions:
-- `AuthStore.listProfiles()`: Retrieves a list of user profiles from the AuthStore.
-- `GoogleAuth.getValidToken(googleProfileId)`: Obtains a valid authentication token using the provided Google profile ID.
-- The code sends an HTTP request to fetch available models with specific headers and an empty body.
+The main execution flow involves:
+- Calling `listProfiles` on `AuthStore` to retrieve a Google profile ID.
+- If no Google profile ID is found, the program exits.
+- Using `GoogleAuth` to obtain a valid token for the Google profile ID.
+- Fetching available models with an empty body and Antigravity headers using the Cloud Code API's `fetchAvailableModels` endpoint.
+- Handling the response from the API, logging success or failure messages depending on the status code.
 
 ## Dependencies
 | Module | Local | Why |
 |--------|-------|-----|
-| `../lib/auth/google` | Yes | Provides functionality for obtaining authentication tokens from Google. |
-| `../lib/auth/auth-store` | Yes | Manages user profiles and provides a list of profiles to authenticate with the Antigravity API. |
+| `AuthStore` | Yes | Manages authentication-related functionality. |
+| `GoogleAuth` | Yes | Handles Google-specific authentication and token retrieval. |
 
 ## Side Effects
-- console_output: This file logs various messages to the console, including successful or failed requests, response status codes, and error messages.
-- network: The code sends an HTTP request to the Antigravity API, potentially impacting network connectivity and performance if multiple concurrent requests are made.
+- console_output: The program logs messages to the console, including success or failure messages and API response details.
+- network: The program makes a network request to the Cloud Code API's `fetchAvailableModels` endpoint to retrieve available models.
 
 ## Dependents
 No known dependents.

@@ -1,37 +1,50 @@
 ---
 source_hash: 63f3b8611c3852ff
-facts_hash: 40d30035bac347ea
-generated_at: 2026-03-03T07:27:21.755Z
+facts_hash: 5ef6dc1ce775e1fe
+generated_at: 2026-03-04T05:46:56.465Z
 generator_version: 1.0.0
 model: cheap
-quality_score: 96
+quality_score: 100
 ---
 # File: lib/utils.js
 
 ## Purpose
-This file exports two functions, `readLastLines` and `estimateJsonLength`, which are used to efficiently read the last N lines of a file without loading the entire file into memory, and estimate the JSON string length of a value without serialization respectively.
+This file provides two utility functions: `readLastLines` and `estimateJsonLength`. The `readLastLines` function efficiently reads the last N lines of a file without loading the entire file into memory, while the `estimateJsonLength` function recursively estimates the JSON string length of a value without serialization.
 
 ## Exports / API Surface
 | Export | Type | Description |
 |--------|------|-------------|
-| `readLastLines` | cjs_named | Reads the last N lines of a file efficiently. |
+| `readLastLines` | cjs_named | Returns an array of lines from the end of a file. |
 | `estimateJsonLength` | cjs_named | Estimates the JSON string length of a value without serialization. |
 
 ## Internal Logic
-The main execution flow of this file is as follows:
+The main execution flow of `readLastLines` involves:
+- Opening the specified file in read mode.
+- Checking if the file is empty or has no newlines, returning an empty array if so.
+- Reading chunks from the end of the file until it reaches the desired number of newlines or hits the start of the file.
+- Splits the content into lines and returns the last `maxLineCount` lines.
 
-- The `readLastLines` function opens the specified file in read mode and gets its stats.
-- It then reads chunks from the end of the file until it has enough newlines or hits the start of the file.
-- After that, it splits the content into lines and returns the last N lines.
-- The `estimateJsonLength` function uses recursion to estimate the JSON string length of a value by counting the number of characters required for each type.
+Key functions:
+- `fs.open`: Opens a file in read mode.
+- `fileHandle.stat`: Gets the stats of the opened file handle.
+- `fileHandle.close`: Closes the file handle.
+- `Buffer.alloc`: Allocates memory for a buffer.
+- `read(buffer, offset, length, position)`: Reads from the file handle into a buffer.
+
+The `estimateJsonLength` function involves:
+- Checking if the input value is null or undefined and returning the corresponding length.
+- Checking if the input value is a string and returning its length plus 2 (for the "string" keyword).
+- Checking if the input value is a number and returning its length as a string.
+- Checking if the input value is a boolean and returning 4 for true and 5 for false.
+- If the input value is an array, recursively estimating the JSON length of each item and adding 2 (for the "[]" keyword) and commas.
 
 ## Dependencies
 | Module | Local | Why |
 |--------|-------|-----|
-| `fs/promises` | No | Provides promise-based file system functionality. |
+| `fs/promises` | No | Provides asynchronous file I/O operations. |
 
 ## Side Effects
-- console_output: Errors are logged to the console with the error message and the file path, and an empty array is returned in case of errors or if the file does not exist.
+- console_output: The function logs an error message to the console if there's an issue reading the log file, but it doesn't directly output anything else.
 
 ## Dependents
 - [index.js](../index.js.md)

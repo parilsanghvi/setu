@@ -1,42 +1,43 @@
 ---
 source_hash: 56715ad0e475c048
-facts_hash: fa9f6d7fd73a4891
-generated_at: 2026-03-03T07:52:23.780Z
+facts_hash: c9e66ec601ca8ecd
+generated_at: 2026-03-04T06:12:01.143Z
 generator_version: 1.0.0
 model: cheap
-quality_score: 83
+quality_score: 88
 ---
 # File: tests/verify-core.js
 
 ## Purpose
-This file, `verify-core.js`, is a test script that verifies the functionality of two agents, Tark and Guru, by checking if they are registered in the database within a specified time frame. The script uses the `bus` object to interact with the database. It spawns the backend processes for Tark and Guru using the `child_process` module.
+This file is used to verify the existence of two agents, Tark and Guru, in a database after spawning their corresponding backend processes. It checks if the agents are alive and registered by querying the database after a 5-second delay. If successful, it logs a success message and exits with code 0; otherwise, it logs an error message and exits with code 1.
 
+## Exports / API Surface
 | Symbol | Type | Params | Description |
 |--------|------|--------|-------------|
-| spawn  | function | Array | Spawns a new process |
-| prepare | method | String | Prepares a SQL query to execute |
-| find   | method | Arrow Function | Finds an element in an array by name |
+| `spawn` | function | - | Spawns a new process by executing a command. |
+| `require` | module | - | Imports the required modules for the file. |
+| `bus.db.prepare` | method | 'SELECT * FROM agents' | Prepares a SQL query to select all records from the 'agents' table. |
 
 ## Internal Logic
-The script consists of the following key steps:
-- Spawn Tark and Guru backend processes using `spawn`.
-- Set a timeout of 5 seconds after which the verification checks are performed.
-- Use the `prepare` method to execute a SQL query on the database, selecting all records from the `agents` table.
-- Find the agents Tark and Guru in the retrieved array by their names using the `find` method.
-- Check if both agents are found; if so, log success and exit with code 0, otherwise log failure and exit with code 1.
+The main execution flow of this file involves spawning two backend processes, Tark and Guru, using the `spawn` function, waiting for 5 seconds, and then querying the database to check if both agents are alive and registered.
+
+- The `spawn` function is used to execute the Tark and Guru backend processes by executing the corresponding JavaScript files.
+- The `setTimeout` function is used to wait for a 5-second delay before checking if the agents are in the database.
+- The `bus.db.prepare` method is used to prepare a SQL query to select all records from the 'agents' table.
+- The `all()` method of the prepared statement returns an array of objects representing the selected rows, which are then logged to the console.
 
 ## Dependencies
 | Module | Local | Why |
 |--------|-------|-----|
-| child_process | No | Provides process creation functionality |
-| path | No | Offers file system utility functions |
-| db       | Yes | Facilitates database interactions |
+| `child_process` | No | Provides a way to spawn new processes. |
+| `path` | No | Helps resolve file paths for the spawned processes. |
+| `../lib/db` | Yes | Provides access to the database used to store agent information. |
 
 ## Side Effects
-- console_output: The script logs various messages to the console, including success and failure messages, as well as the spawned processes.
-- database: The script executes a SQL query on the `agents` table in the database, potentially modifying or retrieving data.
-- process_control: The script spawns two new processes using the `spawn` function, effectively taking control of the main thread to execute the backend processes.
-- subprocess: The script interacts with the spawned subprocesses (Tark and Guru) by sending input and receiving output, allowing it to verify their functionality.
+- console_output: The console.log statements print messages to the console, including the spawning of Tark and Guru processes and the results of the verification.
+- database: The file queries the 'agents' table in the database to check if both agents are alive and registered.
+- process_control: The file uses the `spawn` function to control the execution of Tark and Guru backend processes.
+- subprocess: The spawned Tark and Guru processes can be considered sub-processes, which run independently of the main verification script.
 
 ## Dependents
 No known dependents.

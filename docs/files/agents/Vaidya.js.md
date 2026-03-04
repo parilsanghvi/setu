@@ -1,7 +1,7 @@
 ---
 source_hash: 028c19077094b40b
-facts_hash: 56f34944f9c1a6b5
-generated_at: 2026-03-03T07:05:50.352Z
+facts_hash: bc2810d901974f7d
+generated_at: 2026-03-04T05:25:16.256Z
 generator_version: 1.0.0
 model: cheap
 quality_score: 100
@@ -9,36 +9,41 @@ quality_score: 100
 # File: agents/Vaidya.js
 
 ## Purpose
-The Vaidya.js file defines a class `Vaidya` that extends the `Agent` class from the `../lib/Agent` module. The `Vaidya` class is responsible for booting up the system by checking various components, including environment, Docker, database, and node modules. If all components are healthy, it verifies that the system can speak to confirm its status.
+The Vaidya.js file defines a class that extends the Agent class from the lib/Agent module, which is responsible for booting up the Vaidya agent and verifying its health by checking various components such as environment variables, Docker connectivity, database operations, and node modules.
 
 ## Exports / API Surface
 | Export | Type | Description |
 |--------|------|-------------|
-| `Vaidya` | cjs_default | Exposes a constructor function to create new instances of the Vaidya class. |
+| `Vaidya` | cjs_default | Exports a class that extends the Agent class to perform boot-up checks. |
 
 ## Internal Logic
 The main execution flow of the Vaidya.js file is as follows:
 
-- The `boot()` method is called, which logs messages to the console indicating system status and checks various components.
-- The `checkEnv()`, `checkDocker()`, `checkDB()`, and `checkNodeModules()` methods are called in sequence to verify environment variables, Docker connectivity, database health, and node module dependencies.
+- The constructor initializes the agent with its name, description, and log directory.
+- The `boot()` method is called when the agent boots up, which performs the following checks:
+  - `checkEnv()`: Verifies if environment variables are set correctly and logs a warning if not found.
+  - `checkDocker()`: Checks if Docker is running by executing the `docker --version` command.
+  - `checkDB()`: Connects to the database to check for any errors or inconsistencies.
+  - `checkNodeModules()`: Verifies if node modules are installed and up-to-date.
+- If all checks pass, it logs a success message; otherwise, it exits with an error code.
 
 ## Dependencies
 | Module | Local | Why |
 |--------|-------|-----|
-| `../lib/Agent` | Yes | Provides a base class for agents in the system. |
-| `../lib/Config` | Yes | Offers configuration management functionality. |
-| `../lib/db` | Yes | Enables database interaction and agent counting. |
-| `child_process` | No | Used to execute Docker commands from within the script. |
-| `fs` | No | Utilized for file system operations such as checking for the existence of files. |
-| `path` | No | Provides path manipulation utilities. |
+| `../lib/Agent` | Yes | Provides the base Agent class for extending. |
+| `../lib/Config` | Yes | Configures environment variables and other settings. |
+| `../lib/db` | Yes | Interacts with the database to check its health. |
+| `child_process` | No | Executes system commands for Docker checks. |
+| `fs` | No | Reads and writes files to verify node modules existence. |
+| `path` | No | Manages file paths for environment variable and log directory setup. |
 
 ## Side Effects
-- console_output: The script logs messages to the console indicating its progress and any errors that occur during the boot process.
-- database: The script interacts with a database to check its health and count agents.
-- env_access: The script accesses environment variables to verify their presence and values.
-- filesystem_read: The script checks for the existence of files, including the `.env` file and the `node_modules` directory.
-- process_control: The script uses process control to exit the program with a non-zero status code if the system is not healthy.
-- subprocess: The script executes Docker commands from within the script using the `child_process` module.
+- console_output: Logs success or error messages to the console during boot-up checks.
+- database: Performs a query on the database to retrieve agent counts.
+- env_access: Accesses environment variables to verify their existence and values.
+- filesystem_read: Reads files in the node_modules directory to check for its presence.
+- process_control: Exits the process with an error code if all health checks fail.
+- subprocess: Executes system commands using child_process to run Docker commands.
 
 ## Dependents
 No known dependents.

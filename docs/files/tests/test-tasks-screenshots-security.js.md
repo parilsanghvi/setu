@@ -1,54 +1,53 @@
 ---
 source_hash: 94cbdee7fdfe50ed
-facts_hash: c584154d1535ebdd
-generated_at: 2026-03-03T07:49:12.129Z
+facts_hash: 52627c0004912907
+generated_at: 2026-03-04T06:09:11.691Z
 generator_version: 1.0.0
 model: cheap
-quality_score: 85
+quality_score: 91
 ---
 # File: tests/test-tasks-screenshots-security.js
 
 ## Purpose
-This file tests the security features of a web server, specifically the protection against path traversal attacks on the `/api/tasks/:id/screenshots` endpoint.
+This file tests the security of a server's `/api/tasks/:id/screenshots` path by verifying that it correctly handles various types of input, including valid and invalid task IDs, path traversal attempts, and characters.
 
 ## Exports / API Surface
 | Symbol | Type | Params | Description |
 |--------|------|--------|-------------|
-| `request` | arrow | `path` | Handles incoming requests to the test server. |
-| `DashboardServer` | class | - | Creates a new instance of the DashboardServer class, which handles incoming requests and tests the security features. |
+| `DashboardServer` | function |  | Creates a new instance of the Dashboard server class. |
+| `test` | arrow |  | Runs a test suite for the security functionality. |
+| `request` | arrow | `path` | Makes an HTTP request to the server. |
 
 ## Internal Logic
-The file starts by mocking certain methods of the `fs` module to simulate the behavior of the real file system on the server. It then creates an instance of the `DashboardServer` class, which is responsible for handling incoming requests and testing the security features.
+The main execution flow of this file is as follows:
 
-The main execution flow is as follows:
+1. The `test` function creates a new instance of the `DashboardServer` class and starts the server.
+2. The test suite consists of several tests that verify the security functionality of the `/api/tasks/:id/screenshots` path.
+3. Each test uses the `request` function to make an HTTP request to the server with a specific path parameter.
+4. The test checks the response status code, headers, and data to ensure that it is correct and secure.
 
-1. The file tests that a valid task ID with screenshots returns 200 and a list of files.
-2. It tests that a valid task ID without screenshots returns 200 and an empty list.
-3. It tests that a non-existent task ID returns 200 and an empty list (graceful degradation).
-4. It tests that path traversal attempts return 400 Bad Request.
-5. It tests that invalid characters ($, %2e%2e%2f) return 400 Bad Request.
+The key functions in this file are:
 
-The key functions in the file are:
-
-* `request`: a helper function that sends an HTTP request to the test server and returns the response.
-* `DashboardServer`: the main class that handles incoming requests and tests the security features.
-* `fs.existsSync`, `fs.readdirSync`, and `fs.watchFile` are mocked methods of the `fs` module.
+* `test`: Runs a test suite for the security functionality.
+* `DashboardServer`: Creates a new instance of the Dashboard server class.
+* `request`: Makes an HTTP request to the server.
 
 ## Dependencies
 | Module | Local | Why |
 |--------|-------|-----|
-| `node:test` | No | Provides testing utilities for Node.js. |
-| `http` | No | Provides HTTP request functionality. |
-| `path` | No | Provides path manipulation functionality. |
-| `fs` | Yes | Provides file system functionality, which is mocked in this test. |
+| `node:test` | Yes | Provides a testing framework. |
+| `../lib/server` | Yes | Provides the server implementation. |
+| `http` | No | Provides low-level networking functionality. |
+| `fs` | No | Provides file system functionality. |
+| `node:assert` | No | Provides assertion utilities. |
 
 ## Side Effects
-- console_output: None.
-- env_access: The file accesses the `process.env.DASHBOARD_PASS` environment variable to disable authentication for testing purposes.
-- filesystem_read: The file reads and writes files to the `/screenshots` directory using the mocked `fs.existsSync`, `fs.readdirSync`, and `fs.watchFile` methods.
-- global_mutation: The file mutates the `global.setInterval` function to prevent background tasks from running during the test.
-- network: The file sends HTTP requests over the network to the test server.
-- process_control: The file controls the process exit status by using a timeout and `process.exit(0)` at the end of the test.
+- console_output: The test suite logs messages to the console for debugging purposes.
+- env_access: The test suite accesses environment variables to configure the server.
+- filesystem_read: The test suite reads files from the file system to verify the security functionality.
+- global_mutation: The test suite mutates global variables to mock out certain dependencies.
+- network: The test suite establishes a network connection to the server for testing.
+- process_control: The test suite controls the process flow by waiting for the server to shut down after each test.
 
 ## Dependents
 No known dependents.

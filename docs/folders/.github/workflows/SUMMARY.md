@@ -1,7 +1,7 @@
 ---
 source_hash: 8b1023faf7f1bf3e
 facts_hash: 8b1023faf7f1bf3e
-generated_at: 2026-03-03T07:55:31.055Z
+generated_at: 2026-03-04T06:14:33.842Z
 generator_version: 1.0.0
 model: cheap
 quality_score: 100
@@ -9,20 +9,20 @@ quality_score: 100
 # Folder: .github/workflows
 
 ## Purpose
-This GitHub Actions workflow and onboarding gate are responsible for ensuring the quality and completeness of repository documentation, as well as producing a weekly governance report. The folder enforces best practices for maintaining accurate and up-to-date documentation. Key responsibilities include automated checks and reporting mechanisms.
+This GitHub Actions workflows folder contains two key files responsible for generating and enforcing governance and onboarding compliance in the codebase. The `governance-digest.yml` file runs a job that generates and uploads a report, while the `onboarding-gate.yml` file checks pull requests for completeness before merging them into main branches.
 
 ## Key Files
 | File | Role |
-| `governance-digest.yml` | Defines a GitHub Actions workflow that runs on Mondays at 9:00 AM UTC, producing a weekly digest report of governance actions. |
-| `onboarding-gate.yml` | Checks the completeness and quality of documentation for a repository before allowing pull requests to be merged. |
+|------|------|
+| governance-digest.yml | Generates and uploads governance digest reports on Mondays. |
+| onboarding-gate.yml | Ensures pull request onboarding compliance and documentation quality. |
 
 ## Ownership
 Not yet assigned.
 
 ## Invariants / Rules
-Likely: Conformity to GitHub Actions workflow syntax and structure.
-Likely: Regular usage of Markdown formatting in README files.
-Enforce: Proper indentation and spacing throughout all JavaScript code files.
+Likely: Follows standard GitHub Actions workflow naming conventions.
+Likely: Uses environment variables to manage sensitive data, such as the Ubuntu 20.04 LTS environment in `governance-digest.yml`.
 
 ## Cross-References
 - [governance-digest.yml](../../../files/.github/workflows/governance-digest.yml.md)

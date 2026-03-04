@@ -1,7 +1,7 @@
 ---
 source_hash: 5ab204d68c71c211
-facts_hash: 40a1b63bea4f2658
-generated_at: 2026-03-03T07:33:49.545Z
+facts_hash: 00159b7e4da5a0cf
+generated_at: 2026-03-04T05:52:59.308Z
 generator_version: 1.0.0
 model: cheap
 quality_score: 94
@@ -9,30 +9,44 @@ quality_score: 94
 # File: tests/test-auth-cleanup.js
 
 ## Purpose
-This file contains tests for the authentication middleware in Node.js, specifically testing the rate limit cleanup functionality. It ensures that the `_getMapSize` and `_runCleanup` methods are correctly exported when the `NODE_ENV` is set to 'test'. The test simulates requests from two IPs with different rates of failure, verifying that the map size is updated correctly after running the cleanup.
+This file contains a test suite for the auth middleware's cleanup functionality, specifically testing how it handles rate limit expiration and cleans up expired entries from an IP address map.
+
+| Symbol | Type | Params | Description |
+|--------|------|--------|-------------|
+| `t` | function |  | Test object for assertions |
+| `test` | function | `async (t) => { ... }` | Runs test functions |
+| `authMiddleware` | object |  | Authentication middleware instance |
 
 ## Exports / API Surface
 | Symbol | Type | Params | Description |
 |--------|------|--------|-------------|
-| `createMock` | arrow | `ip` | Creates a mock request object for testing purposes. |
-| `for` | method | `let i = 0; i < 5; i++` | Iterates over a range of values to simulate repeated requests. |
+| `_getMapSize` | function |  | Returns the size of the IP address map |
+| `_resetMap` | function |  | Resets the IP address map to a clean state |
+| `_runCleanup` | function | `time` | Runs cleanup on expired entries with given time |
 
 ## Internal Logic
-The test file uses the `node:test` module to define tests, and the `node:assert` module for assertions. The main execution flow involves:
-- Initializing the test environment by setting `NODE_ENV` to 'test' and requiring the authentication middleware.
-- Creating mock request objects using the `createMock` function.
-- Simulating requests from two IPs with different rates of failure.
-- Verifying that the map size is updated correctly after running the cleanup.
+The main execution flow involves:
+1. Checking if the auth middleware exports the required functions `_getMapSize` and `_runCleanup`.
+2. Creating mock requests for IP addresses to simulate failed and successful authentication attempts.
+3. Verifying the initial size of the IP address map after failed authentication attempts.
+4. Simulating time passing using a cleanup helper function.
+5. Running the cleanup function with the simulated future time and verifying that the map is empty.
+
+| Key Function | Description |
+|---------------|-------------|
+| `createMock` | Creates mock requests for IP addresses with different authentication outcomes |
+| `_resetMap` | Resets the IP address map to a clean state before testing |
 
 ## Dependencies
 | Module | Local | Why |
 |--------|-------|-----|
-| `../lib/middleware/auth` | Yes | Provides the authentication middleware functionality. |
-| `node:assert` | No | Provides assertion utilities for testing. |
+| `../lib/middleware/auth` | Yes | Implements the auth middleware's cleanup functionality |
+| `node:test` | No | Provides test utilities for running tests |
+| `node:assert` | No | Provides assertion functions for testing |
 
 ## Side Effects
-- console_output: The test file logs a warning message to the console if the `_getMapSize` or `_runCleanup` methods are not exported when `NODE_ENV` is set to 'test'.
-- env_access: The test file accesses the `NODE_ENV` environment variable to determine which tests to run.
+- console_output: The file logs a warning message to the console if the required exports are not available, and fails the test using the assert fail function.
+- env_access: The file accesses the `NODE_ENV` environment variable to determine when to run the cleanup functionality.
 
 ## Dependents
 No known dependents.

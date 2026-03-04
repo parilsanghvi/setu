@@ -1,43 +1,50 @@
 ---
 source_hash: dbd8e895bae8e0b1
-facts_hash: 058af784f24fdc92
-generated_at: 2026-03-03T07:35:33.782Z
+facts_hash: feb7ee1d1891af61
+generated_at: 2026-03-04T05:54:45.992Z
 generator_version: 1.0.0
 model: cheap
-quality_score: 79
+quality_score: 85
 ---
 # File: tests/test-chat-input-security.js
 
 ## Purpose
-This file, `test-chat-input-security.js`, is a test suite for the chat input security feature in an application. It uses mocking to simulate various scenarios and ensures that large messages are rejected as expected.
+This file tests the security of a chat input handler in an Express.js application by simulating different payload sizes and verifying that it rejects large messages.
 
 ## Exports / API Surface
 | Symbol | Type | Params | Description |
 |--------|------|--------|-------------|
-| `mockBus` | arrow | `{` | Mocks out the database object for testing purposes. |
-| `mocks` | arrow | `{` | Provides mock implementations for various Node modules, including Express and others. |
-| `res` | arrow | `{` | Represents a response object used in tests. |
+| `app` | function |  | Creates an Express.js app instance |
+| `use` | method | `path, handler` | Registers a middleware function for the specified path |
+| `get` | method | `path, handler` | Registers a route for the specified path and HTTP method |
+| `post` | method | `path, handler` | Registers a route for the specified path and HTTP method |
+| `listen` | method | `(port, host, cb)` | Starts the server listening on the specified port and host |
+| `static` | method |  | Enables static file serving |
+| `json` | function |  | Returns a middleware function to parse JSON bodies |
+| `Server` | class |  | Creates an HTTP server instance |
 
 ## Internal Logic
 The main execution flow of this file is as follows:
 
-1. It sets up mocks for the Express and other Node modules using `mocks`.
-2. It captures the app instance when an Express app is created.
-3. It defines a test handler for the POST /api/chat endpoint using the captured app instance.
-4. It runs two tests: one with a small payload and another with a large payload.
+1. The script sets up mocks for various modules, including Express.js, to replace the original implementations with mock versions.
+2. It captures the app instance when it's created and stores it in a variable.
+3. The script attempts to require the `index.js` file with the `mockBus` setup to test its behavior.
+4. If the app instance is not captured or if no handler for the POST /api/chat route is found, the script exits with an error message.
+5. It then tests two payload sizes: a small one and a large one (50KB).
+6. For each test, it simulates sending a request to the `/api/chat` endpoint with a JSON body and checks the response status code.
 
 ## Dependencies
 | Module | Local | Why |
 |--------|-------|-----|
-| `module` | No | Provides the `require` function for importing modules. |
-| `path` | No | Provides utility functions for working with file paths. |
+| `module` | No | Loads the built-in Node.js module for dynamic imports |
+| `path` | No | Provides utilities for working with file paths |
 
 ## Side Effects
-- console_output: The test suite logs various messages to the console, including success and failure indicators, using `console.log` and `console.error`.
-- database: The mock database object (`mockBus`) is used to simulate a database connection without actually connecting to a real database.
-- env_access: The test suite accesses environment variables, such as `process.env.DASHBOARD_PASS`, to set up the testing environment.
-- process_control: The test suite uses `process.exit` to control the exit status of the process based on test results.
-- subprocess: The test suite does not create any child processes or execute system commands.
+- console_output: The script logs various messages to the console, including success and error messages.
+- database: None - The script does not interact with a database directly.
+- env_access: The script accesses environment variables `DASHBOARD_PASS` and `LOG_LEVEL`.
+- process_control: The script exits the process with a non-zero status code if an error occurs or if the app instance is not captured.
+- subprocess: None - The script does not create any child processes.
 
 ## Dependents
 No known dependents.

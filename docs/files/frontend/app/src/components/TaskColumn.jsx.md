@@ -1,34 +1,35 @@
 ---
 source_hash: 1695bb74005822ad
-facts_hash: 72afd7b9251c2f1b
-generated_at: 2026-03-03T07:11:51.441Z
+facts_hash: 9f90298eeb1f59dd
+generated_at: 2026-03-04T05:31:03.382Z
 generator_version: 1.0.0
 model: cheap
-quality_score: 100
+quality_score: 93
 ---
 # File: frontend/app/src/components/TaskColumn.jsx
 
 ## Purpose
-The TaskColumn component displays a list of tasks categorized by their status and allows users to interact with individual tasks. It receives task items, current status, and an onClick callback as props. The component uses React memoization to optimize performance.
+The TaskColumn component displays a list of tasks organized by status, with filtering and empty state handling capabilities. It utilizes the TaskCard component to render individual task items. The component's props are passed from its parent component.
 
 ## Exports / API Surface
 | Export | Type | Description |
 |--------|------|-------------|
-| `TaskColumn` | esm_default | Renders a list of tasks categorized by their status and allows users to interact with individual tasks. |
+| `TaskColumn` | esm_default | Renders a list of tasks organized by status. |
+| React | esm_default | Provides the React library for building user interfaces. |
 
 ## Internal Logic
-The TaskColumn component uses React functional components and JSX syntax. The main execution flow involves rendering the task list based on the provided props.
+The main execution flow involves rendering the TaskColumn component with its props, conditionally displaying an empty state message when no tasks are available. The `map` function is used to iterate over the task list and render individual TaskCard components.
 
-*   The component first renders a header row displaying the current status.
-*   It then maps over the task items array and renders a TaskCard component for each item, passing the task object and an onClick callback to handle task clicks.
-*   If no tasks are present, it displays an empty state message corresponding to the current status.
+| Function Name | Description |
+|---------------|-------------|
+| `render`      | Renders the TaskColumn component with its props. |
 
 ## Dependencies
 | Module | Local | Why |
 |--------|-------|-----|
-| `TaskCard` | Yes | Provides a reusable task card component. |
-| `./TaskColumn.module.scss` | Yes | Defines CSS styles for the TaskColumn component. |
-| `react` | No | Supplies the React library and its ecosystem functionality. |
+| React | No | Enables JSX syntax for building React components. |
+| TaskCard | Yes | Provides a reusable task item template. |
+| ./TaskColumn.module.scss | Yes | Styles the TaskColumn component's layout and appearance. |
 
 ## Side Effects
 None detected.

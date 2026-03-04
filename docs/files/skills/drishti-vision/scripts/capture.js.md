@@ -1,7 +1,7 @@
 ---
 source_hash: 04161a0d06601256
-facts_hash: 8dc5de101ce559e7
-generated_at: 2026-03-03T07:30:48.016Z
+facts_hash: e5f17ceefaf8b778
+generated_at: 2026-03-04T05:50:06.458Z
 generator_version: 1.0.0
 model: cheap
 quality_score: 85
@@ -9,30 +9,31 @@ quality_score: 85
 # File: skills/drishti-vision/scripts/capture.js
 
 ## Purpose
-This file contains the `capture` function, which is used to capture a screenshot of a web page and save it to a specified output path. The function takes two parameters: the URL of the webpage to capture, and the desired output path for the screenshot. It is called with default values from command-line arguments if not provided.
+This file provides a single function, `capture`, which is used to take a screenshot of a given URL and save it to a specified output path. The function is the main entry point for capturing screenshots in the Drishti-Vision system. It is designed to be executed from the command line.
 
 ## Exports / API Surface
 | Symbol | Type | Params | Description |
 |--------|------|--------|-------------|
-| `capture` | function | `url, outputPath` | Captures a screenshot of a webpage and saves it to the specified output path. |
+| `capture` | function | `url, outputPath` | Captures a screenshot of the specified URL and saves it to the output path. |
 
 ## Internal Logic
 The main execution flow of this file is as follows:
-- The script reads command-line arguments for the URL and output path.
-- It launches a chromium browser instance using the `playwright-core` library.
-- It navigates to the specified URL in the browser page.
-- It captures a screenshot of the entire webpage and saves it to the specified output path.
-- If an error occurs during capture, it logs an error message to the console.
-- Finally, it closes the browser instance.
+- The `capture` function is called with two arguments: `url` and `outputPath`.
+- The function launches a new browser instance using `chromium.launch()`.
+- A new page object is created from the browser instance using `browser.newPage()`.
+- The page navigates to the specified URL using `page.goto(url, { waitUntil: 'networkidle' })`, waiting for the network to idle before proceeding.
+- The page takes a screenshot of the full page using `page.screenshot({ path: outputPath, fullPage: true })` and saves it to the output path.
+- If any errors occur during this process, an error message is logged to the console. Otherwise, a success message is logged indicating that the screenshot has been saved successfully.
+- Finally, the browser instance is closed using `browser.close()`.
 
 ## Dependencies
 | Module | Local | Why |
 |--------|-------|-----|
-| `playwright-core` | No | Provides a way to automate browsers. |
-| `path` | Yes | Helps with handling file paths and output directories. |
+| `path` | No | Provides functionality for working with file paths. |
+| `playwright-core` | No | Allows launching a new browser instance and interacting with it programmatically. |
 
 ## Side Effects
-- console_output: The script logs messages to the console during execution, including a success message when the screenshot is saved, an error message if capture fails, and a progress indicator at the start of the process.
+- console_output: The function logs messages to the console both when the screenshot is captured successfully and when an error occurs during capture.
 
 ## Dependents
 No known dependents.

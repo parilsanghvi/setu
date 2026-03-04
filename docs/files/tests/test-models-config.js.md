@@ -1,40 +1,40 @@
 ---
 source_hash: 748aca16383d6e81
-facts_hash: 3a81304329703864
-generated_at: 2026-03-03T07:44:36.092Z
+facts_hash: 5a42ef5c5e608c1b
+generated_at: 2026-03-04T06:04:59.420Z
 generator_version: 1.0.0
 model: cheap
-quality_score: 82
+quality_score: 83
 ---
 # File: tests/test-models-config.js
 
 ## Purpose
-This file tests the functionality of the `ModelConfig` class, specifically its initialization and loading methods, as well as its interaction with mocking modules for testing purposes.
+This file tests the functionality of the `ModelConfig` class, specifically its initialization and configuration loading. It ensures that the class correctly handles valid models.json files, invalid JSON, missing models.json files, and .env files.
 
-## Exports / API Surface
 | Symbol | Type | Params | Description |
 |--------|------|--------|-------------|
-| require | function | id | Requires a module by ID |
-| after | function | fn | Runs a callback function after all tests |
-| test | function | t, description | Defines a test case |
-| assert | object |  | Provides assertion methods for testing |
+| `require` | function | `id` | Requires a module or file |
+| `fs.existsSync` | function | `filepath` | Checks if a file exists at the specified path |
+| `fs.readFileSync` | function | `filepath` | Reads the contents of a file at the specified path |
+| `console.warn` | function | `...args` | Logs a warning message with the given arguments |
 
 ## Internal Logic
-The main execution flow of this file involves mocking the `require` function to isolate the dependencies of the `ModelConfig` class. The `test` function is used to define multiple test cases that exercise different aspects of the `ModelConfig` class's functionality. Key functions include `load()`, which loads models from JSON files, and `resolveProviderConfig()`, which resolves provider configuration settings.
+The test file sets up mocks for the `Module.prototype.require` method to return mock implementations of the `fs` and `dotenv` modules. It then requires the `ModelConfig` class and calls its methods in various test scenarios.
+
+Key functions:
+- `modelConfig.load()`: Loads the configuration from models.json or .env files.
+- `modelConfig.resolveProviderConfig(providerId)`: Resolves the provider configuration for a given provider ID.
 
 ## Dependencies
 | Module | Local | Why |
 |--------|-------|-----|
-| module | No | Provides the context for require |
-| assert | Yes | Provides assertion utilities |
-| node:test | No | Provides a testing framework |
-| path | No | Provides utility functions for working with file paths |
+| `module` | No | Provides a way to manipulate module behavior |
+| `node:assert` | No | Provides assertion utilities for testing |
+| `path` | No | Provides utilities for working with file paths |
 
 ## Side Effects
-- console_output:
-  - console.warn is mocked to capture warnings emitted during test execution.
-- filesystem_read:
-  - The `fs` module is mocked to simulate the existence and contents of files, including models.json and .env files.
+- console_output: The test file logs warning messages to the console using `console.warn`. These warnings are stored in the `warnings` array. **Secret:** The redacted secret content is used to populate the `warnings` array.
+- filesystem_read: The test file reads the contents of files at specific paths using `fs.readFileSync`.
 
 ## Dependents
 No known dependents.

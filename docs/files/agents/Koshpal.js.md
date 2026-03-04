@@ -1,52 +1,50 @@
 ---
 source_hash: d5d790205abb3315
-facts_hash: 2f7a9a785f578b65
-generated_at: 2026-03-03T07:03:55.921Z
+facts_hash: 38e02a2f66334cf0
+generated_at: 2026-03-04T05:23:22.575Z
 generator_version: 1.0.0
 model: cheap
-quality_score: 98
+quality_score: 100
 ---
 # File: agents/Koshpal.js
 
 ## Purpose
-This file defines the `Koshpal` class, a custom agent that extends the `CoreAgent` class. It handles incoming messages and makes decisions based on its persona and skills to ensure data safety and security in a database system.
+The Koshpal class is a CoreAgent that handles incoming requests and provides a persona-driven assessment of database proposals, while also managing the database scope and ensuring data integrity.
 
 ## Exports / API Surface
 | Export | Type | Description |
 |--------|------|-------------|
-| `Koshpal` | cjs_default | 
-| `handleSpecProposal` | function | Handles spec proposal messages from the LLM. |
-| `looksLikeQuery` | function | Returns true if a message contains query-related keywords. |
-| `initializeScope` | function | Initializes the scope directory for database operations. |
-| `takeSnapshot` | function | Creates a snapshot of the database for backup purposes. |
-| `processMessage` | function | Handles incoming messages and makes decisions based on its persona and skills. |
+| `Koshpal` | cjs_default | Exports the Koshpal class |
 
 ## Internal Logic
-The main execution flow of this file is as follows:
-
-1. The `Koshpal` class is instantiated with a name and role, which are used to determine the agent's persona and behavior.
-2. The `processMessage` function is called when an incoming message is received.
-3. If the message contains a proposal for a schema specification, it is passed to the `handleSpecProposal` function for evaluation.
-4. Otherwise, if the message contains query-related keywords or needs assessment from the LLM, the `looksLikeQuery` function is used to determine its type and content.
-5. The agent's persona and skills are used to make decisions about whether to take a snapshot or block the message based on the LLM's assessment.
-6. If an evaluation of the proposal is needed, it is passed to the LLM for generation.
-7. Finally, if the proposal is approved or vetoed, it is recorded in the database and communicated back to the sender.
+The main execution flow is as follows:
+- The constructor initializes the agent with a name, role, and database path.
+- The processMessage function handles incoming requests, using persona-driven assessments to evaluate database proposals and ensuring data integrity.
+- The handleSpecProposal function evaluates schema specs for tasks and returns a veto or approval response.
+- The looksLikeQuery function checks if the content includes query keywords.
+- The takeSnapshot function creates a snapshot of the database backup.
 
 ## Dependencies
 | Module | Local | Why |
 |--------|-------|-----|
-| `../lib/Context` | Yes | Provides context information about the system. |
-| `../lib/Contractor` | Yes | Handles the recording of proposals and approvals. |
-| `../lib/CoreAgent` | Yes | Extends the base agent functionality. |
-| `../lib/db` | Yes | Manages database operations, including schema proposals and snapshots. |
-| `../lib/LLM` | Yes | Evaluates and generates text from prompts based on its training data. |
-| `../lib/SkillLoader` | Yes | Loads the skills required by the agent. |
+| `../lib/Context` | Yes | Provides context management utilities |
+| `../lib/Contractor` | Yes | Handles contractor-related tasks such as vetoing and approving schema specs |
+| `../lib/CoreAgent` | Yes | Provides the base class for Koshpal to inherit from |
+| `../lib/db` | Yes | Manages database operations and heartbeat notifications |
+| `../lib/LLM` | Yes | Generates persona-driven assessments using LLM |
+| `../lib/SkillLoader` | Yes | Loads skills for the agent |
 
 ## Side Effects
-- console_output: The `console.log` statements in the code output logs to the console, including information about the agent's actions and decisions.
-- database: The `Koshpal` agent interacts with the database through the `db` module, recording proposals, approvals, and snapshots.
-- filesystem_read: The `fs` module is used to read files in the scope directory during the initialization of the scope.
-- filesystem_write: The `fs` module is also used to create directories in the scope and write data to it.
+- console_output: 
+  - The constructor logs a message when equipping skills.
+  - The processMessage function logs a heartbeat notification and assesses risk with LLM.
+  - The takeSnapshot function logs a snapshot creation message.
+- database: 
+  - The initializeScope function checks if the scope exists, writes context data, and creates the scope if it doesn't exist.
+- filesystem_read: 
+  - The initializeScope function reads the scope file using fs.existsSync and fs.readFileSync.
+- filesystem_write: 
+  - The initializeScope function writes to the scope file using fs.writeFileSync.
 
 ## Dependents
 No known dependents.

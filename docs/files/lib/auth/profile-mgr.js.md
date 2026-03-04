@@ -1,40 +1,36 @@
 ---
 source_hash: a63532e411ffa93c
-facts_hash: e49c0bae0fe01fe4
-generated_at: 2026-03-03T07:18:19.451Z
+facts_hash: c4d2c58b91672cc9
+generated_at: 2026-03-04T05:38:04.259Z
 generator_version: 1.0.0
 model: cheap
-quality_score: 89
+quality_score: 94
 ---
 # File: lib/auth/profile-mgr.js
 
 ## Purpose
-The ProfileManager class is responsible for managing user profiles, resolving API keys based on environment variables and Auth Store profiles, and providing methods to retrieve specific profiles. It handles the complexity of authenticating users with multiple APIs by encapsulating the logic in a single class.
+The `ProfileManager` class is responsible for managing API keys, profiles, and their relationships, serving as a centralized authority for authentication-related data. It provides methods to resolve API keys, retrieve specific profiles, and list all available profiles. This module exports an instance of the `ProfileManager` class.
 
 ## Exports / API Surface
 | Export | Type | Description |
 |--------|------|-------------|
-| profileManager | cjs_default | Exports an instance of the ProfileManager class |
-| resolveApiKey | function | Resolves API key for a given provider and options |
-| getProfile | function | Retrieves a specific user profile by ID |
-| listProfiles | function | Lists all available user profiles |
+| `resolveApiKey` | function | Resolves an API key with precedence based on environment variables and Auth Store profiles |
+| `getProfile` | function | Retrieves a specific profile by ID |
+| `listProfiles` | function | Lists all available profiles |
+| `new` | cjs_default | Exports a new instance of the ProfileManager class |
 
 ## Internal Logic
-The main execution flow involves the following steps:
-
-* The constructor initializes the environment map with predefined API keys.
-* The `resolveApiKey` method checks environment variables for an explicit override, then queries the Auth Store to find a matching profile. If found, it returns the resolved API key.
-* The `getProfile` and `listProfiles` methods delegate their work to the Auth Store, allowing external access to user profiles.
+The main execution flow of the `ProfileManager` class involves resolving API keys using the `resolveApiKey` method, which checks environment variables and Auth Store profiles for precedence. The `getProfile` method directly retrieves a profile by ID from the Auth Store, while the `listProfiles` method fetches all available profiles from the Auth Store.
 
 ## Dependencies
 | Module | Local | Why |
 |--------|-------|-----|
-| AuthStore | Yes | Provides a centralized store for user profiles |
-| './auth-store' | Yes | Supplies necessary dependencies for authenticating users |
+| `./auth-store` | Yes | Provides the implementation of profiles and their data |
 
 ## Side Effects
-- env_access: The resolveApiKey method retrieves environment variables, which may expose sensitive information to the application.
-- env_update: Setting an environment variable through the resolveApiKey method updates the corresponding value in the environment map.
+- env_access: The `resolveApiKey` method accesses environment variables to determine API key precedence.
+- auth_store_update: The `resolveApiKey` method updates the Auth Store with new profile data when resolving an API key from a stored profile.
+- env_var_change: The `getProfile` and `listProfiles` methods do not have explicit side effects, but they rely on the environment variables being set correctly.
 
 ## Dependents
 No known dependents.

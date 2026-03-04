@@ -1,7 +1,7 @@
 ---
 source_hash: f9a89e108f5c173e
-facts_hash: 70eda89ad0edb302
-generated_at: 2026-03-03T07:40:37.091Z
+facts_hash: 25d491413ca8da76
+generated_at: 2026-03-04T06:00:55.818Z
 generator_version: 1.0.0
 model: cheap
 quality_score: 85
@@ -9,28 +9,30 @@ quality_score: 85
 # File: tests/test-drona-parsing.js
 
 ## Purpose
-This file tests the robustness of Drona's `parseResponse` method by parsing a series of mock responses and verifying their contents.
+This file tests the robustness of the `Drona.parseResponse` method by parsing different types of responses, including raw JSON, Markdown blocks, and noisy text with braces.
 
 ## Exports / API Surface
 | Symbol | Type | Params | Description |
 |--------|------|--------|-------------|
-| `drona.parseResponse` | function | `resp` | Parses a response from the agent |
-| `Guru` | class | `` | Manages agent interactions |
+| `require` | function | `id` | Mocks native/external dependencies. |
+| `Guru` | class | `` | Represents a Guru agent, but is not exported directly. |
+| `drona` | object | `` | An instance of the Guru class, used for testing. |
 
 ## Internal Logic
-The main execution flow involves mocking native dependencies and then testing Drona's parsing functionality. The key functions are:
-- `Module.prototype.require`: A mock implementation that returns specific values for certain dependencies.
-- `drona.parseResponse`: Tests the robustness of parsing responses from the agent.
+The main execution flow involves mocking native/external dependencies using the `require` function. The `Guru` class is instantiated and its `parseResponse` method is tested with different types of responses. The key functions are:
+- `require`: Mocks native/external dependencies, returning a mock implementation or the original module.
+- `Guru.constructor`: Initializes the Guru agent instance with a name and identifier.
+- `drona.parseResponse`: Parses a response and returns an object containing the parsed data.
 
 ## Dependencies
 | Module | Local | Why |
 |--------|-------|-----|
-| `module` | No | Provides the `Module` class for mocking native dependencies |
-| `../agents/Guru` | Yes | Brings in the Guru agent class for testing |
+| `module` | No | Provides the `require` function for mocking dependencies. |
+| `../agents/Guru` | Yes | Implements the Guru agent class, which is tested in this file. |
 
 ## Side Effects
-- console_output: The file logs passing and failing test cases to the console using console.error and console.log statements.
-- database: The mock implementation returns a simulated database object with certain methods, such as pragma, exec, and prepare, to support the parsing tests.
+- console_output: The test outputs the results of each parsed response to the console, indicating whether the parsing was successful or not.
+- database: None, as no actual database operations are performed during the testing process.
 
 ## Dependents
 No known dependents.

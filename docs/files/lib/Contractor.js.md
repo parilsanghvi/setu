@@ -1,7 +1,7 @@
 ---
 source_hash: 54aa6649d5f352fb
-facts_hash: 097f9f25ba42a0d7
-generated_at: 2026-03-03T07:15:20.681Z
+facts_hash: ce341792b86ef92a
+generated_at: 2026-03-04T05:35:09.559Z
 generator_version: 1.0.0
 model: cheap
 quality_score: 82
@@ -9,33 +9,41 @@ quality_score: 82
 # File: lib/Contractor.js
 
 ## Purpose
-This file defines a class called `Contractor` that manages contracts, which are essentially draft specifications for tasks in a domain. The `Contractor` class allows users to issue new specs, record vetoes from Lead agents, and approve the current spec. It also provides methods to load and save the contract data.
+This file provides a JavaScript class named `Contractor` that manages contracts and specifications for tasks, allowing for the issuance of new specs, recording vetoes, and approving current specs.
 
 ## Exports / API Surface
 | Export | Type | Description |
 |--------|------|-------------|
-| contractor | cjs_default | Exports a single instance of the Contractor class. |
+| `issueSpec` | function | Issues a new spec (contract draft) for a task. |
+| `recordVeto` | function | Records a veto from a Lead agent for a task. |
+| `approve` | function | Approves the current spec for a task. |
+| `getSpec` | function | Returns the spec for a task. |
+| `Constructor` | class | Constructor for managing contracts and specifications. |
 
 ## Internal Logic
-The main execution flow involves creating an instance of the `Contractor` class, passing in a contracts path. The constructor loads the contract data from file if it exists or returns an empty object otherwise. The key methods include:
+The main execution flow of this file is as follows:
 
-- `load()`: Loads the contract data from file if it exists.
-- `save()`: Saves the contract data to file.
-- `issueSpec(taskId, domain, spec)`: Issues a new spec for a task with the given ID and domain.
-- `recordVeto(taskId, agentName, reason)`: Records a veto from a Lead agent for the specified task.
-- `approve(taskId)`: Approves the current spec for the specified task.
+1. The `Contractor` class is instantiated, and its constructor loads existing contracts from a JSON file.
+2. Methods such as `issueSpec`, `recordVeto`, `approve`, and `getSpec` modify the loaded contracts and save them to the JSON file accordingly.
+
+Key functions include:
+- `load`: Loads existing contracts from a JSON file.
+- `save`: Saves the current contracts to a JSON file.
+- `issueSpec`: Issues a new spec (contract draft) for a task, updating the contracts and saving the changes.
+- `recordVeto`: Records a veto from a Lead agent for a task, updating the contracts and saving the changes.
+- `approve`: Approves the current spec for a task, updating the contracts and saving the changes.
+- `getSpec`: Returns the spec for a task.
 
 ## Dependencies
 | Module | Local | Why |
 |--------|-------|-----|
-| fs | No | Provides file system interaction functions. |
-| path | No | Provides path manipulation functions. |
+| `fs` | No | Provides file system operations. |
+| `path` | No | Provides path manipulation utilities. |
 
 ## Side Effects
-
-- console_output: Logs messages to the console, including success and warning messages when specs or vetoes are issued or received.
-- filesystem_read: Reads contract data from file if it exists.
-- filesystem_write: Writes contract data to file after changes are made.
+- console_output: The file logs console messages to the standard output, including success and veto messages.
+- filesystem_read: The file reads existing contracts from a JSON file using `fs.readFileSync`.
+- filesystem_write: The file writes updated contracts to a JSON file using `fs.writeFileSync`.
 
 ## Dependents
 No known dependents.

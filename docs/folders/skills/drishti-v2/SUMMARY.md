@@ -1,7 +1,7 @@
 ---
 source_hash: a6a420f488f6cb7b
 facts_hash: a6a420f488f6cb7b
-generated_at: 2026-03-03T08:00:35.353Z
+generated_at: 2026-03-04T06:18:32.577Z
 generator_version: 1.0.0
 model: cheap
 quality_score: 94
@@ -9,21 +9,20 @@ quality_score: 94
 # Folder: skills/drishti-v2
 
 ## Purpose
-This folder contains a set of tools for analyzing and manipulating the codebase. It exports functions to search for string patterns in the codebase using grep, as well as recursively list all files in a directory. The key responsibility is to provide utilities for code inspection and exploration.
+This folder contains utility functions for searching and managing codebase content, allowing for efficient pattern detection and file listing capabilities. It provides a centralized location for these tools, making it easier to access and maintain them. The key responsibility of this folder is to enable robust search functionality.
 
 ## Key Files
 | File | Role |
-|------|------|
-| `tools.js` | Exports utility functions for searching and listing files in the codebase |
+| `tools.js` | Exports a list of tool functions that perform specific tasks |
 
 ## Ownership
 Not yet assigned.
 
 ## Invariants / Rules
-Likely: The folder adheres to the conventional naming scheme of using camelCase for file names.
-| Rule ID | Rule Description |
-|---------|-------------------|
-| 1       | All imported modules must be listed at the top of each file.
+Likely: All exported functions should be documented with clear, concise descriptions.
+Rules:
+1. Functions should have unique names to avoid naming conflicts.
+2. Function names should follow the camelCase convention for consistency.
 
 ## Cross-References
 - [tools.js](../../../files/skills/drishti-v2/tools.js.md)

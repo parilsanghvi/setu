@@ -837,8 +837,71 @@ switch (cmd) {
     }
     break;
 
+  case 'context': {
+    const { buildContextPackage, buildContextJSON, resolveTargetFiles } = require('../lib/onboarding/context-builder');
+    const repoRoot = process.cwd();
+
+    // Parse flags
+    const fileFlags = [];
+    let depth = 2;
+    let asJson = false;
+    let save = false;
+    let taskDescription = '';
+
+    for (let i = 0; i < args.length; i++) {
+      if (args[i] === '--file' && args[i + 1]) {
+        fileFlags.push(args[++i]);
+      } else if (args[i] === '--depth' && args[i + 1]) {
+        depth = parseInt(args[++i]) || 2;
+      } else if (args[i] === '--json') {
+        asJson = true;
+      } else if (args[i] === '--save') {
+        save = true;
+      } else if (!args[i].startsWith('--')) {
+        taskDescription += (taskDescription ? ' ' : '') + args[i];
+      }
+    }
+
+    const targetFiles = fileFlags.length > 0 ? fileFlags : undefined;
+
+    if (!targetFiles && !taskDescription) {
+      log('Usage: setu context [task description] [options]');
+      log('  --file <path>   Target specific file(s) (repeatable)');
+      log('  --depth <N>     Dependency walk depth (default: 2)');
+      log('  --json          Output as JSON');
+      log('  --save          Save to .setu/CONTEXT_PACKAGE.md');
+      log('');
+      log('Examples:');
+      log('  setu context --file lib/db.js');
+      log('  setu context "refactor the database layer"');
+      log('  setu context --file lib/db.js --depth 3 --save');
+      break;
+    }
+
+    log(`🔍 Building context package (depth: ${depth})...`);
+
+    if (asJson) {
+      const result = buildContextJSON({ targetFiles, taskDescription, repoRoot, depth });
+      console.log(JSON.stringify(result, null, 2));
+    } else {
+      const result = buildContextPackage({ targetFiles, taskDescription, repoRoot, depth });
+
+      if (save) {
+        const setuDir = path.join(require('os').homedir(), '.setu');
+        if (!fs.existsSync(setuDir)) fs.mkdirSync(setuDir, { recursive: true });
+        const outPath = path.join(setuDir, 'CONTEXT_PACKAGE.md');
+        fs.writeFileSync(outPath, result);
+        log(`✅ Context package saved to ${outPath}`);
+      } else {
+        console.log(result);
+      }
+    }
+    break;
+  }
+
   default:
-    console.log('Usage: setu [start|stop|status|onboarding|chat|task|dashboard|ignite]');
+    console.log('Usage: setu [start|stop|status|onboarding|context|chat|task|dashboard|ignite]');
     console.log('  onboarding enrich   — Generate rich docs via LLM');
     console.log('  onboarding quality  — View documentation quality report');
+    console.log('  context --file X    — Build a context package for a task');
 }

@@ -1,41 +1,45 @@
 ---
 source_hash: 17e043f39009c55d
-facts_hash: d391b023cd45313f
-generated_at: 2026-03-03T07:36:54.799Z
+facts_hash: 1c16fcb02a5060b6
+generated_at: 2026-03-04T05:56:07.554Z
 generator_version: 1.0.0
 model: cheap
-quality_score: 79
+quality_score: 82
 ---
 # File: tests/test-core-agent-compaction.js
 
 ## Purpose
-This file contains tests for the `CoreAgent` class, specifically its `compactContext` method, to ensure it handles different scenarios correctly, including compaction of context when token count exceeds a threshold.
+This file is a test suite for the `CoreAgent` class, specifically testing its `compactContext` method under various scenarios such as no compaction, compaction triggered, compaction error handling, LLM error without message property, and LLM returns null/empty.
 
 ## Exports / API Surface
+
 | Symbol | Type | Params | Description |
 |--------|------|--------|-------------|
-| `require` | function | `id` | Requires and returns modules or dependencies. |
-| `Module.prototype.require` | method | `id` | Mocks and overrides the original require function to test CoreAgent. |
-| `CoreAgent` | class | `` | 
-| `TestAgent` | class | `` |
+| require | function | `id` | Imports the specified module or function |
+| MockBus | object | `{ ... }` | Mock bus implementation for testing purposes |
+| MockLLM | object | `{ ... }` | Mock LLM implementation for testing purposes |
+| MockSkillLoader | object | `{ ... }` | Mock skill loader implementation for testing purposes |
+| MockZodType | class | `{}` | Minimal implementation of Zod type for mocking |
+| CoreAgent | function | `` | The core agent class being tested |
+| TestAgent | class | `` | A subclass of the CoreAgent, used for testing purposes |
 
 ## Internal Logic
 The main execution flow of this file is as follows:
-- The `runTest` function is called, which contains five test cases.
-- Each test case creates an instance of the `TestAgent` class and tests a specific scenario of compaction.
-- The scenarios include: no compaction (tokens below threshold), compaction triggered, compaction error handling, LLM error without message property, and LLM returns null/empty.
+1. The `runTest` function is executed.
+2. It sets up a test environment by creating an instance of the `TestAgent` class and populating its context with dummy messages.
+3. It tests various scenarios such as no compaction, compaction triggered, compaction error handling, LLM error without message property, and LLM returns null/empty.
 
 ## Dependencies
+
 | Module | Local | Why |
 |--------|-------|-----|
-| `../lib/CoreAgent` | Yes | Implements the CoreAgent class to be tested. |
-| `module` | No | Provides built-in functionality for requiring modules. |
-| `path` | No | Provides path manipulation utilities. |
+| module | Yes | Provides the `require` function for importing modules |
+| path | No | Provides utility functions for working with file paths |
 
 ## Side Effects
-- console_output: The test file logs console messages indicating whether tests passed or failed.
-- database: There are no database interactions in this test file.
-- process_control: The test file uses the `process.exit` function to control the exit status of the process based on the number of failed tests.
+- console_output: The test suite logs messages to the console, including pass/fail indicators and summary results.
+- database: None - There is no direct interaction with a database in this test suite.
+- process_control: The `process.exit` function is used to control the process exit status based on the number of failed tests.
 
 ## Dependents
 No known dependents.

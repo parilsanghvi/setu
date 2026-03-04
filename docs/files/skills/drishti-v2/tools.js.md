@@ -1,15 +1,15 @@
 ---
 source_hash: 14c0268d8c72580d
-facts_hash: 2d844db2507ad609
-generated_at: 2026-03-03T07:30:38.409Z
+facts_hash: eb8f32a03f2cd0e9
+generated_at: 2026-03-04T05:49:55.504Z
 generator_version: 1.0.0
 model: cheap
-quality_score: 78
+quality_score: 85
 ---
 # File: skills/drishti-v2/tools.js
 
 ## Purpose
-This file exports a list of tools that can be used to analyze and manipulate the codebase, including `tools.search_code` which searches for a string pattern in the codebase using grep, and `tools.list_files_recursive` which recursively lists all files in a directory.
+This file exports a list of tools, which are functions that perform specific tasks, such as searching for patterns in the codebase and listing files recursively.
 
 ## Exports / API Surface
 | Export | Type | Description |
@@ -18,22 +18,21 @@ This file exports a list of tools that can be used to analyze and manipulate the
 | `list_files_recursive` | function | Recursively lists all files in a directory. |
 
 ## Internal Logic
-The main execution flow of this file is as follows:
-- The `tools` array contains two objects, each representing a tool that can be used to analyze and manipulate the codebase.
-- Each tool object has a `name`, `description`, `parameters`, and an `execute` function.
-- The `execute` function takes in the required parameters specified in the `parameters` object and executes the corresponding command using the `execAsync` function from the `util` module.
-- The `execAsync` function runs the provided command in a child process and returns the output as a promise.
-- If any error occurs during execution, it is caught and handled by returning an error message.
+The main execution flow involves iterating over each tool and calling its corresponding function when invoked. The key functions are:
+- `search_code`: executes a search operation, where it takes a pattern and a directory path as input, uses the `findstr` command to search for the pattern in the files of the specified directory, and returns the results.
+- `list_files_recursive`: executes a recursive file listing operation, where it takes a directory path as input, uses the `dir` command to list all files in the directory and its subdirectories, and returns the results.
 
 ## Dependencies
 | Module | Local | Why |
 |--------|-------|-----|
-| `child_process` | No | Provides an interface to interact with child processes. |
-| `path` | Yes | Used to construct file paths in the `search_code` tool. |
+| `zod` | Yes | Provides schema validation for tool parameters. |
+| `child_process` | No | Enables execution of external commands, such as grep and dir. |
+| `path` | No | Helps with file path manipulation, especially when joining directory paths with file names. |
+| `util` | No | Provides a promisified version of the exec function for executing child processes asynchronously. |
 
 ## Side Effects
 - database: None
-- subprocess: The `execAsync` function runs commands in child processes, which can lead to potential security risks if not handled properly.
+- subprocess: The tools may spawn new subprocesses to execute external commands like grep and dir, but they do not establish persistent connections or interact with databases.
 
 ## Dependents
 No known dependents.

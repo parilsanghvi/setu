@@ -1,26 +1,32 @@
 ---
 source_hash: 3e5314930f33068d
-facts_hash: 9bf7b713c3ef8344
-generated_at: 2026-03-03T07:12:21.400Z
+facts_hash: a29f9f5716aa1d99
+generated_at: 2026-03-04T05:31:57.353Z
 generator_version: 1.0.0
 model: cheap
-quality_score: 85
+quality_score: 80
 ---
 # File: frontend/app/src/utils/logUtils.js
 
 ## Purpose
-This file provides a utility function `updateLogs` that updates an array of logs while maintaining a maximum size limit, allowing for efficient management of log data in the system.
+This file exports a utility function `updateLogs` that updates an array of logs while maintaining a maximum size limit, ensuring that the most recent items are kept and older ones are discarded when space constraints are reached.
 
-## Exports / API Surface
 | Export | Type | Description |
-| updateLogs | esm_named | Updates an array of logs while maintaining a maximum size limit. |
+|--------|------|-------------|
+| `updateLogs` | esm_named | Updates an array of logs with new items while maintaining a maximum size limit. |
 
 ## Internal Logic
-The `updateLogs` function takes three parameters: `prevLogs`, `newItems`, and `maxLogs`. It first checks if the length of `items` (which is either `newItems` or an array containing `newItems`) exceeds the maximum allowed size (`maxLogs`). If it does, it returns the last `maxLogs` items from the `prevLogs` array using slicing. Otherwise, it calculates the available space in the `prevLogs` array and slices it to include the last `availableSpace` items before concatenating the new `items`. The resulting updated array of logs is returned.
+The main execution flow involves the following key functions:
+
+- `items`: This variable is assigned an array of new items, which can be either a single item or an array of items.
+- `prevLogs.slice(-availableSpace)`: Extracts the last available space in the logs array, discarding any excess elements if the total size exceeds the limit.
+- The spread operator (`[...prevLogs.slice(-availableSpace), ...items]`): Combines the extracted elements from the beginning of the logs array with the new items.
 
 ## Dependencies
-| Import | Why |
-| none | No specific dependencies are required for this utility function. |
+| Export | Type | Description |
+|--------|------|-------------|
+|  | import | Maintains a maximum size limit to prevent excessive log accumulation. |
+|  | import | Allows for flexible handling of single or multiple new log items. |
 
 ## Side Effects
 

@@ -1,44 +1,46 @@
 ---
 source_hash: fc606f170b84f5e0
-facts_hash: 898234e8f341cd73
-generated_at: 2026-03-03T07:40:27.162Z
+facts_hash: ac703fcfd0510bf2
+generated_at: 2026-03-04T06:00:44.365Z
 generator_version: 1.0.0
 model: cheap
-quality_score: 77
+quality_score: 90
 ---
 # File: tests/test-drona-learning.js
 
 ## Purpose
-This file tests the functionality of the Drona learning system, specifically the Guru agent's ability to ingest documents and create skills based on the content.
+This file tests the Drona learning functionality, specifically the Guru agent's ability to ingest documents and create skills for a given language.
 
 ## Exports / API Surface
 | Symbol | Type | Params | Description |
 |--------|------|--------|-------------|
-| `require` | function | `id` | Mocks native/external dependencies for testing purposes. |
-| `Guru` | class | `` | Represents an agent that can process and learn from incoming messages. |
-| `LLM.generate` | function | `system, prompt` | Generates a response based on the input system and prompt. |
+| `require` | function | `id` | Mocks native/external dependencies. |
+| `Guru` | class | `` | Exposes the Guru agent class for use in tests. |
+| `LLM` | object | `` | Provides an LLM (Large Language Model) instance for testing purposes. |
 
 ## Internal Logic
-The main execution flow involves creating a new instance of the Guru class, passing it a message to ingest documents, and then checking if the expected skill was created successfully.
+The main execution flow of this file is as follows:
 
-Key functions:
-
-- `testDronaLearning`: The test function that runs the entire workflow.
-- `Guru.constructor`: Initializes the agent with an ID and scope.
-- `agent.processMessage`: Ingests the incoming document content into the agent's knowledge graph.
+1. The testDronaLearning function is defined, which sets up the Guru agent and tests its ability to ingest documents.
+2. The Guru agent is created with a specific name and scope.
+3. A document content string is passed to the Guru agent's processMessage method, which ingests the document and creates a skill for the given language (in this case, COBOL).
+4. The test checks if the skill was successfully created by checking if a corresponding file exists in the agent's scope.
 
 ## Dependencies
 | Module | Local | Why |
 |--------|-------|-----|
-| `../agents/Guru` | Yes | Provides the Guru agent class for testing. |
-| `../lib/LLM` | Yes | Supplies the LLM generate function for mock response generation. |
+| `module` | No | Provides the require function for mocking native dependencies. |
+| `fs` | No | Provides file system utilities, but not used directly in this test. |
+| `path` | No | Provides path manipulation utilities, but not used directly in this test. |
+| `../agents/Guru` | Yes | Exposes the Guru agent class and its functionality for testing purposes. |
+| `../lib/LLM` | Yes | Provides an LLM instance for testing purposes and generating mock data. |
 
 ## Side Effects
-- console_output: The test prints success or failure messages to the console, indicating whether the skill was created successfully.
-- database: None - This file does not interact with a database directly.
-- filesystem_read: The test checks if a specific skill file exists on disk, but does not read from it.
-- filesystem_write: The test creates and deletes a directory for the skill file, but only in the cleanup section (commented out).
-- process_control: The test uses `process.exit(0)` to control the process flow after completing the test.
+- console_output: The test logs messages to the console, including success or failure indicators for the skill creation process.
+- database: No direct interactions with a database occur in this test.
+- filesystem_read: The test checks if a file exists on disk using fs.existsSync, but does not read any data from it.
+- filesystem_write: The test writes no data to the file system.
+- process_control: The test controls the flow of the program by checking for successful skill creation and exiting with a status code.
 
 ## Dependents
 No known dependents.

@@ -1,39 +1,38 @@
 ---
 source_hash: 2a079e0dc1206cf5
-facts_hash: f9ed5ba0c6e596eb
-generated_at: 2026-03-03T07:49:36.033Z
+facts_hash: 2a7ca715cfbc88c2
+generated_at: 2026-03-04T06:09:32.322Z
 generator_version: 1.0.0
 model: cheap
-quality_score: 84
+quality_score: 89
 ---
 # File: tests/test-token-estimation.js
 
 ## Purpose
-This file contains a test suite for the `TokenEstimation` function in the `CoreAgent` class, ensuring it accurately estimates token counts from various input formats and edge cases.
+This file contains a test suite for token estimation, a feature of the CoreAgent class that estimates the number of tokens in a given message content.
 
 ## Exports / API Surface
 | Symbol | Type | Params | Description |
 |--------|------|--------|-------------|
-| `runTest` | function | `` | Runs a test suite for TokenEstimation function |
-| `TestAgent` | class | `` | Represents an agent with a context and provides methods to estimate token counts |
+| `runTest` | function | `` | Runs the token estimation tests |
+| `TestAgent` | class | `` | A test agent class for CoreAgent |
 
 ## Internal Logic
-The main execution flow involves creating instances of the `TestAgent` class, setting its context, and then calling the `estimateTokenCount` method. The `estimateTokenCount` method processes the input data and returns an estimated token count.
-
-Key functions include:
-- `constructor`: Initializes a new instance of the `TestAgent` class with the agent's name, role, and scope.
-- `estimateTokenCount`: Estimates the number of tokens in the context based on the input data format.
+The main execution flow of this file is as follows:
+- The `runTest` function sets up a new TestAgent instance and runs 13 test cases to verify the correctness of the token estimation feature.
+- Each test case creates a new message with different types of content (strings, objects, arrays, etc.) and passes it through the token estimation feature of the TestAgent instance.
+- The test cases compare the estimated token count with the expected value and assert that they are equal.
 
 ## Dependencies
 | Module | Local | Why |
 |--------|-------|-----|
-| `../lib/CoreAgent` | Yes | Provides a base for token estimation functionality |
-| `assert` | No | Used for assertion testing and validation |
+| `../lib/CoreAgent` | Yes | Provides the CoreAgent class being tested |
+| `assert` | No | Provides assertion utilities for testing |
 
 ## Side Effects
-- console_output: The test suite logs various messages to the console, including test results and expected values.
-- database: There is no interaction with a database in this file, as it only contains mock data and uses local imports.
-- process_control: The `runTest` function catches any errors that occur during execution and exits the process with an error code.
+- console_output: The test suite logs various messages to the console, including test case names and expected values.
+- database: None (the file does not interact with a database).
+- process_control: None (the file does not control the process in any way).
 
 ## Dependents
 No known dependents.

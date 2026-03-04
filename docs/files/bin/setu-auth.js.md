@@ -1,40 +1,37 @@
 ---
 source_hash: 6ab7090541c5c87d
-facts_hash: b0674568d95cb148
-generated_at: 2026-03-03T07:08:03.968Z
+facts_hash: a27cc83457e9deba
+generated_at: 2026-03-04T05:27:29.164Z
 generator_version: 1.0.0
 model: cheap
-quality_score: 86
+quality_score: 84
 ---
 # File: bin/setu-auth.js
 
 ## Purpose
-This file contains the main entry point for the Setu Auth Manager application, responsible for handling user authentication and profile management.
+This file provides a command-line interface for managing authentication using various providers, including Google, OpenAI, Anthropic, and Ollama. The `main` function serves as the entry point, parsing commands and dispatching them to corresponding functions like `handleLogin` and `listProfiles`. These functions interact with the `AuthStore` class to manage user profiles.
 
+## Exports / API Surface
 | Symbol | Type | Params | Description |
 |--------|------|--------|-------------|
-| `main` | function | `` | 
-| `handleLogin` | function | `providerArg` | 
-| `handleLogout` | function | `profileArg` | 
+| `main` | function | `` | Serves as the entry point for the authentication manager. |
+| `handleLogin` | function | `providerArg` | Handles login operations with various providers. |
+| `handleLogout` | function | `profileArg` | Manages profile removal and logout functionality. |
+| `listProfiles` | function | `` | Displays a list of active user profiles. |
+| `showMenu` | function | `` | Presents the main authentication menu to users. |
 
 ## Internal Logic
-The main execution flow of this file is as follows:
-
-1. The `main` function checks if a command was passed in the command line arguments, and if not, it calls the `showMenu` function to display a menu.
-2. The `showMenu` function prompts the user to select an action using the Enquirer library, and based on their selection, it calls either the `handleLogin`, `listProfiles`, or `handleLogout` function.
-3. The `handleLogin` function handles login functionality for different providers (Google, OpenAI, Anthropic, Ollama), and saves the user's credentials to the AuthStore.
-4. The `handleLogout` function removes a selected profile from the AuthStore.
+The file follows an execution flow where the `main` function is called, which checks for available commands in the command line. Depending on the command, it calls either `handleLogin`, `listProfiles`, or `handleLogout`. The `handleLogin` function handles the actual login operation with various providers, and the `handleLogout` function manages profile removal and logout.
 
 ## Dependencies
 | Module | Local | Why |
 |--------|-------|-----|
-| `../lib/auth/auth-store` | Yes | 
-| `../lib/auth/google` | Yes | 
-| `enquirer` | No | 
+| `../lib/auth/auth-store` | Yes | Provides a centralized store for user profiles. |
+| `../lib/auth/google` | Yes | Handles Google OAuth login and authentication flows. |
 
 ## Side Effects
-- console_output: The application logs messages to the console, including success and error messages.
-- database: The AuthStore is used to store user credentials and profiles in a local storage solution (not explicitly stated as a database).
+- console_output: The program logs messages to the console, including success or failure indicators during login and logout operations.
+- database: No external database interactions occur in this implementation; instead, the `AuthStore` class manages user profile data locally.
 
 ## Dependents
 No known dependents.

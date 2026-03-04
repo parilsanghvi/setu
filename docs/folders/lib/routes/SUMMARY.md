@@ -1,7 +1,7 @@
 ---
 source_hash: 150a5c73f357abce
 facts_hash: 150a5c73f357abce
-generated_at: 2026-03-03T07:59:27.783Z
+generated_at: 2026-03-04T06:17:41.436Z
 generator_version: 1.0.0
 model: cheap
 quality_score: 94
@@ -9,18 +9,19 @@ quality_score: 94
 # Folder: lib/routes
 
 ## Purpose
-This folder contains a single file, `api.js`, which exports a function to set up API routes for an Express.js application. The key responsibilities of this file are to configure and define the API endpoints for onboarding status, historical trend, drift trend, stats, tasks, agents, create task, get screenshots for task, and chat with agent. It serves as a crucial part of the application's routing infrastructure.
+This folder contains the lib/routes/ API routes file (api.js), which sets up API endpoints for an application, defining how the system responds to various requests and providing functionality such as retrieving onboarding status, historical trend data, and task-related information. The primary responsibility of this folder is to manage these API routes. 
 
 ## Key Files
 | File | Role |
-| `api.js` | Handles setup and configuration of API routes for an Express.js application |
+|------|------|
+| `api.js` | Defines and exports API routes for the application |
 
 ## Ownership
 Not yet assigned.
 
 ## Invariants / Rules
-Likely: The file follows a consistent naming convention, with all functions and variables prefixed with lowercase letters.
-Likely: The API endpoints are properly secured using middleware, ensuring only authorized requests can access sensitive data.
+Likely: This folder adheres to a single Responsibility Principle, where each file (or subfolder) has a single responsibility. The api.js file follows this principle as it handles all API-related functionality.
+Likely: The folder uses a consistent naming convention for files and directories.
 
 ## Cross-References
 - [api.js](../../../files/lib/routes/api.js.md)

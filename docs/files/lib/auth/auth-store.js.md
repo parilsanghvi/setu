@@ -1,45 +1,50 @@
 ---
 source_hash: 5493515227a86925
-facts_hash: 4001ffe58c08593f
-generated_at: 2026-03-03T07:17:26.776Z
+facts_hash: dd43701ee319082f
+generated_at: 2026-03-04T05:37:18.039Z
 generator_version: 1.0.0
 model: cheap
-quality_score: 100
+quality_score: 93
 ---
 # File: lib/auth/auth-store.js
 
 ## Purpose
-The `auth-store.js` file defines the `AuthStore` class, which is responsible for managing authentication data in a JSON file located at the user's home directory. The class provides methods for loading and saving authentication profiles, as well as adding, removing, and listing profiles.
+The `auth-store.js` file provides an authentication store that manages user profiles and credentials, utilizing the `fs` module for file system operations.
 
-## Exports / API Surface
 | Export | Type | Description |
 |--------|------|-------------|
-| `new` | cjs_default | Creates a new instance of the `AuthStore` class. |
+| constructor | cjs_default | Initializes the authentication store with a unique store path. |
+| ensureStore | function | Ensures the presence of the authentication store directory and files. |
+| load | function | Loads the existing user profiles from the authentication store file. |
+| save | function | Saves the updated user profiles to the authentication store file. |
+| getProfile | function | Retrieves a specific user profile by ID. |
+| listProfiles | function | Lists all available user IDs in the authentication store. |
+| addProfile | function | Adds a new user profile with credentials and an updated timestamp. |
+| removeProfile | function | Removes a specified user profile from the authentication store. |
+| findProfilesByProvider | function | Finds and returns user profiles by provider ID. |
 
 ## Internal Logic
-The main execution flow of the `auth-store.js` file begins with the constructor, which initializes the store path and ensures that the directory exists if necessary. The `ensureStore()` method creates the directory and saves an empty authentication profile to it.
+The main execution flow begins with the constructor, which initializes the store path using `os.homedir()` and ensures the presence of the directory and file using the `ensureStore` method.
 
 Key functions include:
 
-* `load()`: Reads the authentication data from the JSON file and returns it as a JavaScript object.
-* `save(data)`: Writes the provided authentication data to the JSON file.
-* `getProfile(profileId)`: Retrieves a specific authentication profile by ID and returns its contents.
-* `listProfiles()`: Returns an array of IDs for all available authentication profiles.
-* `addProfile(profileId, credential)`: Adds a new authentication profile with the specified ID and credentials, and saves it to the store.
-* `removeProfile(profileId)`: Removes the authentication profile with the specified ID from the store.
-* `findProfilesByProvider(provider)`: Finds and returns an array of authentication profiles for a specific provider.
+*   `load`: Retrieves the existing user profiles from the authentication store file.
+*   `save`: Saves the updated user profiles to the authentication store file.
+*   `getProfile`: Looks up a specific user profile by ID.
+*   `listProfiles`: Returns all available user IDs in the authentication store.
 
 ## Dependencies
 | Module | Local | Why |
 |--------|-------|-----|
-| `fs` | No | Provides file system operations. |
-| `os` | No | Provides operating system-specific functions. |
-| `path` | No | Provides path manipulation utilities. |
+| fs | No | Provides asynchronous file system operations. |
+| os | No | Offers platform-specific utilities for determining the home directory. |
+| path | No | Enables path manipulation and normalization. |
 
 ## Side Effects
-- console_output: The class logs error messages to the console in cases where loading or saving fails.
-- filesystem_read: The `load()` method reads data from a JSON file located at the user's home directory.
-- filesystem_write: The `save(data)` method writes data to a JSON file located at the user's home directory.
+
+-   `console_output`: Logs error messages to the console when loading or saving the authentication store fails.
+-   `filesystem_read`: Reads the contents of the authentication store file using `fs.readFileSync`.
+-   `filesystem_write`: Writes data to the authentication store file using `fs.writeFileSync`.
 
 ## Dependents
 - [google.js](./google.js.md)

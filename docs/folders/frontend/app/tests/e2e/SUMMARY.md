@@ -1,7 +1,7 @@
 ---
 source_hash: d26263340918fa84
 facts_hash: d26263340918fa84
-generated_at: 2026-03-03T07:57:11.447Z
+generated_at: 2026-03-04T06:15:50.959Z
 generator_version: 1.0.0
 model: cheap
 quality_score: 100
@@ -9,21 +9,21 @@ quality_score: 100
 # Folder: frontend/app/tests/e2e
 
 ## Purpose
-This folder contains end-to-end tests for the frontend application's UI components, ensuring they match their expected layouts and functionality. The tests in this folder are crucial for detecting regressions in the UI and verifying the modal focus functionality. This folder is responsible for validating the user interface of the application.
+This folder contains end-to-end tests for the frontend application, ensuring its functionality and usability in different environments. The key responsibilities of this folder are to verify the consistency of the UI and test the focus management of modals.
 
 ## Key Files
 | File | Role |
-| `dashboard.spec.js` | Verifies the layout of the legacy server against its expected snapshot. |
-| `modal-focus.spec.js` | Ensures the modal does not interfere with keyboard navigation and restores focus to the task button after closing. |
+| dashboard.spec.js | Ensures visual regression of legacy and new dashboard components. |
+| modal-focus.spec.js | Verifies proper focus management of modals in web applications. |
 
 ## Ownership
 Not yet assigned.
 
 ## Invariants / Rules
-Likely: The tests in this folder follow the single responsibility principle, where each test file has a single clear responsibility.
-| invariant/rule | description |
-| --- | --- |
-| Likely: No duplicated code between tests | All test code is unique and does not overlap.
+Likely: Code follows the Single Responsibility Principle, with each test suite having a single responsibility.
+| Rule ID | Rule Description |
+| 1      | Each test file has a descriptive name that clearly indicates its purpose. |
+| 2      | All end-to-end tests are executed in parallel to minimize overall test run time. |
 
 ## Cross-References
 - [dashboard.spec.js-snapshots/](./dashboard.spec.js-snapshots/SUMMARY.md)

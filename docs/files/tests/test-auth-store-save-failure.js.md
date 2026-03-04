@@ -1,34 +1,42 @@
 ---
 source_hash: f53d1b6b405dfacb
-facts_hash: 24ff0d82b1a882da
-generated_at: 2026-03-03T07:33:59.671Z
+facts_hash: d9a006ef6c249f51
+generated_at: 2026-03-04T05:53:10.767Z
 generator_version: 1.0.0
 model: cheap
-quality_score: 80
+quality_score: 87
 ---
 # File: tests/test-auth-store-save-failure.js
 
 ## Purpose
-This file tests the AuthStore class's save functionality to ensure it logs an error when attempting to save a failed operation, specifically when writing to a mock auth file.
+This file tests the functionality of the AuthStore class, specifically its save method, by simulating a failure during file writing and verifying that an error is logged correctly.
 
 ## Exports / API Surface
 | Export | Description |
 |--------|-------------|
-| `authStore` | Provides the AuthStore instance for testing. |
+| `authStore` | Exposes the AuthStore class. |
 
 ## Internal Logic
-The test setup involves mocking the os.homedir function to return a temporary directory and overriding console.error to verify the expected error message is logged when the auth store fails to save. The authStore.save method is then called with fake data, triggering the mock writeFileSync function to throw an error. The test asserts that the expected error has been logged and provides a success message if the test passes.
+The main execution flow involves:
+- Setting up a mock environment to simulate a save failure.
+- Initializing the AuthStore instance with a real file system.
+- Triggering the save method and verifying that an error is logged correctly.
+
+Key functions include:
+- `os.homedir = () => tempDir`: Sets the home directory to a temporary location for testing.
+- `authStore.save({ test: 'data' })`: Calls the AuthStore's save method with sample data.
+- `fs.writeFileSync = (file, data, options) => { ... }`: Mocks the writeFileSync function to throw an error when writing to the auth file.
 
 ## Dependencies
 | Module | Local | Why |
 |--------|-------|-----|
 | `../lib/auth/auth-store` | Yes | Provides the AuthStore class for testing. |
-| `assert` | No | Used to assert conditions in the test. |
+| `assert` | No | Used for verifying assertions in the test code. |
 
 ## Side Effects
-- console_output: The console.error function is mocked to log an error message, and its original behavior is restored when the test completes.
-- filesystem_read: None
-- filesystem_write: The writeFileSync function is overridden to throw a mock error when writing to the auth file.
+- console_output: An error message is logged to the console when the save method fails.
+- filesystem_read: The file system is not modified during this test (filesystem_read is not applicable).
+- filesystem_write: The mock writeFileSync function simulates a failure by throwing an error when writing to the auth file.
 
 ## Dependents
 No known dependents.

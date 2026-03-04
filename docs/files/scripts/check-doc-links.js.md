@@ -1,7 +1,7 @@
 ---
 source_hash: f59676842487a26c
-facts_hash: adb5daf5eeb07bca
-generated_at: 2026-03-03T07:28:38.913Z
+facts_hash: 8139745df61e6060
+generated_at: 2026-03-04T05:47:56.518Z
 generator_version: 1.0.0
 model: cheap
 quality_score: 88
@@ -9,30 +9,39 @@ quality_score: 88
 # File: scripts/check-doc-links.js
 
 ## Purpose
-This file, `check-doc-links.js`, is a command-line utility that scans all documentation files in the repository for internal markdown links and validates their integrity. It checks if links are valid, reports broken links, and provides options to auto-fix these issues.
+This file, `check-doc-links.js`, is a script that scans all documentation files in the repository and validates internal Markdown links. It uses the `validateAllLinks` function from the `../lib/onboarding/doc-links` module to perform the validation. The script provides an option to fix broken links automatically.
 
 ## Exports / API Surface
 | Symbol | Type | Params | Description |
 |--------|------|--------|-------------|
-| `validateAllLinks` | function | `repoRoot` | Validates all internal markdown links in a repository. |
-| `fixDir` | function | `dir` | Fixes broken links in a directory by removing GitHub blob URLs and empty link targets. |
+| `validateAllLinks` | function |  | Validates all internal Markdown links in a repository |
+| `fixDir` | function | `dir` | Fixes broken links in the specified directory |
+| `for` | method | `const entry of entries` | Iterates over the files and subdirectories in the current directory |
+| `if` | method | `isFix` | Evaluates whether to run the fix script or just report errors |
 
 ## Internal Logic
-The main execution flow involves:
-- Loading command-line arguments and determining if the "--json" or "--fix" options are used.
-- Validating all internal markdown links in the repository using the `validateAllLinks` function.
-- If the "--fix" option is used, fixing broken links by modifying file contents and updating a report of fixed issues.
+The main execution flow is as follows:
+
+- The script reads command-line arguments to determine which action to take (`--json` for compact output, `--fix` to fix broken links).
+- It uses the `validateAllLinks` function to scan all documentation files in the repository and reports the validation results.
+- If `--fix` is specified, it runs the `fixDir` function on each directory containing Markdown files, fixing broken links automatically.
+- The script then outputs the results of the link validation and fix operation (if applicable) using JSON or plain text.
+
+Key functions include:
+
+- `validateAllLinks`: Validates all internal Markdown links in a repository.
+- `fixDir`: Fixes broken links in the specified directory.
 
 ## Dependencies
 | Module | Local | Why |
 |--------|-------|-----|
-| `../lib/onboarding/doc-links` | Yes | Provides the logic for validating internal markdown links. |
+| `../lib/onboarding/doc-links` | Yes | Provides the `validateAllLinks` function for link validation. |
+| `fs` | No | Used to read and write files, but it's not a dependency because its functions are not used directly in this script. |
 
 ## Side Effects
-- console_output: The utility prints JSON-formatted data to the console in both debug mode and when fixing issues, as well as regularized output in non-debug mode.
-- filesystem_read: The utility reads file contents using `fs.readFileSync` when scanning files.
-- filesystem_write: The utility writes modified file contents back to disk using `fs.writeFileSync` when fixing broken links.
-- process_control: The utility exits the process with a zero or one status code based on whether all links were valid.
+- console_output: The script outputs JSON or plain text to the console indicating the results of the link validation and fix operation.
+- filesystem_read: The script reads the contents of Markdown files using `fs.readFileSync`.
+- filesystem_write: The script writes the modified contents of Markdown files back to disk after fixing broken links using `fs.writeFileSync`.
 
 ## Dependents
 No known dependents.

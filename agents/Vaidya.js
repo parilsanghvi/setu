@@ -93,6 +93,27 @@ class Vaidya extends Agent {
         console.log(`[${this.name}] ✅ Dependencies installed.`);
         return true;
     }
+    /**
+     * Build a context package for a task.
+     * 100% rule-based, no LLM involvement.
+     * @param {Object} opts
+     * @param {string} [opts.taskDescription] - Free-text task description
+     * @param {string[]} [opts.targetFiles] - Explicit file paths
+     * @param {string} opts.repoRoot - Repo root
+     * @param {number} [opts.depth=2] - Dependency walk depth
+     * @param {string} [opts.format='markdown'] - 'markdown' or 'json'
+     * @returns {string|Object} Context package
+     */
+    static buildContext({ taskDescription, targetFiles, repoRoot, depth = 2, format = 'markdown' }) {
+        const { buildContextPackage, buildContextJSON } = require('../lib/onboarding/context-builder');
+
+        console.log(`[Vaidya] 🔍 Building context package...`);
+
+        if (format === 'json') {
+            return buildContextJSON({ targetFiles, taskDescription, repoRoot, depth });
+        }
+        return buildContextPackage({ targetFiles, taskDescription, repoRoot, depth });
+    }
 }
 
 // Standalone execution

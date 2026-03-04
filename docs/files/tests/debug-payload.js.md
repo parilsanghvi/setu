@@ -1,7 +1,7 @@
 ---
 source_hash: 4b6d2d68b60f1f8f
-facts_hash: b82295de7b760149
-generated_at: 2026-03-03T07:31:50.927Z
+facts_hash: 39f5bca5677362fd
+generated_at: 2026-03-04T05:51:00.129Z
 generator_version: 1.0.0
 model: cheap
 quality_score: 94
@@ -9,34 +9,32 @@ quality_score: 94
 # File: tests/debug-payload.js
 
 ## Purpose
-This file tests the functionality of the `GoogleAuth` class, specifically its ability to retrieve a valid token for authentication with Google. It also defines various payload variations and sends them to a content generation API to test its response.
+This file tests the debug payload functionality of the Google authentication system, specifically generating content using the antigravity API.
 
 ## Exports / API Surface
 | Symbol | Type | Params | Description |
 |--------|------|--------|-------------|
-| `getValidToken` | function | `profile.id` | Retrieves a valid token for the given Google profile ID. |
-| `findProfilesByProvider` | method | `'google'` | Returns an array of profiles from AuthStore associated with the 'google' provider. |
+| `GoogleAuth` | function | `profile.id` | Retrieves a valid token for a given profile ID. |
+| `AuthStore` | function | `provider: 'google'` | Finds profiles by provider. |
+| `fetch` | method | `url, options` | Sends an HTTP request to the specified URL with the provided options. |
 
 ## Internal Logic
-The file starts by finding a profile in AuthStore associated with the 'google' provider and retrieving its token using the `getValidToken` function.
-
-It then defines an array of payload variations, each representing a different model and project combination.
-
-For each variation, it constructs a payload object and sends a POST request to a content generation API (`https://cloudcode-pa.googleapis.com/v1internal:generateContent`) with the payload as JSON data. The request includes authentication headers set using the retrieved token.
-
-The file logs the response status and any errors that occur during the request. If the request is successful, it logs the JSON response and breaks out of the loop, indicating that a valid response was found.
+The main execution flow involves:
+- Getting a valid token for a specific profile using `GoogleAuth.getValidToken(profile.id)`.
+- Defining variations of payload requests for testing different cases.
+- Iterating over each variation, constructing and sending an HTTP request to generate content using `fetch`, and logging the response.
 
 ## Dependencies
 | Module | Local | Why |
 |--------|-------|-----|
-| `../lib/auth/google` | Yes | Provides the Google authentication functionality used to retrieve tokens. |
-| `../lib/auth/auth-store` | Yes | Manages profiles for different providers and provides access to them. |
-| `crypto` | No | Offers a random UUID generator used in constructing payload objects. |
+| `../lib/auth/google` | Yes | Provides functionality for interacting with Google authentication. |
+| `../lib/auth/auth-store` | Yes | Retrieves profiles from storage for testing. |
+| `crypto` | No | Generates random user prompt IDs and session IDs for payload requests. |
 
 ## Side Effects
-- console_output: The file logs various messages to the console, including profile information, token retrieval status, request and response details, and error messages.
-- network: It sends POST requests to a content generation API, which may result in network communication and potential latency or timeouts.
-- process_control: The `process.exit(1)` statement is used to exit the process with an error code if no profile is found.
+- console_output: The file logs various messages to the console, including test results, errors, and debug information.
+- network: The file sends HTTP requests to generate content using the antigravity API, which may result in network connections being established or updated.
+- process_control: The file exits the process with a non-zero status code if no valid profile is found.
 
 ## Dependents
 No known dependents.

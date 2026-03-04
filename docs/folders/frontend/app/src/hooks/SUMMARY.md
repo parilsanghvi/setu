@@ -1,7 +1,7 @@
 ---
-source_hash: bfe2b5d457fbbf08
-facts_hash: bfe2b5d457fbbf08
-generated_at: 2026-03-03T07:56:43.438Z
+source_hash: 89d77a9ead2478af
+facts_hash: 89d77a9ead2478af
+generated_at: 2026-03-04T06:15:31.583Z
 generator_version: 1.0.0
 model: cheap
 quality_score: 94
@@ -9,20 +9,18 @@ quality_score: 94
 # Folder: frontend/app/src/hooks
 
 ## Purpose
-This folder contains a single file, `useSocket.js`, which is a custom React hook responsible for establishing and managing connections to a Socket.IO server. The key responsibilities of this file include handling incoming messages, updating state, and exposing the socket instance, connection status, agents, tasks, and logs as a stateful object. It is likely used throughout the frontend application to interact with the backend server.
+This folder contains a single file, `useSocket.js`, which is responsible for establishing connections to a Socket.IO server and managing real-time data updates. The hook retrieves authentication credentials and stores them for later use. Its key responsibility is to provide an interface between the client-side application and the server-side Socket.IO infrastructure.
 
 ## Key Files
 | File | Role |
-| `useSocket.js` | Establishes and manages connections to a Socket.IO server |
-| 
+| `useSocket.js` | Establishes connection to Socket.IO server, retrieves authentication credentials, and updates real-time data |
 
 ## Ownership
 Not yet assigned.
 
 ## Invariants / Rules
-| Rule | Description |
-| Likely: Conform to Prettier code formatting conventions | The folder follows standard coding conventions for readability and maintainability. |
-| Likely: Enforce strict React hooks usage | The `useSocket` hook is a custom implementation of the React hook pattern, ensuring proper lifecycle management and reactivity. |
+Likely: All interactions with the Socket.IO server must be performed using WebSockets.
+Likely: Authentication tokens must be checked for validity before each request is sent to the server.
 
 ## Cross-References
 - [useSocket.js](../../../../../files/frontend/app/src/hooks/useSocket.js.md)

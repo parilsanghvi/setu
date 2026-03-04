@@ -1,7 +1,7 @@
 ---
 source_hash: c764a12cc2198c55
-facts_hash: 5b1604b8fc66850b
-generated_at: 2026-03-03T07:29:49.396Z
+facts_hash: 6b1bf657d8ccf19c
+generated_at: 2026-03-04T05:49:05.829Z
 generator_version: 1.0.0
 model: cheap
 quality_score: 94
@@ -9,39 +9,37 @@ quality_score: 94
 # File: scripts/test-google-internal.js
 
 ## Purpose
-This file runs a test suite for the Gemini 2.0 flash thinking experiment model, using Google OAuth authentication to generate content. It tests various scenarios with different user prompts and generates results using the cloudcode-pa API. The test suite is designed to ensure the correctness of the experimental setup.
+This file contains a test script for the Gemini 2.0 flash thinking experiment, specifically designed to interact with the Google OAuth provider and generate content using the `GeminiProvider` class.
 
 ## Exports / API Surface
 | Symbol | Type | Params | Description |
 |--------|------|--------|-------------|
-| `main` | function | `` | Runs the test suite |
-| `for` | method | `const v of variations` | Loops through different model and project combinations |
-| `if` | method | `!profileKey` | Checks if a Google OAuth profile is found in auth.json |
+| main | function | `` | Runs the test script |
+| for | method | `const v of variations` | Iterates over a list of model and project variations to test each one |
+| if | method | `!profileKey` | Checks if a Google OAuth profile is found in the authentication data |
+| delete | method | `profile.projectId` | Deletes a property from an object to force discovery |
 
 ## Internal Logic
-The main execution flow starts with loading authentication data from `.setu/auth.json`. It then finds a Google OAuth profile, loads cached OAuth credentials from `.gemini/oauth_creds.json`, and deletes unnecessary project ID information. The test suite then iterates through different model and project combinations using the `for` loop.
-
-Key functions include:
-
-* `main`: Runs the test suite.
-* `fs.readFileSync`: Reads authentication data from file.
-* `JSON.parse`: Parses JSON data from file.
-* `execSync`: Executes a curl command to generate content on the cloudcode-pa API.
-* `crypto.randomUUID`: Generates a unique user prompt ID.
+The main execution flow of this script involves:
+- Authenticating with the Google OAuth provider and obtaining an access token.
+- Loading a list of model and project variations to test.
+- Iterating over each variation, generating content using `curl`, and logging the result.
+- Optionally testing the generation of content using the `GeminiProvider` class.
 
 ## Dependencies
 | Module | Local | Why |
 |--------|-------|-----|
+| `child_process` | No | Provides an interface to spawn subprocesses |
+| `crypto` | No | Offers a secure way to generate random IDs and hashes |
 | `fs` | No | Provides file system utilities for reading authentication data |
-| `os` | No | Provides operating system utilities, such as homedir() |
-| `path` | No | Provides path manipulation utilities, such as joining paths |
-| `child_process` | Yes | Provides subprocess execution utilities using execSync |
-| `crypto` | Yes | Provides cryptographic utilities, including randomUUID generation |
+| `os` | No | Offers platform-specific functionality, such as accessing the home directory |
+| `path` | No | Helps construct file paths and names |
+| `../lib/models/providers/google` | Yes | Provides a class to interact with the Google OAuth provider |
 
 ## Side Effects
-- console_output: The test suite prints console logs and errors to the standard output.
-- filesystem_read: The test suite reads authentication data from `.setu/auth.json` and cached OAuth credentials from `.gemini/oauth_creds.json`.
-- subprocess: The test suite executes a curl command using `execSync` to generate content on the cloudcode-pa API.
+- console_output: The script logs various messages to the console, including error messages, test results, and progress updates.
+- filesystem_read: The script reads authentication data from files on disk, including the `auth.json` and `oauth_creds.json` files.
+- subprocess: The script spawns a new process using `curl` to generate content and interact with the Gemini API.
 
 ## Dependents
 No known dependents.

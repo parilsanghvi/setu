@@ -1,42 +1,42 @@
 ---
 source_hash: e339f78027f791e8
-facts_hash: cde56f09215a3f68
-generated_at: 2026-03-03T07:14:41.918Z
+facts_hash: 2bbaafa67046e06f
+generated_at: 2026-03-04T05:34:26.027Z
 generator_version: 1.0.0
 model: cheap
-quality_score: 91
+quality_score: 88
 ---
 # File: lib/Camera.js
 
 ## Purpose
-This file defines the `Camera` class, which is responsible for managing a browser instance and taking screenshots of URLs, storing them in a directory with task IDs as subdirectories.
+The Camera class is a browser automation tool that allows taking screenshots of web pages and saving them to a directory. It initializes a Chromium browser instance, sets up a screenshot directory, and provides methods for taking screenshots of specific URLs. The class uses the Config and Logger modules for configuration and logging purposes.
 
 ## Exports / API Surface
 | Export | Type | Description |
 |--------|------|-------------|
-| `snap` | function | Captures a screenshot of a URL and returns the relative URL path. |
-| `init` | function | Initializes the browser instance if it doesn't exist. |
-| `close` | function | Closes the browser instance. |
-| `ensureDir` | function | Ensures a directory exists by creating it recursively. |
+| Camera | cjs_default | Creates a new Camera instance for browser automation. |
+| init | function | Initializes the Chromium browser instance and sets up screenshot directory. |
+| snap | function | Takes a screenshot of a URL and saves it to a file. |
+| close | function | Closes the Chromium browser instance. |
 
 ## Internal Logic
-The main execution flow of this file is as follows:
+The main execution flow involves:
 
-1. The constructor initializes the logger, browser, and screenshots directory.
-2. The `init` method launches a new chromium browser instance if one doesn't exist.
-3. The `snap` method takes a screenshot of a URL by navigating to it in the browser context, saving it to disk, and returning the relative URL path.
-4. The `close` method closes the browser instance.
+*   Initializing the Camera class with a new logger, browser instance, and screenshot directory.
+*   The `init` method is called when the browser instance needs to be initialized or updated. It launches a new Chromium browser instance with headless mode enabled.
+*   The `snap` method takes a URL as input, navigates to it using the browser instance, captures a screenshot of the page, and saves it to a file in the screenshot directory.
+*   The `close` method closes the Chromium browser instance when it is no longer needed.
 
 ## Dependencies
 | Module | Local | Why |
 |--------|-------|-----|
-| `playwright-core` | No | Provides a high-level API for controlling browsers. |
-| `Config` | Yes | Configures browser options, such as executable path and headless mode. |
-| `Logger` | Yes | Logs events and errors to the console or file. |
+| playwright-core | No | Provides browser automation functionality. |
+| Config | Yes | Supplies configuration settings for browser launch and screenshot directory. |
+| Logger | Yes | Logs important events during browser initialization, screenshot capture, and browser closure. |
 
 ## Side Effects
-- filesystem_write: The program writes screenshots to disk in the specified directory.
-- filesystem_read: This file does not read from disk; it only writes.
+-   **filesystem_write**: Screenshots are saved to the specified directory in a PNG format.
+-   **filesystem_read**: The `snap` method reads URLs and screenshot file paths from user input to determine which screenshot to take.
 
 ## Dependents
 No known dependents.

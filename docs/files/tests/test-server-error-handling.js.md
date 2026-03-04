@@ -1,45 +1,49 @@
 ---
 source_hash: 4477b9a9edbe55b8
-facts_hash: c3bbe308291025ec
-generated_at: 2026-03-03T07:46:42.718Z
+facts_hash: 1acbd9125b7c44a8
+generated_at: 2026-03-04T06:06:57.959Z
 generator_version: 1.0.0
 model: cheap
-quality_score: 87
+quality_score: 94
 ---
 # File: tests/test-server-error-handling.js
 
 ## Purpose
-This file tests the server error handling functionality of the `DashboardServer` class, verifying that it returns a generic "Internal Server Error" message and logs the detailed error internally.
+This file verifies the server error handling functionality of the `DashboardServer` class by testing its behavior when an error occurs, particularly in cases where sensitive information is leaked.
 
 ## Exports / API Surface
-
 | Symbol | Type | Params | Description |
 |--------|------|--------|-------------|
-| expressMock | arrow | `` | Mocks the Express.js module. |
-| app | arrow | `{ use: () => { }, get: function (path, handler) { ... }, post: function (path, handler) { ... } }` | Exposes an instance of the mocked Express application with `use`, `get`, and `post` methods. |
-| error | method | `msg` | Returns an error message when called with a message. |
-| info | method | `` | Logs a message to the internal logger. |
+| `app` | arrow | `{}` | Creates a mock Express app with basic methods. |
+| `error` | method | `msg` | Logs an error message to the internal logger. |
+| `expressMock` | arrow | `` | Mocks the Express module for testing purposes. |
+| `if` | method | `` | Checks if a handler exists for a given route. |
+| `info` | method | `` | Logs information messages to the internal logger. |
+| `loggedError` | arrow | `` | Finds the logged error message in the internal logs. |
+| `mocks` | arrow | `{}` | Defines mock dependencies for testing purposes. |
 
 ## Internal Logic
+The main execution flow of this file involves:
+- Setting up a test environment by mocking Express, creating a new instance of the `DashboardServer` class, and configuring its routes.
+- Triggering the vulnerable endpoint to simulate an error occurrence.
+- Verifying that the correct HTTP status code is returned and checking if sensitive information is leaked in the response body.
+- Logging internal errors and verifying that they are logged correctly.
 
-The test file first sets up a mock environment using the `expressMock` function, which creates a mocked Express application instance. It then requires the `DashboardServer` class from `../lib/server` and creates an instance of it.
-
-Next, it sets up a mock request and response object to simulate an incoming request to the server's route `/api/onboarding`. The test then triggers the vulnerable endpoint by calling the handler function associated with the route.
-
-The test then checks that the expected error status code (500) is returned in the response body. If not, it logs an error message indicating that the error message leaked. It also verifies that the detailed error message is logged internally using the `Logger` class.
+The key functions involved in this process are:
+- `DashboardServer` constructor, which initializes the server instance with a given port number.
+- The `app.routes['/api/onboarding']` handler, which is triggered when the vulnerable endpoint is accessed.
+- The error handling mechanism implemented in the `error` method of the `Logger` class.
 
 ## Dependencies
-
 | Module | Local | Why |
 |--------|-------|-----|
-| module | Yes | Provides functions for working with modules. |
-| assert | No | Used to assert conditions during testing, but not used in this specific file. |
+| `module` | Yes | Provides a way to mock dependencies for testing purposes. |
+| `assert` | No | Provides assertion functionality, but it's not used in this file. |
 
 ## Side Effects
-
-- console_output: The test logs error messages to the console when an insecure error message is found or when the detailed error is not logged.
-- database: None
-- process_control: The test exits the process with a non-zero exit code if any of the verification checks fail.
+- console_output: The script logs various messages to the console, including test results and error messages.
+- database: There is no direct interaction with a database in this script.
+- process_control: The script exits the process with an exit code of 0 if all tests pass or 1 if any test fails.
 
 ## Dependents
 No known dependents.

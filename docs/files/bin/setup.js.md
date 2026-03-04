@@ -1,43 +1,43 @@
 ---
 source_hash: 3bc4bdeda4eeed92
-facts_hash: a93d15b611c9351a
-generated_at: 2026-03-03T07:08:37.289Z
+facts_hash: 0ce3eef689e374ac
+generated_at: 2026-03-04T05:28:01.558Z
 generator_version: 1.0.0
 model: cheap
-quality_score: 93
+quality_score: 90
 ---
 # File: bin/setup.js
 
 ## Purpose
-This file, `setup.js`, is responsible for configuring the Dual-Model Environment by guiding users through a setup wizard that sets up expensive and cheap models, handles Docker setup, and writes configuration to a `.env` file.
+This file sets up a configuration for a Dual-Model Environment, using the `setup` function to guide the user through selecting model providers and saving the settings to a `.env` file.
 
 ## Exports / API Surface
 | Symbol | Type | Params | Description |
 |--------|------|--------|-------------|
-| `configureModel` | function | `type, defaults = {}` | Configures a specific model type. |
-| `setup` | function | `` | Runs the setup wizard to configure the environment. |
+| `configureModel` | function | `type, defaults = {}` | Configures a specific type of model. |
+| `setup` | function | `` | Sets up the configuration for the Dual-Model Environment. |
 
 ## Internal Logic
 The main execution flow of this file is as follows:
 
-1. The `setup()` function initializes the setup process by logging a welcome message and explaining its purpose.
-2. It calls the `configureModel()` function twice: once for an expensive model and once for a cheap model, depending on user input.
-3. For each model configuration, it asks the user to select or input various settings (e.g., provider, API key, base URL).
-4. Based on user input, it sets up the environment with the selected settings.
-5. If Docker is detected in the system's PATH, it allows users to specify its executable path and includes this setting in the configuration.
-6. Finally, it writes all the configuration settings to a `.env` file using `fs.writeFileSync()`.
+1. The `setup` function is called, which initializes an object to store the environment data.
+2. The `configureModel` function is used twice: once to configure an "expensive" model and again to configure a "cheap" model.
+3. After configuring both models, the user is asked if they want to use the same configuration for the cheap model.
+4. If the user chooses to use the same configuration, all settings from the expensive model are copied to the cheap model.
+5. Otherwise, a new set of settings is configured for the cheap model.
+6. The `setup` function then writes the environment data to a `.env` file using the `fs` module.
 
 ## Dependencies
 | Module | Local | Why |
 |--------|-------|-----|
-| `../lib/auth/profile-mgr` | Yes | Manages user profiles for authentication purposes. |
-| `../lib/llm/OpenAICompatible` | Yes | Provides compatibility functionality with OpenAI models. |
-| `../lib/models/providers/google` | Yes | Handles Google model provider settings. |
+| `../lib/auth/profile-mgr` | Yes | Manages user authentication profiles. |
+| `../lib/llm/OpenAICompatible` | Yes | Provides compatibility utilities for OpenAI models. |
+| `../lib/models/providers/google` | Yes | Supplies Google provider-specific functionality. |
 
 ## Side Effects
-- console_output: The script logs various messages to the console throughout its execution, including welcome messages, progress updates, and success notifications.
-- filesystem_write: The script writes configuration settings to a `.env` file in the current working directory.
-- subprocess: It runs external commands using `execSync()` (e.g., launching Google login flow) as needed.
+- console_output: The file logs messages to the console, including a welcome message, configuration options, and success messages.
+- filesystem_write: The file writes data to a `.env` file in the current working directory.
+- network: The file may make HTTP requests to fetch models from OpenAI or Google providers.
 
 ## Dependents
 No known dependents.

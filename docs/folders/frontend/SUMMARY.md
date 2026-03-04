@@ -1,32 +1,29 @@
 ---
-source_hash: 2ef2986fa06b6ad9
-facts_hash: 2ef2986fa06b6ad9
-generated_at: 2026-03-03T07:58:27.308Z
+source_hash: ad855d8fdfcacfd9
+facts_hash: ad855d8fdfcacfd9
+generated_at: 2026-03-04T10:14:11.793Z
 generator_version: 1.0.0
 model: cheap
-quality_score: 100
+quality_score: 93
 ---
 # Folder: frontend
 
 ## Purpose
-This frontend folder serves as a centralized hub for all client-side JavaScript code and related assets. It is responsible for managing the visual aspects of the application and handling user interactions. The folder's key responsibilities include rendering UI components, handling form submissions, and communicating with backend APIs.
+The `frontend/` folder contains critical error response data and monitoring task status, responsible for prompting elevated privileges via `sudo` to resolve stuck tasks.
 
-## Key Files
-| Role | Description |
-| --- | --- |
-| index.html | Serves as the entry point for the frontend application, loading necessary dependencies and assets. |
-| styles.css | Defines the visual styling and layout of the application's UI components. |
-| scripts.js | Contains the main JavaScript code responsible for handling user interactions, rendering components, and communicating with backend APIs. |
+| File | Role |
+|------|------|
+| output.json | Contains a JSON response indicating a task has become stuck with an error message requiring intervention. |
 
 ## Ownership
 Not yet assigned.
 
 ## Invariants / Rules
-Likely: Follows Pug templating engine for HTML file generation.
-Always: Uses Babel to transpile ES6+ syntax to ES5.
-Likely: Adheres to a consistent naming convention for CSS classes and JavaScript variables.
+Likely: Follows standardized naming conventions for files and subdirectories.
+The folder adheres to the convention of separating related functionality into distinct subdirectories, ensuring clear organization and maintainability.
 
 ## Cross-References
 - [app/](./app/SUMMARY.md)
 - [dashboard/](./dashboard/SUMMARY.md)
+- [output.json](../../files/frontend/output.json.md)
 

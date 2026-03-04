@@ -1,54 +1,46 @@
 ---
-source_hash: a2d3fae994e82eb2
-facts_hash: eec68829aeefad49
-generated_at: 2026-03-03T07:25:25.910Z
+source_hash: 42dd63161caae646
+facts_hash: 159bb0acb5fc9e00
+generated_at: 2026-03-04T05:45:00.940Z
 generator_version: 1.0.0
 model: cheap
-quality_score: 94
+quality_score: 92
 ---
 # File: lib/onboarding/status.js
 
 ## Purpose
-This file is responsible for computing the quality of documentation within a repository, specifically by scoring the content and structure of individual doc files. The `getRepoQuality` function aggregates these scores to provide an overall quality report.
+This file contains functions for evaluating the quality of documentation within a repository, specifically focusing on detecting populated doc files and calculating coverage.
 
 ## Exports / API Surface
+
 | Export | Type | Description |
 |--------|------|-------------|
-| `calculateCoverage` | cjs_named | Calculates repository coverage statistics. |
-| `getOnboardingStatus` | cjs_named | Returns the onboarding status of a repository. |
-| `getRepoQuality` | cjs_named | Computes the quality report for a repository's documentation. |
-| `IGNORE_DIRS` | cjs_named | Array of directories to ignore during doc file scanning. |
-| `isDocPopulated` | cjs_named | Checks if a doc file contains real content (not just placeholder templates). |
-| `MIN_MEANINGFUL_LENGTH` | cjs_named | Minimum length required for meaningful doc content. |
-| `PLACEHOLDER_MARKERS` | cjs_named | Array of placeholder markers to detect in doc files. |
-| `scoreDocQuality` | cjs_named | Scores a doc file's quality on multiple dimensions. |
-| `TARGET_EXTS` | cjs_named | Array of target file extensions for doc scanning. |
+| `isDocPopulated` | function | Checks if a doc file has real content (not just a placeholder template). |
+| `scoreDocQuality` | function | Scores a doc file's quality on multiple dimensions, including structure, factuality, specificity, and cross-references. |
+| `getRepoQuality` | function | Computes repo-wide documentation quality report, including aggregate scores, missing documents, and low-quality files. |
+| `calculateCoverage` | function | Scans the repository for documentation coverage, identifying missing docs and folders with summaries. |
+| `IGNORE_DIRS` | array | Array of directories to ignore during documentation evaluation. |
+| `MIN_MEANINGFUL_LENGTH` | number | Minimum meaningful content length threshold for doc file population detection. |
+| `PLACEHOLDER_MARKERS` | array | Array of placeholder markers used in doc file templates. |
+| `TARGET_EXTS` | array | Array of file extensions targeted by the documentation evaluation system. |
 
 ## Internal Logic
-The main execution flow involves:
-- Scanning the repository's docs directory and its subdirectories to find relevant doc files.
-- For each doc file, checking if it is populated with real content using `isDocPopulated`.
-- If populated, scoring its quality using `scoreDocQuality`.
-- Aggregating these scores to provide an overall quality report for the repository.
-
-Key functions include:
-- `calculateCoverage`: computes repository coverage statistics.
-- `getRepoQuality`: aggregates doc file scores to provide an overall quality report.
-- `isDocPopulated`: checks if a doc file contains real content (not just placeholder templates).
-- `scoreDocQuality`: scores a doc file's quality on multiple dimensions.
+The main execution flow involves scanning the repository for doc files, evaluating their quality using `scoreDocQuality`, and calculating coverage using `calculateCoverage`. Key functions include `getRepoQuality`, which aggregates scores from individual files and folders, and `calculateCoverage`, which identifies missing docs and folders with summaries.
 
 ## Dependencies
+
 | Module | Local | Why |
 |--------|-------|-----|
-| `child_process` | No | Provides the execSync function for running Git commands. |
-| `fs` | No | Provides functions for interacting with the file system, such as fs.readFileSync and fs.existsSync. |
-| `path` | No | Provides utilities for working with file paths, such as path.join and path.relative. |
+| `fs` | No | Provides file system access. |
+| `path` | No | Provides path manipulation utilities. |
+| `child_process` | No | Allows execution of subprocesses (e.g., for git commands). |
 
 ## Side Effects
-- env_access: None.
-- filesystem_read: The script reads files from the repository's docs directory and its subdirectories.
-- network: The script runs Git commands to retrieve repository information and compute coverage statistics.
-- subprocess: The script uses the child_process module to run external Git commands for computing coverage.
+
+- env_access: The function accesses environment variables, specifically for determining the repository root.
+- filesystem_read: The functions read files from the file system to access doc file content and repository metadata.
+- network: None, as all operations are local file system interactions.
+- subprocess: The `child_process` module is used to execute git commands (e.g., for HEAD resolution), but no external networks are accessed.
 
 ## Dependents
 - [index.js](../../index.js.md)

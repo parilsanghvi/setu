@@ -1,55 +1,60 @@
 ---
 source_hash: 102d51e030d5fbc3
-facts_hash: fdfa633af9300fc3
-generated_at: 2026-03-03T07:50:34.690Z
+facts_hash: 618e07926fb843bb
+generated_at: 2026-03-04T06:10:25.083Z
 generator_version: 1.0.0
 model: cheap
-quality_score: 78
+quality_score: 85
 ---
 # File: tests/verify-agent-broadcast-optimization.js
 
 ## Purpose
-This file runs a test scenario for verifying the broadcast optimization feature in a system using socket.io and database interactions.
+This file tests the broadcast optimization of a system by simulating an agent update and verifying that updates are received correctly on both heartbeat change and status change.
 
 ## Exports / API Surface
+
 | Symbol | Type | Params | Description |
 |--------|------|--------|-------------|
-| `checkServerReady` | function | `` | Checks if the server is ready by sending a GET request to its URL. |
-| `cleanup` | function | `` | Cleans up resources when the process exits or receives a SIGINT signal. |
-| `if` | method | `agents.length > 0` | Conditionally executes code based on whether an agent with the name 'TestAgent' has been detected in updates. |
-| `interval` | arrow | `setInterval((` | Creates and starts an interval that sends GET requests to the server's URL until it returns a response. |
-| `socket.on('connect')` | function | `(res)` | Handles the 'connect' event by injecting a test agent into the database and logging its status and heartbeat information. |
-| `socket.on('connect_error')` | function | `(err)` | Handles connection errors that occur during socket establishment. |
-| `socket.on('agents_update')` | function | `(agents)` | Updates local state with received agent data from the server, including agent counts and statuses. |
+| `checkServerReady` | function | `` | Checks if the server is ready to accept connections. |
+| `cleanup` | function | `` | Cleans up resources used during testing, including closing sockets and killing child processes. |
+| `if` | method | `agents.length > 0` | Evaluates a condition to determine whether an update has been received from the server. |
+| `interval` | arrow | `setInterval((` | Creates an interval function to wait for server readiness. |
+| `lastAgents` | arrow | `[];` | Stores the last received updates from the server. |
+| `socket.on('connect', (` | `function() { ... }` | Listens for a connection event on the socket and injects a test agent into the database. |
+| `req` | arrow | `http.get(SERVER_URL, (res` | Sends an HTTP request to the server to check its availability. |
+| `retries` | arrow | `0; while (!lastAgents.find(a` | Waits for a specified amount of time before retrying if an update is not received from the server. |
+| `startTest` | function | `` | Starts the testing process by connecting to the database and socket, injecting a test agent, and simulating updates to verify the broadcast optimization. |
+| `ta` | arrow | `agents.find(a => a.name === 'TestAgent')` | Finds the TestAgent in the list of received updates from the server. |
 
 ## Internal Logic
-The main execution flow of this file is as follows:
-1. It starts a new test scenario using the `startTest` function.
-2. The `startTest` function initializes the test environment by setting up a temporary directory, creating a socket connection to the server, and connecting to a database.
-3. Once connected, it injects a test agent into the database using the 'connect' event handler of the socket.
-4. The test scenario then waits for updates from the server, which includes received agent data.
-5. Upon receiving an update, it verifies if the test agent has been detected and checks for the broadcast optimization feature by updating the agent's heartbeat only and status separately.
-6. After each verification, it compares the number of updates received before and after the change to determine if the optimization is working correctly.
+The main execution flow of this file involves:
+1. Setting up the test environment, including spawning an index.js process with modified HOME and logging settings.
+2. Waiting for the server to become ready by checking its availability every 500 milliseconds.
+3. Connecting to the database and socket, injecting a test agent into the database.
+4. Simulating updates to verify the broadcast optimization, including updating the heartbeat and status of the test agent.
+5. Verifying that updates are received correctly on both heartbeat change and status change.
 
 ## Dependencies
+
 | Module | Local | Why |
 |--------|-------|-----|
-| `child_process` | No | Provides a way to spawn new processes for executing server-side code. |
-| `fs` | No | Provides file system utilities, including creating temporary directories. |
-| `http` | No | Provides a way to send GET requests to the server's URL for checking readiness. |
-| `io` | No | Enables communication between the client and server using socket.io. |
-| `os` | No | Provides operating system-specific utilities, including getting the current directory path. |
-| `path` | No | Provides file system utility functions, such as joining paths together. |
-| `socket.io-client` | No | Enables communication with the server-side application via socket.io client. |
+| `child_process` | No | Provides process spawning functionality for running index.js. |
+| `fs` | No | Not used in this file, but required by child_process. |
+| `http` | No | Used to send an HTTP request to the server to check its availability. |
+| `os` | No | Required by fs and child_process. |
+| `path` | No | Required by fs and os. |
+| `socket.io-client` | No | Used to connect to the socket and simulate updates. |
+| `better-sqlite3` | No | Not used in this file, but required by socket.io-client for database operations. |
 
 ## Side Effects
-- console_output: The test scenario logs various messages to the console for tracking progress and errors.
-- database: The test scenario creates, reads from, updates, and deletes data in the database as part of the test scenario execution.
-- env_access: The test scenario accesses environment variables such as the server URL and database path for setup.
-- filesystem_write: The test scenario writes temporary files to the file system during its execution.
-- network: The test scenario sends HTTP requests to the server's URL over the network connection for checking readiness.
-- process_control: The test scenario controls the process lifecycle by listening for exit signals and closing resources when necessary.
-- subprocess: The test scenario spawns a new process for executing the server-side code using child_process.
+
+- console_output: The script logs various messages to the console during testing.
+- database: The script interacts with the SQLite database to inject a test agent and update its heartbeat and status.
+- env_access: The script modifies the HOME environment variable to specify the temporary directory used during testing.
+- filesystem_write: The script writes to the file system to create the temporary directory and database file.
+- network: The script sends an HTTP request to the server to check its availability and simulates updates over the socket.
+- process_control: The script spawns a new process using child_process to run index.js and kills it after testing is complete.
+- subprocess: The script uses spawn to launch the index.js process with modified environment variables.
 
 ## Dependents
 No known dependents.

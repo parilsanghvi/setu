@@ -1,7 +1,7 @@
 ---
 source_hash: 041851c4c3a2cfc3
-facts_hash: 542e99000d3817ea
-generated_at: 2026-03-03T07:40:49.430Z
+facts_hash: 743e71ddc8f9fd9e
+generated_at: 2026-03-04T06:01:09.269Z
 generator_version: 1.0.0
 model: cheap
 quality_score: 85
@@ -9,28 +9,33 @@ quality_score: 85
 # File: tests/test-events.js
 
 ## Purpose
-This file tests the Structured Events feature by running a steering agent script in isolation and verifying if it sends Tool Events to a console output. The test also checks for a timeout condition where events are not detected within 10 seconds.
+This file tests the detection of Tool Events (Tool Start/End) using a modified version of the CoreAgent, which is extended by the Steering Agent script. The test verifies that the tool start and end events are correctly detected in the output from the steering agent. The test also checks for timeouts if the events are not detected within a certain time frame.
 
 ## Exports / API Surface
 | Symbol | Type | Params | Description |
 |--------|------|--------|-------------|
-| `fork` | function | `script, args, options` | Creates a new child process by spawning the specified script with given arguments and options. |
-| `stdout` | event emitter |  | Emitted when data is available from the child process's standard output stream. |
+| `fork` | function | `agentScript, args, options` | Creates a new child process and executes the given script. |
+| `stdout.on('data')` | event listener | `(data)` | Handles incoming data from the child process's standard output stream. |
 
 ## Internal Logic
-The main execution flow of this file consists of creating a child process using the `fork` function, which runs the steering agent script. The test listens for data emitted by the child process's standard output stream and checks if Tool Events are present in the accumulated output. If events are detected within 10 seconds, the test logs a success message and exits; otherwise, it logs an error message and exits.
+The main execution flow of this file is as follows:
+- The test creates a new child process using the `fork` function, which executes the Steering Agent script.
+- The test sets up an event listener on the child process's standard output stream to capture any incoming data.
+- When data is received, it is processed and checked for the presence of Tool Start/End events in the accumulated output.
+- If the events are detected, a success message is logged, and the child process is killed.
+- If no events are detected within a certain time frame, a timeout error message is logged, and the child process is killed.
 
 ## Dependencies
 | Module | Local | Why |
 |--------|-------|-----|
-| `child_process` | No | Allows spawning child processes for isolated execution of scripts. |
-| `path` | No | Provides utilities for working with file paths in the current working directory. |
+| `child_process` | No | Provides the necessary functionality for creating new processes. |
+| `path` | No | Enables path manipulation to join directory and script paths. |
 
 ## Side Effects
-- console_output: The test prints messages to both the console output and the process's standard output stream.
-- database: There is no direct interaction with a database; however, the steering agent script may use a bus to send events that could be related to a database.
-- process_control: The test uses `process.exit` to control the main process flow based on event detection and timeout conditions.
-- subprocess: A child process is created using `fork`, which executes the steering agent script in isolation.
+- console_output: The test writes output from the child process's standard output stream directly to the console, which may be logged in other parts of the system.
+- database: This file does not interact with a database; it only processes output from the steering agent.
+- process_control: The test kills the child process when events are detected or a timeout occurs.
+- subprocess: A new child process is created and executed using the `fork` function.
 
 ## Dependents
 No known dependents.

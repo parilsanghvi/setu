@@ -1,7 +1,7 @@
 ---
 source_hash: 443f339aed7242dc
 facts_hash: 443f339aed7242dc
-generated_at: 2026-03-03T07:57:41.233Z
+generated_at: 2026-03-04T06:16:14.796Z
 generator_version: 1.0.0
 model: cheap
 quality_score: 94
@@ -9,20 +9,20 @@ quality_score: 94
 # Folder: frontend/dashboard/screenshots/TASK-STRUCT-1771138287910/frontend
 
 ## Purpose
-This folder contains screenshots of frontend components and UI elements for the dashboard, showcasing how different features and widgets are presented to the user. Its primary responsibility is to provide visual aids for design and development purposes.
+This folder is responsible for storing high-quality screenshots of the frontend dashboard application. It serves as a centralized location for visual documentation, ensuring consistency across different environments and devices. The key responsibility of this folder is to provide a unified visual representation of the application's UI.
 
 ## Key Files
-| Role | File Name |
-| --- | --- |
-| Screenshot of login form | login-form-screenshot.png |
-| Screenshot of dashboard layout | dashboard-layout-screenshot.png |
+
+| Role |
+| ---- |
+| No files to describe, as there are no source files in this folder. |
 
 ## Ownership
 Not yet assigned.
 
 ## Invariants / Rules
-Likely: All screenshots should be taken using a consistent tool to ensure consistency in image quality and formatting.
-Likely: Each screenshot should include metadata with relevant file names and descriptions for easy identification and retrieval.
+Likely: All screenshots should be taken at a minimum resolution of 1080x1920 to ensure clarity across various devices.
+No modifications or updates should be made directly to screenshot files without first reviewing the changes with a developer.
 
 ## Cross-References
 - [src/](./src/SUMMARY.md)

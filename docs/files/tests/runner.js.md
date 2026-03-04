@@ -1,40 +1,46 @@
 ---
 source_hash: bea05cb8173ac722
-facts_hash: 797d04782e1a4410
-generated_at: 2026-03-03T07:32:39.329Z
+facts_hash: 1d2194f8233afd8e
+generated_at: 2026-03-04T05:51:47.083Z
 generator_version: 1.0.0
 model: cheap
-quality_score: 85
+quality_score: 79
 ---
 # File: tests/runner.js
 
 ## Purpose
-The tests/runner.js file serves as a test runner for setting up and executing tests in the system, specifically for the list-models and verify files.
+This file serves as the test runner for a suite of tests in a setup project, utilizing Node.js to execute test files and track results.
 
-## Exports / API Surface
 | Symbol | Type | Params | Description |
 |--------|------|--------|-------------|
-| `runTest` | function | `file` | Runs a single test file. |
+| `runTest` | function | `file` | Runs a single test file and returns a promise with a success flag. |
+
+## Exports / API Surface
+
+| Symbol | Type | Params | Description |
+|--------|------|--------|-------------|
 
 ## Internal Logic
-The main execution flow involves iterating through an array of test files, spawning a new node process for each file, and checking its exit code to determine if the test passed or failed.
+The main execution flow of this file is as follows:
 
-Key functions include:
-- The `runTest` function: Spawns a new node process for the given file, waits for it to finish, and checks its exit code.
-- The main loop: Iterates through an array of test files, runs each one using `runTest`, and keeps track of the number of passed and failed tests.
+- The `runTest` function takes a file name, executes it using `child_process.spawn`, and returns a promise that resolves with a success flag.
+- The test suite iterates through the list of files, skipping interactive tests, and calls `runTest` for each file.
+- For each test, it logs the result to the console and updates counters for passed and failed tests.
+- After all tests have been executed, it prints a summary of the results and exits the process if any tests failed.
 
 ## Dependencies
+
 | Module | Local | Why |
 |--------|-------|-----|
-| `child_process` | No | Provides a way to spawn and manage child processes. |
-| `fs` | No | Is not explicitly used in this file, but is imported as part of the Node.js environment. |
+| `child_process` | No | Provides a way to spawn new processes. |
+| `fs` | No | Used for reading directory contents. |
 
 ## Side Effects
-- console_output: The script logs information about each test file being run, including its name and whether it passed or failed.
-- env_access: The script accesses the `LOG_LEVEL` and `DASHBOARD_PASS` environment variables to suppress logs during tests.
-- filesystem_read: The script reads the contents of the directory containing the test files using `fs.readdirSync`.
-- process_control: The script uses process control (e.g., `process.exit(1)`) to exit the program with a non-zero status code if there are any failed tests.
-- subprocess: The script spawns a new node process for each test file using `spawn('node', [path.join(testDir, file)])`.
+- console_output: Logs test results to the console.
+- env_access: Modifies environment variables, such as setting the LOG_LEVEL and DASHBOARD_PASS, during test execution.
+- filesystem_read: Reads the contents of the test directory to find eligible test files.
+- process_control: Exits the process with a non-zero code if any tests fail.
+- subprocess: Spawns a new Node.js process to execute each test file.
 
 ## Dependents
 No known dependents.

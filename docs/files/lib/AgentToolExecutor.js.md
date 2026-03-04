@@ -1,39 +1,35 @@
 ---
 source_hash: d816554f2da8eb03
-facts_hash: 2c8c306b2b43b0f8
-generated_at: 2026-03-03T07:14:18.216Z
+facts_hash: fa6f11fd750e7baa
+generated_at: 2026-03-04T05:33:59.905Z
 generator_version: 1.0.0
 model: cheap
-quality_score: 81
+quality_score: 85
 ---
 # File: lib/AgentToolExecutor.js
 
 ## Purpose
-The lib/AgentToolExecutor.js file defines a class, AgentToolExecutor, which handles the execution of tools for CoreAgent instances, including built-in file tools and dynamically loaded skills.
+The AgentToolExecutor file defines a class responsible for executing tools for CoreAgent, including built-in file tools and dynamically loaded skills. It handles tool execution by validating schema and parameters, executing dynamic tools from skills, and delegating to internal methods. The class provides a standardized way of interacting with tools in the system.
 
 ## Exports / API Surface
 | Export | Type | Description |
 |--------|------|-------------|
-| `executeTool` | function | Executes a specific tool according to its defined schema and handler. |
-| `_resolvePath` | function | Resolves a path against the agent's scope and ensures it is contained within. |
+| `AgentToolExecutor` | cjs_default | Handles execution of tools for CoreAgent |
 
 ## Internal Logic
-The main execution flow of AgentToolExecutor involves:
-- The `executeTool` method, which takes a tool call object as input.
-- Schemas validation (if defined) for the tool call arguments using zod.
-- Execution of dynamic tool code from skills or delegated internal methods.
-- Handling default common tools like read_file and write_file.
-
-The constructor initializes the AgentToolExecutor instance with a reference to the CoreAgent instance.
+The main execution flow involves the `executeTool` method, which takes a tool call as input and executes the corresponding action. The key functions involved in this process are:
+- `_resolvePath`: Resolves a path against the agent's scope to ensure it is contained within.
+- `readFile` and `writeFile`: Handle file operations by resolving paths and reading/writing files securely.
 
 ## Dependencies
 | Module | Local | Why |
 |--------|-------|-----|
-| `fs` | No | Provides file system utilities. |
-| `path` | No | Provides path manipulation functions. |
-| `zod` | No | Offers schema validation and type checking capabilities. |
+| `fs` | No | Provides file system utilities for handling file access. |
+| `path` | No | Supplies path manipulation functions for resolving paths relative to the scope. |
+| `zod` | No | Offers schema validation capabilities for ensuring tool parameters conform to expected formats. |
 
 ## Side Effects
+None detected.
 
 ## Dependents
 - [CoreAgent.js](./CoreAgent.js.md)

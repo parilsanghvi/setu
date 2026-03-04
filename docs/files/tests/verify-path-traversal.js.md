@@ -1,49 +1,42 @@
 ---
 source_hash: d4e4ba4641450050
-facts_hash: 4885cc204dc09232
-generated_at: 2026-03-03T07:54:40.700Z
+facts_hash: f1d0712d8a54fe20
+generated_at: 2026-03-04T06:13:53.094Z
 generator_version: 1.0.0
 model: cheap
-quality_score: 94
+quality_score: 89
 ---
 # File: tests/verify-path-traversal.js
 
 ## Purpose
-This file contains a test case for the CoreAgent class, specifically its path traversal prevention functionality. It verifies that the agent correctly denies access to files outside its scope when reading absolute paths and relative paths with traversals. The test creates a temporary directory, writes a sensitive file outside it, and then attempts to read the file using both an absolute path and a relative path with traversal.
+This file tests the security features of the CoreAgent class, specifically its ability to prevent path traversal attacks. The test creates a temporary directory for the agent scope and attempts to read files using both absolute and relative paths, verifying that the agent correctly denies access to files outside its scope.
 
 ## Exports / API Surface
 | Symbol | Type | Params | Description |
 |--------|------|--------|-------------|
-| `test` | function |  | Runs test cases for Node.js testing framework. |
-| `assert` | function |  | Verifies conditions in assertions and throws an error if they fail. |
-| `fs` | module |  | Provides file system-related functionality, such as creating directories and writing files. |
-| `path` | module |  | Provides path manipulation utilities, including resolving relative paths. |
-| `os` | module |  | Provides information about the operating system, such as the tmpdir() function. |
-| `CoreAgent` | class | obj, scope | Creates a new CoreAgent instance with the given name and scope. |
+| `CoreAgent` | function | `name, role, dir` | Creates a new instance of the CoreAgent class. |
+| `readFile` | method | `{ path: string }` | Reads the contents of a file using the provided path. |
 
 ## Internal Logic
-The main execution flow of this file is as follows:
+The test begins by setting up a temporary directory for the agent scope and creating a file outside this scope. It then creates an instance of the CoreAgent class with limited scope and attempts to read the outside file using both absolute and relative paths.
 
-1. The test case creates a temporary directory for the agent's scope using fs.mkdtempSync().
-2. It writes a sensitive file outside the temporary directory.
-3. It creates an instance of the CoreAgent class with a limited scope, passing the temporary directory as its scope.
-4. It attempts to read the sensitive file using both an absolute path and a relative path with traversal.
-5. If either attempt succeeds, it fails the test case.
-6. If neither attempt succeeds (i.e., Access denied is returned), it passes the test case.
-7. The test case cleans up by removing the temporary directory and deleting the sensitive file.
+1. `test('Security: CoreAgent Path Traversal Prevention', async (t) => { ... })`: The main test function, which sets up the test environment and runs the test.
+2. `const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'agent-scope-'));`: Creates a temporary directory for the agent scope.
+3. `fs.writeFileSync(outsideFile, 'SECRET_DATA');`: Writes secret data to a file outside the agent's scope.
+4. `const agent = new CoreAgent('TestAgent', 'Intern', tempDir);`: Creates a new instance of the CoreAgent class with limited scope.
+5. `try { ... } finally { ... }`: The test execution block, which attempts to read files using both absolute and relative paths, and then cleans up after itself.
 
 ## Dependencies
 | Module | Local | Why |
 |--------|-------|-----|
-| `node:test` | No | Provides a testing framework for Node.js applications. |
-| `node:assert` | No | Verifies conditions in assertions and throws an error if they fail. |
-| `../lib/CoreAgent` | Yes | Provides the CoreAgent class implementation with path traversal prevention functionality. |
-| `fs` | No | Provides file system-related functionality, such as creating directories and writing files. |
-| `os` | No | Provides information about the operating system, such as the tmpdir() function. |
-| `path` | No | Provides path manipulation utilities, including resolving relative paths. |
+| `../lib/CoreAgent` | Yes | Provides the CoreAgent class for testing. |
+| `node:assert` | No | Provides assertion utilities for testing. |
 
 ## Side Effects
-- filesystem_write: The test case writes a sensitive file outside the temporary directory using fs.writeFileSync().
+- `fs.mkdtempSync`: Creates a temporary directory and returns its path.
+- `fs.writeFileSync`: Writes data to a file synchronously.
+- `fs.rmSync`: Removes a file or directory recursively, returning the number of files removed.
+- `fs.unlinkSync`: Deletes a file, returning immediately if it is a socket.
 
 ## Dependents
 No known dependents.

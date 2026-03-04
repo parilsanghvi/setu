@@ -1,7 +1,7 @@
 ---
 source_hash: bea3032ddc8ae4f2
-facts_hash: 3afb82fdf7d92e77
-generated_at: 2026-03-03T07:54:01.945Z
+facts_hash: de01f10485063027
+generated_at: 2026-03-04T06:13:24.459Z
 generator_version: 1.0.0
 model: cheap
 quality_score: 80
@@ -9,37 +9,34 @@ quality_score: 80
 # File: tests/verify-log-watch.js
 
 ## Purpose
-This file verifies the functionality of a log watch feature in the DashboardServer application by connecting to it using Socket.IO and sending a test message. The test checks if the server correctly appends and receives the message, indicating successful log watching. If the log is received correctly, the test exits the process.
+This file tests the log watch functionality of the DashboardServer class, ensuring it correctly appends log messages to a specified file and receives notifications when new log events are generated.
 
 ## Exports / API Surface
-
 | Export | Description |
-|--------|--------------|
-| `DashboardServer` | Creates an instance of the DashboardServer class to start a server on a specified port. |
-| `io` | Establishes a connection to a Socket.IO client at a specified URL with additional headers for authentication. |
+|--------|-------------|
+| `DashboardServer` | Starts the server and listens for incoming connections. |
+| `io` | Establishes a socket connection to the DashboardServer instance. |
 
 ## Internal Logic
-The main execution flow of this file involves:
-
-1. Starting a new instance of the `DashboardServer` class, which creates a server on a specified port.
-2. Connecting to the dashboard server using a Socket.IO client, establishing an authentication header for the connection.
-3. Sending a test message through the Socket.IO connection and checking for its reception by the server.
-4. If the log is received correctly, disconnecting from the socket, closing the server, and exiting the process.
+1. The file starts by setting up the necessary dependencies, including the DashboardServer class, HTTP module, and socket.io-client.
+2. It ensures the log file exists and creates it if it doesn't, and then starts the server on port 3002.
+3. A client connection is established using socket.io-client, passing in authentication credentials for the user.
+4. The client listens for a 'connect' event to confirm successful connection and appends a test message to the log file upon establishing the connection.
+5. It waits for a 'log' event from the server with a matching test message, then verifies that the received log is correct, closes the socket and server, and exits the process if successful.
+6. If no response within 5000ms is received, it logs an error, disconnects the client, and exits the process.
 
 ## Dependencies
-
 | Module | Local | Why |
 |--------|-------|-----|
-| `../lib/server` | Yes | Provides a server class to start and manage the dashboard server. |
-| `fs` | No | Provides file system operations for reading and writing log files. |
+| `../lib/server` | Yes | Provides the DashboardServer class for testing. |
+| `http` | No | Used internally by the DashboardServer instance. |
 
 ## Side Effects
-
-- console_output: The script logs messages to the console, including connection status, log reception confirmation, timeout errors, and process exit.
-- env_access: The script accesses environment variables `Dashboard_USER` and `Dashboard_PASS` to authenticate with the dashboard server.
-- filesystem_read: The script reads the contents of a log file located in the set directory using `fs.readFileSync`.
-- filesystem_write: The script writes data to the log file at path `setu.log` using `fs.writeFileSync`.
-- process_control: The script controls the process by starting, stopping, and exiting it using various methods (e.g., `start()`, `disconnect()`, `close()`, `process.exit()`).
+- console_output: This script logs messages to the console, including connection establishment, receipt of log events, and timeouts.
+- env_access: The process uses environment variables DASHBOARD_USER and DASHBOARD_PASS for authentication purposes.
+- filesystem_read: The script reads from the specified log file to verify that incoming log events are correctly appended.
+- filesystem_write: The script writes to the log file when appending a test message or disconnecting due to successful verification.
+- process_control: This script controls the process flow, including establishing connections, waiting for responses, and exiting with success or failure.
 
 ## Dependents
 No known dependents.

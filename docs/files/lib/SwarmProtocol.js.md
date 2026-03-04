@@ -1,7 +1,7 @@
 ---
 source_hash: 94c25056b3364cb1
-facts_hash: b23373e4262a3217
-generated_at: 2026-03-03T07:17:13.319Z
+facts_hash: 7b14a978e4a2895a
+generated_at: 2026-03-04T05:37:04.699Z
 generator_version: 1.0.0
 model: cheap
 quality_score: 89
@@ -9,23 +9,24 @@ quality_score: 89
 # File: lib/SwarmProtocol.js
 
 ## Purpose
-This file defines a standardized workflow for task orchestration, specifically message types and constants used by the SwarmProtocol class. It allows managers to assign tasks to workers, receive progress updates, and acknowledge completion of tasks. The Protocol object serves as a centralized hub for task-related communication.
+This file defines a standardized workflow handoff protocol for task orchestration, specifically the `Protocol` object which contains message types and constants for assignment, acknowledgement, completion, and failure, as well as status updates.
 
 | Export | Type | Description |
 |--------|------|-------------|
-| `createMessage` | function | Creates a message object with specified type, content, and metadata. |
+| Protocol | cjs_default | Exports the standardized workflow handoff protocol |
 
 ## Internal Logic
-The Protocol object is a key component in the SwarmProtocol class. The `createMessage` method generates a standardized message format for task-related communication.
+The main execution flow of this file involves creating a `Protocol` object with predefined message types and constants. The `createMessage` function is used to format message objects with specific types, content, and metadata.
 
-No specific constructor or main methods are defined in this file.
+| Function | Description |
+|----------|-------------|
+| createMessage | Formats a message object with the specified type, content, and optional metadata |
 
 ## Dependencies
-| Why | Description |
-|------|-------------|
-| No imports detected. | This module does not rely on external dependencies to function as intended. |
+No imports are detected in this file.
 
 ## Side Effects
+None detected.
 
 ## Dependents
 - [CoreAgent.js](./CoreAgent.js.md)

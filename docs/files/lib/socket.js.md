@@ -1,44 +1,45 @@
 ---
 source_hash: 1a084d38dda51a6f
-facts_hash: 2942e3495d2ebfec
-generated_at: 2026-03-03T07:26:37.377Z
+facts_hash: 3c83b0383725c9d9
+generated_at: 2026-03-04T05:46:10.319Z
 generator_version: 1.0.0
 model: cheap
-quality_score: 84
+quality_score: 86
 ---
 # File: lib/socket.js
 
 ## Purpose
-The `socket.js` file exports a single function, `setupSocket`, which sets up a socket connection for real-time communication between the client and server. It handles incoming requests from clients, emits log history to connected clients, and forwards chat messages from the database to connected sockets. The function also establishes a watcher on the log file to stream changes to clients.
+The `socket.js` file exports the `setupSocket` function, which sets up a WebSocket connection between the client and server, handling log streaming, message forwarding, and polling for database updates.
 
-## Exports / API Surface
 | Export | Type | Description |
 |--------|------|-------------|
-| `setupSocket` | cjs_default | Sets up a socket connection for real-time communication between the client and server. |
+| setupSocket | cjs_default | Sets up a WebSocket connection for communication with clients |
 
 ## Internal Logic
-The main execution flow of the `setupSocket` function is as follows:
-- It sets up an event listener for incoming connections from clients.
-- It emits the initial log history to connected clients.
-- It establishes a watcher on the log file to stream changes to clients.
-- It listens for disconnections from clients and logs disconnection events.
-- It forwards chat messages from the database to connected sockets.
-- It periodically polls the database for updates (simulated "push") and emits updates to connected sockets.
+The main execution flow of `setupSocket` involves:
+- Setting up the WebSocket connection and listening for incoming requests.
+- Watching the log file for changes, handling file truncation and rotation.
+- Forwarding messages from the database to connected clients.
+- Polling the database for updates at regular intervals.
 
-Key functions:
-- `setupSocket(io, logger)`: Sets up a socket connection and establishes the watcher on the log file.
-- `io.on('connection', async (socket))`: Handles incoming connections from clients and emits initial log history.
-- `fs.watch(logFile, (eventType) => {...})`: Establishes a watcher on the log file to stream changes to clients.
+Key functions include:
+- `io.on('connection')`: Handles new client connections and initializes log streaming.
+- `setupWatcher()`: Configures the log watcher for file system events.
+- `db.on('message')`: Forward messages from the database to connected clients.
+- `context.pollInterval = setInterval()`: Polls the database for updates at regular intervals.
 
 ## Dependencies
 | Module | Local | Why |
 |--------|-------|-----|
-| `./db` | Yes | Provides database access utilities |
-| `./utils` | Yes | Provides utility functions for reading last lines of files |
+| db | Yes | Manages the in-memory database |
+| utils | Yes | Provides utility functions |
+| fs | No | Interacts with the file system |
 
 ## Side Effects
-- Database: The function forwards chat messages from the database to connected sockets and periodically polls the database for updates (simulated "push").
-- Filesystem_read: The function establishes a watcher on the log file to stream changes to clients.
+- database:
+  - Stores and retrieves data from an in-memory database.
+- filesystem_read: 
+  - Reads and watches changes to the log file, emitting events for new log entries.
 
 ## Dependents
 - [server.js](./server.js.md)

@@ -1,42 +1,41 @@
 ---
 source_hash: 20e7e3b820bc61d6
-facts_hash: 0559765a0c315066
-generated_at: 2026-03-03T07:53:02.162Z
+facts_hash: 7e46e34c9267d2c1
+generated_at: 2026-03-04T06:12:30.687Z
 generator_version: 1.0.0
 model: cheap
-quality_score: 90
+quality_score: 82
 ---
 # File: tests/verify-google-auth-xss.js
 
 ## Purpose
-This file contains a test function `testXSS` that verifies the GoogleAuth library's handling of cross-site scripting (XSS) vulnerabilities by simulating a malicious request and checking the server's response for potential security issues.
+This file tests the GoogleAuth library for vulnerability to reflected XSS attacks by sending a malicious request and verifying the server's response.
 
 ## Exports / API Surface
 | Symbol | Type | Params | Description |
 |--------|------|--------|-------------|
-| `http.get` | function | `url, callback` | Handles incoming HTTP requests to simulate a Google OAuth callback. |
-| `res.on('data')` | method | `chunk` | Processes and logs data received from the server in response to an HTTP request. |
-| `res.on('end')` | method |  | Notifies that the end of the data has been reached for an HTTP request. |
-| `req.on('error')` | method | `e` | Handles any errors encountered while sending an HTTP request. |
+| `testXSS` | function | `` | Starts an XSS verification test, simulating a login flow and sending a malicious request. |
 
 ## Internal Logic
-The test function executes as follows:
-1. It starts the GoogleAuth login flow, which begins a server process.
-2. After a short delay, it sends a malicious request to the server with a payload containing JavaScript code.
-3. The response from the server is then checked for potential security issues, such as reflected XSS vulnerabilities.
+The main execution flow involves:
+
+- Starting the login flow using `GoogleAuth.login()`, which starts a server.
+- Sending a malicious request to the server using `http.get()` after giving the server a moment to start.
+- Verifying the vulnerability by checking the content type and body of the response.
+- Exiting with a status code based on whether the response is safe or not.
 
 ## Dependencies
 | Module | Local | Why |
 |--------|-------|-----|
-| `../lib/auth/google` | Yes | Provides the GoogleAuth library functionality used in the test. |
-| `assert` | No | Used for assertion statements to validate expected behavior. |
+| `../lib/auth/google` | Yes | Provides the GoogleAuth library for simulating a login flow. |
+| `http` | No | Provides the HTTP client for sending requests to the server. |
 
 ## Side Effects
-- console_output: The script logs various messages to the console, including successful responses, errors, and potential security vulnerabilities.
-- env_access: The script accesses environment variables related to Google OAuth settings, such as `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, and `GOOGLE_REDIRECT_URI`.
-- network: The script sends HTTP requests to a local server running on port 51121 and receives responses in the form of HTTP status codes and content types.
-- process_control: The script uses process control mechanisms to exit with specific error or success codes depending on the outcome of the test.
-- subprocess: The script creates a mock child_process.spawn function to simulate the launch of a browser, but this functionality is not actually used.
+- console_output: The script logs various messages to the console, including the status of the test and any errors that occur.
+- env_access: The script accesses environment variables such as `GOOGLE_CLIENT_ID`, `GOOGLE_REDIRECT_URI`, and `GOOGLE_CLIENT_<!-- REDACTED: sensitive content omitted -->` to configure the test.
+- network: The script sends an HTTP request to a server, which may involve network communication.
+- process_control: The script exits with a status code based on the result of the test.
+- subprocess: The script mocks the behavior of child processes using `child_process.spawn`, but does not actually spawn any sub-processes.
 
 ## Dependents
 No known dependents.

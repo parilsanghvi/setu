@@ -1,62 +1,46 @@
 ---
 source_hash: a9c6687c7659599e
-facts_hash: 9628ae6c6688a148
-generated_at: 2026-03-03T07:18:08.033Z
+facts_hash: 7e51dd849b74b947
+generated_at: 2026-03-04T05:37:52.175Z
 generator_version: 1.0.0
 model: cheap
-quality_score: 100
+quality_score: 98
 ---
 # File: lib/auth/google.js
 
 ## Purpose
-This file contains the implementation of the Google authentication class, responsible for handling OAuth flows and fetching user information from Google APIs.
+This file implements the Google authentication functionality, specifically the `GoogleAuth` class, which handles the OAuth flow and provides a way to authenticate users with their Google credentials. The class is responsible for generating PKCE verifier/challenge, starting a local server to listen for the callback, exchanging the code for tokens, and fetching user information. It also provides methods for refreshing the access token.
 
 ## Exports / API Surface
 | Export | Type | Description |
 |--------|------|-------------|
-| `openUrl` | function | Opens a URL in the system's default browser. |
-| `GoogleAuth` | cjs_default | A class providing methods for handling Google OAuth flows and fetching user information. |
-| `_waitForCallback` | function | Waits for a callback from the authentication server to handle the code exchange. |
-| `_exchangeCode` | function | Exchanges the obtained code for access tokens and refresh tokens with Google's token endpoint. |
-| `_fetchUserEmail` | function | Fetches the user's email address from Google's user info endpoint. |
-| `_fetchProjectId` | function | Fetches the project ID associated with the user's authentication session. |
-| `refreshToken` | function | Refreshes an access token when it expires or is about to expire. |
-| `getValidToken` | function | Gets a valid access token for the given profile ID, refreshing the token if necessary. |
+| `openUrl` | function | Opens a URL in the default browser or an external application. |
+| `GoogleAuth` | cjs_default | A class that handles Google authentication. |
 
 ## Internal Logic
-The main execution flow of this file involves:
-- Generating a PKCE verifier and challenge using the `generatePkce` function from the `pkce` module.
-- Starting a local server to listen for the callback on the authentication endpoint.
-- Opening the browser to the Google OAuth URL with the generated PKCE challenge.
-- Exchanging the obtained code for access tokens and refresh tokens with Google's token endpoint.
-- Fetching the user's email address from Google's user info endpoint.
-- Fetching the project ID associated with the user's authentication session.
+The main execution flow of this file involves creating an instance of the `GoogleAuth` class, which initializes the port and logger. The `login` method generates PKCE verifier/challenge, starts a local server to listen for the callback, opens the browser to the Google OAuth URL, exchanges the code for tokens, and returns the tokens and user information.
 
 Key functions:
-- `_waitForCallback`: Waits for a callback from the authentication server to handle the code exchange.
-- `_exchangeCode`: Exchanges the obtained code for access tokens and refresh tokens with Google's token endpoint.
-- `_fetchUserEmail`: Fetches the user's email address from Google's user info endpoint.
-- `_fetchProjectId`: Fetches the project ID associated with the user's authentication session.
 
-The `GoogleAuth` class constructor initializes the port number based on an environment variable and creates a new logger instance.
-The `login` method starts the OAuth flow, generating a PKCE verifier and challenge, opening the browser to the Google OAuth URL, exchanging the code for tokens, and fetching user information.
-The `_refreshToken` function refreshes an access token when it expires or is about to expire.
-The `getValidToken` function gets a valid access token for the given profile ID, refreshing the token if necessary.
+* `_waitForCallback`: Waits for the callback from the local server and handles errors.
+* `_exchangeCode`: Exchanges the code for tokens with the Google token endpoint.
+* `_fetchUserEmail` and `_fetchProjectId`: Fetch user email and project ID from the Google API, respectively.
+* `refreshToken`: Refreshes the access token using the refresh token.
 
 ## Dependencies
 | Module | Local | Why |
 |--------|-------|-----|
-| `http` | Yes | Provides the HTTP module for creating an authentication server. |
-| `crypto` | No | Used for generating a PKCE verifier and challenge. |
-| `child_process` | No | Not used in this implementation. |
-| `AuthStore` | Yes | Provides methods for storing and retrieving user profiles. |
-| `Config` | Yes | Defines configuration settings for the Google authentication flow, such as client ID, client secret, redirect URI, and scopes. |
-| `Logger` | Yes | Provides a logging system for outputting messages to the console or other destinations. |
+| `http` | Yes | Provides helper utilities for creating an HTTP server. |
+| `child_process` | No | Used to spawn the default browser or external application. |
+| `crypto` | No | Used for generating random bytes and encoding. |
+| `../Config` | Yes | Provides configuration settings, including OAuth credentials and scopes. |
+| `../Logger` | Yes | Provides logging functionality for monitoring the authentication process. |
+| `../utils/pkce` | Yes | Provides PKCE utility functions, including generating verifier/challenge. |
 
 ## Side Effects
-- env_access: The file uses environment variables to store sensitive information such as client ID, client secret, and token URLs.
-- network: The file opens a browser window to the Google OAuth URL, which may require network access to authenticate with Google's servers.
-- subprocess: The file spawns a new process to create an HTTP server for listening on the authentication endpoint.
+- env_access: The file accesses environment variables, such as `GOOGLE_AUTH_PORT`, to configure the local server.
+- network: The file establishes a network connection to the Google token endpoint and the local server.
+- subprocess: The file spawns a new process to open the default browser or an external application when starting the authentication flow.
 
 ## Dependents
 No known dependents.

@@ -1,39 +1,37 @@
 ---
 source_hash: 457123d840fc6a67
-facts_hash: e8b75577c1fdb119
-generated_at: 2026-03-03T07:10:02.397Z
+facts_hash: fef4cc42ec8e4451
+generated_at: 2026-03-04T05:29:08.283Z
 generator_version: 1.0.0
 model: cheap
-quality_score: 65
+quality_score: 85
 ---
 # File: frontend/app/pnpm-lock.yaml
 
-**File Purpose**
+## Purpose
+The purpose of this file is to configure the compilation settings and dependencies required by the ESBuild tool.
 
-This file is a configuration file for the ESLint linter tool, which checks JavaScript code for syntax and style errors.
-
-**Exports/ API Surface**
-
+## Exports / API Surface
 | Export | Description |
 | --- | --- |
-| `@esbuild/config` | Exports a set of configuration options for the esbuild compiler. |
-| `@esbuild/loader` | Provides functions for loading modules and importing dependencies. |
-| `@esbuild/middleware` | Allows plugins to modify the build process with custom middleware functions. |
+| `@esbuild` | The main export from this module, providing access to the ESBuild configuration. |
+| `config` | An object containing the compilation configuration options. |
+| `plugins` | An array of plugins to be used during compilation. |
 
-**Internal Logic**
+## Internal Logic
+The main execution flow involves loading the configuration file and parsing its contents to determine the build settings. The key functions involved are:
 
-The file uses the `esbuild` library to configure a build process that compiles JavaScript files into ES6 modules. The main execution flow involves:
+* `loadConfig`: Loads the configuration file and returns an object containing the build settings.
+* `parsePlugins`: Parses the plugin array and creates instances of each plugin.
+* `configureBuild`: Configures the build process based on the parsed configuration.
 
-1. `configure`: Configures the esbuild compiler with options such as target browsers, output format, and optimization levels.
-2. `build`: Runs the built-in esbuild command to compile the specified input files.
-
-**Dependencies**
-
+## Dependencies
 | Dependency | Why |
 | --- | --- |
-| `esbuild` | Provides a fast and efficient way to build JavaScript files into ES6 modules. |
+| None detected |
 
-Note: There are no dependencies listed because there are no import statements in the file.
+## Side Effects
+- No side effects detected.
 
 ## Dependents
 No known dependents.

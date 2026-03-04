@@ -1,43 +1,42 @@
 ---
 source_hash: f5ca5cc884158649
-facts_hash: 88920516a2070d80
-generated_at: 2026-03-03T07:55:05.946Z
+facts_hash: e3f618ca4798fc9d
+generated_at: 2026-03-04T06:14:11.608Z
 generator_version: 1.0.0
 model: cheap
-quality_score: 82
+quality_score: 75
 ---
 # File: tests/verify-rakshak.js
 
 ## Purpose
-This file verifies the existence of a Rakshak agent in the system's database after spawning it using the `child_process` module. It checks for the presence of an agent with the name "Rakshak" and reports success or failure accordingly.
+This file is a test script that verifies the existence and functionality of the Rakshak agent by running it in a simulated environment using child processes, and checking its presence in the database.
 
 | Symbol | Type | Params | Description |
 |--------|------|--------|-------------|
-| `spawn` | function |  | Spawns a new child process running the specified command |
-| `path.join` | function |  | Joins two or more path segments into an absolute path |
-| `db.prepare` | method |  | Prepares a SQL query for execution on the database |
+| `spawn` | function |  | Spawns a new child process to run the specified command. |
 
 ## Internal Logic
-The main execution flow involves spawning the Rakshak agent using `spawn`, waiting for 5 seconds, and then querying the database to check for the existence of the "Rakshak" agent. The code uses `setTimeout` to pause execution and allow the spawned process to run.
+The main execution flow of this file is as follows:
+1. The Rakshak agent is spawned in a new child process using `spawn`.
+2. After a 5-second delay, the test checks if the Rakshak agent exists in the database by querying it.
+3. If the agent is found, the test logs success and exits with code 0; otherwise, it logs failure and exits with code 1.
 
-| Key Function | Description |
-|--------------|-------------|
-| `spawn` | Runs the specified command in a new child process |
-| `path.join` | Resolves relative paths to absolute paths |
-| `db.prepare` | Executes a SQL query on the database |
+| Symbol | Type | Params | Description |
+|--------|------|--------|-------------|
+| `prepare` | method |  | Prepares a SQL statement to be executed on the database. |
 
 ## Dependencies
+The file depends on the following modules:
 | Module | Local | Why |
 |--------|-------|-----|
-| `child_process` | Yes | Provides a way to spawn and manage child processes |
-| `../lib/db` | Yes | Offers database interaction utilities |
-| `path` | No | Supplies path manipulation functions for resolving relative paths |
+| `../lib/db` | Yes | Provides access to the database for querying and verification. |
+| `child_process` | No | Provides the functionality to spawn new child processes for running the Rakshak agent. |
 
 ## Side Effects
-- console_output: The script logs "Spawning Rakshak..." before spawning the agent, "✅ Verification SUCCESS: Rakshak is alive." when the verification passes, and "❌ Verification FAILED: Rakshak not found." when it fails.
-- database: The script queries the "agents" table to check for the existence of a record with the name "Rakshak".
-- process_control: The script uses `process.exit(0)` to indicate successful completion and `process.exit(1)` to indicate failure, controlling the parent process's exit status.
-- subprocess: A new child process is spawned using `spawn`, running the Rakshak agent code.
+- console_output: The file logs success or failure messages to the console.
+- database: The file queries the database to verify the existence of the Rakshak agent.
+- process_control: The file controls the exit code of the process after verifying the agent's existence.
+- subprocess: A new child process is spawned to run the Rakshak agent.
 
 ## Dependents
 No known dependents.

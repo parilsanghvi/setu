@@ -1,30 +1,26 @@
 ---
-source_hash: dbeb429abe92eb00
-facts_hash: dbeb429abe92eb00
-generated_at: 2026-03-03T07:56:57.081Z
+source_hash: ead2cf3c73c50e44
+facts_hash: ead2cf3c73c50e44
+generated_at: 2026-03-04T10:13:52.939Z
 generator_version: 1.0.0
 model: cheap
-quality_score: 100
+quality_score: 93
 ---
 # Folder: frontend/app/src
 
 ## Purpose
-This folder contains the main entry point of a React application, responsible for rendering the UI and managing state. It fetches data from the socket API and updates its active agents count in real-time. The app renders various components, including the agent list, kanban board, logs, chat box, and onboarding status.
+The frontend/app/src/ folder contains the main entry points and user interface components of the application, responsible for rendering the UI and handling interactions between various components.
 
-## Key Files
 | File | Role |
-| App.jsx | Renders the application's UI and manages state |
-| main.jsx | Sets up the root element for the app and imports necessary styles |
+|------|------|
+| App.jsx | Renders the user interface and handles component interactions |
+| main.jsx | Renders the App component under a StrictMode wrapper using React DOM's createRoot function |
 
 ## Ownership
 Not yet assigned.
 
 ## Invariants / Rules
-Likely: The React StrictMode is used to ensure that all components receive props. 
-Likely: The createRoot function from react-dom/client ensures that the app's JSX is properly rendered in the browser DOM.
-| Rule | Description |
-| Use of StrictMode | Ensure all components receive props by wrapping them with StrictMode. |
-| Proper rendering | Use createRoot to render the app's JSX in the correct context.
+The application follows Likely: consistent use of React hooks for state management, and follows standard React best practices for component structure and naming conventions.
 
 ## Cross-References
 - [assets/](./assets/SUMMARY.md)

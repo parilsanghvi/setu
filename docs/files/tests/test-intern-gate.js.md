@@ -1,48 +1,43 @@
 ---
-source_hash: b44d0d2dd60cac0c
-facts_hash: 5566f99e43e84d0e
-generated_at: 2026-03-03T07:41:32.395Z
+source_hash: 1f738e17c7e006c3
+facts_hash: 898673c371bfb9c0
+generated_at: 2026-03-04T06:01:48.166Z
 generator_version: 1.0.0
 model: cheap
-quality_score: 100
+quality_score: 91
 ---
 # File: tests/test-intern-gate.js
 
 ## Purpose
-This file tests the Intern Approval Protocol, specifically the human gate mechanism, by simulating an intern proposing a risky task and checking if the escalation message is triggered successfully.
+This file tests the Intern approval protocol, which involves an intern proposing a risky task and receiving escalation from a Backend Lead if the plan includes dropping the users table. The test creates mock data to simulate this scenario and verifies that the human gate is triggered successfully. It uses the `Intern` and `BackendLead` classes to interact with the system.
 
 ## Exports / API Surface
 | Symbol | Type | Params | Description |
 |--------|------|--------|-------------|
-| `testInternGate` | function | `` | Tests the Intern Approval Protocol |
-|  |  |  |             |
-|  |  |  |             |
-|  |  |  |             |
+|  | function | `req, res` | Handles incoming requests |
+| `handleInternProposal` | method | `msgs.length > 0` | Escalates message to Sutradhar if proposal is risky enough |
+| `testInternGate` | function | `` | Tests Intern approval protocol |
 
 ## Internal Logic
-The main execution flow of this file involves the following key functions:
-- The `testInternGate` function: This is the main test function that orchestrates the simulation of an intern proposing a risky task and checks if the escalation message is triggered successfully.
-  - It creates instances of the `BackendLead` and `Intern` agents, representing the backend lead and the intern, respectively.
-  - It simulates the intern initiating a risky task by creating a plan file and sending it to the backend lead for review.
-  - It checks if the escalation message is triggered in the database by querying the messages table.
-- The `handleInternProposal` method: This method of the `BackendLead` agent handles the proposal sent by the intern, which includes the plan file and task details. It is not implemented in this test but would typically involve checking the proposal against certain criteria before escalating it to a human for review.
+The main execution flow of this file creates a test environment, proposes a risky task, and checks for escalation. The key functions involved are:
+- `testInternGate`: Tests the Intern approval protocol by proposing a risky task and verifying that the human gate is triggered.
+- `handleInternProposal`: Handles the proposal from the intern, including checking if the plan is risky enough to require escalation.
 
 ## Dependencies
 | Module | Local | Why |
 |--------|-------|-----|
-| `../agents/Shishya` | Yes | Provides a default implementation of an agent with basic functionality. |
-| `../agents/Tark` | Yes | Provides a specific type of backend lead agent used in this test. |
-| `../lib/db` | Yes | Supplies a database interface for interacting with the message table. |
-| `../lib/LLM` | Yes | Offers a mock LLM implementation that can be overridden to simulate different response scenarios. |
-| `fs` | No |  Provides file system utilities, including reading and writing files, which are used in this test for creating and deleting plan files. |
-| `path` | No |  Supplies utility functions for working with file paths, including joining path components together. |
+|  | Yes | Provides helper utilities for file system operations |
+| `../agents/Shishya` | Yes | Implements the Intern class |
+| `../agents/Tark` | Yes | Implements the BackendLead class |
+| `../lib/db` | Yes | Provides a database connection for storing messages |
+| `../lib/LLM` | Yes | Generates responses from the LLM |
 
 ## Side Effects
-- console_output: The `console.log` statements in the code output messages to the console during the execution of the test.
-- database: The code queries the messages table in the database to check if an escalation message has been triggered and retrieve its content for output.
-- filesystem_read: The code reads plan files from disk using `fs.readFileSync` and writes new plan files to disk using `fs.writeFileSync`.
-- filesystem_write: The code creates a new directory and writes a new file to it when creating the plan file.
-- process_control: The code exits the process after completing the test using `process.exit(0)`.
+- console_output: The file logs various messages to the console, including test steps and results.
+- database: The file writes a message to the database when an escalation is triggered.
+- filesystem_read: The file reads files from the file system, including creating directories and writing plan files.
+- filesystem_write: The file writes files to the file system, including creating a plan file with a risky task proposal.
+- process_control: The file exits the test environment after completion.
 
 ## Dependents
 No known dependents.

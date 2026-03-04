@@ -1,39 +1,36 @@
 ---
 source_hash: 45ee651d9d9a9c31
-facts_hash: 0d8d291ffedf8448
-generated_at: 2026-03-03T07:09:32.543Z
+facts_hash: 931f9fe4d7b6d22c
+generated_at: 2026-03-04T05:28:38.599Z
 generator_version: 1.0.0
 model: cheap
-quality_score: 80
+quality_score: 85
 ---
 # File: frontend/app/playwright.config.js
 
 ## Purpose
-This file defines the configuration for a Playwright test suite, setting up the environment and project details for running end-to-end tests.
+This file, playwright.config.js, is a configuration file for the Playwright test framework, defining the settings for running automated browser tests on various browsers and environments. It sets up the testing environment, specifies the test directory, and configures the web server to run development mode. The configuration allows for parallel testing and retries, depending on the CI (Continuous Integration) environment.
 
+## Exports / API Surface
 | Export | Type | Description |
 |--------|------|-------------|
-| `defineConfig` | esm_default | Defines the configuration for the test suite. |
+| `defineConfig` | esm_default | Defines the Playwright test configuration. |
+| `devices` | constant | Provides a collection of predefined devices for testing different browsers and platforms. |
 
 ## Internal Logic
-The main execution flow in this file involves defining the test suite configuration using the `defineConfig` function from the `@playwright/test` module. The configuration is set up with various options such as test directory, fully parallel mode, and project details.
+The main execution flow involves importing necessary modules, setting up the test environment, and configuring the web server. The key functions include:
 
-Key functions in this file include:
-
-* `defineConfig`: sets up the test suite configuration.
-* `use`, `projects`, and `webServer` objects are used to configure the test environment.
-* The `process.env.CI` variable is used to determine the number of workers and retries based on whether the test is running in a CI environment.
+- `defineConfig`: This function is used to define the Playwright test configuration, which includes settings such as the test directory, parallelism, retries, workers, reporter, and use of devices.
+- `process.env.CI`: This variable checks if the environment is a CI build, affecting settings such as fullyParallel, retries, and workers.
 
 ## Dependencies
 | Module | Local | Why |
 |--------|-------|-----|
-| `defineConfig` | Yes | Exports a function to define the configuration. |
-| `@playwright/test` | No | Provides the necessary functions and modules for setting up the test suite. |
+| `defineConfig` | Yes | Defines the Playwright test configuration. |
+| `@playwright/test` | No | Provides necessary functionality for the test framework. |
 
 ## Side Effects
-- env_access: The environment variables, such as `process.env.CI`, are accessed to determine the testing conditions.
-- command execution: The legacy server is started using the `command` option in the `webServer` configuration.
-- worker management: The number of workers and retries are determined based on whether the test is running in a CI environment.
+- env_access: The file accesses environment variables, such as `process.env.CI`, to determine settings and behavior in different environments.
 
 ## Dependents
 No known dependents.

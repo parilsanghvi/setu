@@ -1,7 +1,7 @@
 ---
-source_hash: 326aca724debff49
-facts_hash: 326aca724debff49
-generated_at: 2026-03-03T07:57:25.854Z
+source_hash: 8f559260d89d29bc
+facts_hash: 8f559260d89d29bc
+generated_at: 2026-03-04T10:13:48.595Z
 generator_version: 1.0.0
 model: cheap
 quality_score: 100
@@ -9,24 +9,24 @@ quality_score: 100
 # Folder: frontend/app
 
 ## Purpose
-This folder contains essential configuration files for a Vite-based React application, including ESLint settings, package dependencies, Playwright test configurations, and development server setup. Its key responsibilities include enforcing coding standards, managing project dependencies, setting up automated testing, and configuring the development environment.
+This folder contains essential configuration files for a Vue.js project built with Vite, ensuring smooth development, testing, and dependency management. It sets up ESLint, Playwright, and ESBuild tools to maintain quality and consistency across the codebase.
 
 ## Key Files
 | File | Role |
 |------|------|
-| `eslint.config.js` | Defines configuration for JavaScript linter ESLint to enforce coding standards and detect errors. |
-| `package.json` | Specifies scripts, dependencies, and development tools for a Vite-based React application. |
-| `playwright.config.js` | Defines the configuration for a Playwright test suite, setting up the environment and project details. |
-| `vite.config.js` | Configures the Vite development server to proxy API endpoints and socket.io connections to localhost:3000. |
+| eslint.config.js | Specifies linting rules and options for JavaScript and React files. |
+| package.json | Manages project dependencies, scripts, and development tools. |
+| playwright.config.js | Defines testing settings for automated browser tests on various browsers and environments. |
+| pnpm-lock.yaml | Configures compilation settings and dependencies required by the ESBuild tool. |
+| vite.config.js | Configures the Vite development server for a React application with proxy settings. |
 
 ## Ownership
 Not yet assigned.
 
 ## Invariants / Rules
-Likely: Follows standard JavaScript file naming conventions.
-Likely: Uses semicolons at the end of every statement in code files.
-Enforces consistent indentation (4 spaces) throughout all code files.
-Ensures that test files are written using Jest.
+Likely: Follows the standard naming conventions for configuration files in JavaScript projects.
+Likely: Ensures consistent indentation and spacing across all code files using ESLint's default configuration.
+Enforces the use of semicolons at the end of every statement to prevent errors.
 
 ## Cross-References
 - [playwright-report/](./playwright-report/SUMMARY.md)

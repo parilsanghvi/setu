@@ -1,7 +1,7 @@
 ---
 source_hash: 4aab9887d5cfc0bd
 facts_hash: 4aab9887d5cfc0bd
-generated_at: 2026-03-03T07:59:33.443Z
+generated_at: 2026-03-04T06:17:45.345Z
 generator_version: 1.0.0
 model: cheap
 quality_score: 94
@@ -9,19 +9,18 @@ quality_score: 94
 # Folder: lib/sockets
 
 ## Purpose
-The lib/sockets/ folder contains a single JavaScript file, dashboard.js, responsible for handling incoming connections to a dashboard socket. This folder exists to manage the socket connection and provide real-time updates to connected clients. Its key responsibilities include emitting log history and chat messages.
+This folder contains the lib/sockets directory, which is responsible for handling socket-related functionality in the application. The key responsibilities of this folder are to establish connections to sockets, set up event listeners and watchers, and forward messages between the database and clients through the DashboardSocket class.
 
 ## Key Files
 | File | Role |
-|------|------|
-| `dashboard.js` | Handles incoming connections to a dashboard socket and broadcasts relevant data to connected clients. |
+| dashboard.js | Establishes connection to the dashboard socket and forwards messages between the database and clients |
+| 
 
 ## Ownership
 Not yet assigned.
 
 ## Invariants / Rules
-Likely: The folder follows the principle of least surprise, where all socket-related operations are exposed through a single, well-documented interface.
-Likely: All database queries and log file changes are performed in asynchronous manner to prevent blocking the main thread.
+Likely: The sockets directory should follow the principle of separation of concerns, where each file is responsible for a single aspect of socket functionality.
 
 ## Cross-References
 - [dashboard.js](../../../files/lib/sockets/dashboard.js.md)

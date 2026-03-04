@@ -1,39 +1,41 @@
 ---
 source_hash: 93b8185e8e038311
-facts_hash: 52bf55bf64e7fe4e
-generated_at: 2026-03-03T07:43:00.354Z
+facts_hash: d40f91f6aed7de83
+generated_at: 2026-03-04T06:03:16.751Z
 generator_version: 1.0.0
 model: cheap
-quality_score: 81
+quality_score: 94
 ---
 # File: tests/test-llm-openai-compatible.js
 
 ## Purpose
-This file contains a test suite for the OpenAICompatible class, which is responsible for interacting with the OpenAI API to generate responses. The tests cover various scenarios, including configuration initialization, API requests, and error handling.
+This file contains a set of unit tests for the `OpenAICompatible` class, which is used to interact with OpenAI's API. The tests cover various scenarios, including configuration initialization, API request generation, and discovery of models.
 
 ## Exports / API Surface
 | Symbol | Type | Params | Description |
 |--------|------|--------|-------------|
-| `createMockRequest` | function | `url, options, callback` | Creates a mock request object with the given URL, options, and callback. |
-| `if` | method | `event === 'error' && mockRequestError` | A conditional statement to check if an error event occurs. |
-| `res` | arrow | `{
-                statusCode: mockResponse.statusCode || 200, on: (event, handler` | Creates a response object with the given status code and event handlers. |
+| `createMockRequest` | function | `url, options, callback` | Creates a mock request object with the given URL and options. |
+| `if` | method | `event === 'error' && mockRequestError` | Checks if an error event has occurred and sets up the mock request accordingly. |
+| `res` | arrow | `{statusCode: mockResponse.statusCode || 200, on: (event, handler)}` | Creates a response object with the given status code and handler functions. |
 
 ## Internal Logic
 The main execution flow of this file is as follows:
-1. The `runTests` function is called to execute all the test cases.
-2. Within `runTests`, each test case is defined and executed sequentially, including tests for configuration initialization, API requests, and error handling.
+1. The `runTests` function creates an instance of `OpenAICompatible` for each test configuration.
+2. Each test configuration is used to create a new instance of `OpenAICompatible`.
+3. The `generate`, `fetchModels`, and other methods are called on the instance, with mock responses and errors set up accordingly.
+4. The test results are compared to expected values using assertions.
 
 ## Dependencies
 | Module | Local | Why |
 |--------|-------|-----|
-| `createMockRequest` | Yes | Provides a custom request object creation function. |
-| `../lib/llm/OpenAICompatible` | Yes | The OpenAICompatible class is used for testing. |
+| `assert` | Yes | Provides assertion utilities for testing. |
+| `http` | No | Provides HTTP request utilities, which are mocked in this file. |
+| `https` | No | Provides HTTPS request utilities, which are mocked in this file. |
 
 ## Side Effects
-- console_output: This file logs success or failure messages to the console using `console.log` and `console.error`.
-- network: No explicit network requests are made in this file.
-- process_control: The `process.exit(1)` statement is used to exit the process with a non-zero status code if any test fails.
+- console_output: The test output is written to the console using `console.log` and `console.error`.
+- network: Network requests are made using mock HTTP and HTTPS requests, allowing for testing of API interactions without actual network traffic.
+- process_control: The test process is exited with a non-zero status code if any tests fail.
 
 ## Dependents
 No known dependents.

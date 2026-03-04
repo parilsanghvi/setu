@@ -1,28 +1,29 @@
 ---
 source_hash: cb5c7ec036775d51
-facts_hash: fa03883a97189067
-generated_at: 2026-03-03T07:19:01.944Z
+facts_hash: c02093241c4cf42a
+generated_at: 2026-03-04T05:38:49.348Z
 generator_version: 1.0.0
 model: cheap
-quality_score: 90
+quality_score: 100
 ---
 # File: lib/llm/BaseProvider.js
 
 ## Purpose
-The BaseProvider class provides a foundation for generating completion responses, with methods to implement specific task completions and generate mock responses for testing purposes.
+The BaseProvider class is a core component that generates responses for various prompts, enabling the system to provide completion and mock data for testing purposes. It provides two primary methods: `generate` and `getMockResponse`, which handle different types of user input. The `BaseProvider` class serves as a base class for other provider classes in the system.
 
+## Exports / API Surface
 | Export | Type | Description |
 |--------|------|-------------|
-| `generate` | async function | Handles implementation of specific task completions |
-| `getMockResponse` | function | Generates mock response for testing purposes |
+| `BaseProvider` | cjs_default | Exports the BaseProvider class, enabling it to be used by other parts of the system. |
 
 ## Internal Logic
-The constructor initializes the config object, while the generate method is intended to be implemented by subclasses to handle specific completion tasks. The getMockResponse method generates a mock response based on user input.
+The main execution flow involves two key methods: `constructor` and `getMockResponse`. The constructor initializes the provider with a given configuration object. The `generate` method is currently unimplemented, throwing an error when called. In contrast, the `getMockResponse` method uses various user prompts to determine which response to return, including mock veto responses for specific architectural or UI-related prompts and a generic mock skill response.
 
 ## Dependencies
-| Export | Type | Why |
-|--------|------|-----|
-| None |  | No dependencies are imported for this module. |
+No imports detected.
+
+## Side Effects
+None detected.
 
 ## Dependents
 - [Anthropic.js](./Anthropic.js.md)

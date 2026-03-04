@@ -1,42 +1,48 @@
 ---
-source_hash: d3aeea65a48963e5
-facts_hash: df1a1d14aa44e9e1
-generated_at: 2026-03-03T07:10:37.770Z
+source_hash: 7247ebee6defe7a9
+facts_hash: 58a02b25f73d7774
+generated_at: 2026-03-04T05:29:48.132Z
 generator_version: 1.0.0
 model: cheap
-quality_score: 94
+quality_score: 97
 ---
 # File: frontend/app/src/components/ChatBox.jsx
 
 ## Purpose
-The ChatBox file is a React component that displays a chat interface for users to send and receive messages to different agents. It fetches logs from the server, filters them to show only chat messages, and sends user input messages to the server in real-time. The component also handles agent selection, message scrolling, and loading states.
+The ChatBox component is a UI element that displays a conversation interface, allowing users to send and receive messages with agents. It fetches message history from the server and updates it in real-time as new messages are sent. The component also handles user input and sends messages to the server.
 
 ## Exports / API Surface
 | Export | Type | Description |
 |--------|------|-------------|
-| `ChatBox` | function | A React component for displaying a chat interface for users to send and receive messages to different agents. |
+| `ChatBox` | function | Renders a conversation interface |
+| `React.memo` | function | Memoizes the ChatBox component |
 
 ## Internal Logic
-The main execution flow of the ChatBox file is as follows:
+The main execution flow of the ChatBox component is as follows:
 
-- The `useMemo` hook filters the incoming logs to show only chat messages, which are stored in the `chatHistory` state.
-- The `useEffect` hook listens for changes in the `chatHistory` state and scrolls the messages end ref into view when necessary.
-- The `send` function is called when the user submits a message. It sends a POST request to the server with the user's input message, agent selection, and other relevant data.
-- When the response from the server is received, it updates the chat history state.
+- The component initializes its state with an empty message and target agent.
+- When the prefillTaskText prop changes, the component updates its message and target agent accordingly.
+- The component fetches its chat history from the server using the useEffect hook and stores it in the useMemo hook.
+- When the chat history changes, the component scrolls to the bottom of the conversation list using the messagesEndRef.
+- The component handles keyboard input with the handleKeyDown function, which sends a message when the Enter key is pressed without Shift.
+- The send function is called when the form is submitted, sending the current message and target agent to the server.
+- The renderMessageContent function parses HTML content from the marked library.
 
 ## Dependencies
 | Module | Local | Why |
 |--------|-------|-----|
-| `fetch` | Yes | Provides the API for sending HTTP requests to the server. |
-| `./Spinner` | Yes | Used to display a loading animation when sending messages. |
-| `./ChatBox.module.scss` | Yes | Defines the styles for the chat interface component. |
+| `React` | Yes | Provides the foundation for building user interfaces |
+| `./ChatBox.module.scss` | Yes | Styles the UI components of the ChatBox |
+| `./Spinner` | Yes | Displays a loading spinner when sending messages |
+| `marked` | No | Parses HTML content from markdown format |
 
 ## Side Effects
-- network: The component sends HTTP POST requests to the server when the user submits a message, which can result in increased latency and bandwidth usage if not handled carefully.
+- Network: The send function sends a request to the server to send a message, which may result in network requests and responses.
 
 ## Dependents
-No known dependents.
+- [TaskCreationModal.jsx](./TaskCreationModal.jsx.md)
 
 ## Cross-References
 - [ChatBox.module.scss](./ChatBox.module.scss.md)
 - [Spinner.jsx](./Spinner.jsx.md)
+- [TaskCreationModal.jsx](./TaskCreationModal.jsx.md)

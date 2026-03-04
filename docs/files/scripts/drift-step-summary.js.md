@@ -1,7 +1,7 @@
 ---
 source_hash: d4d8832220dcc546
-facts_hash: 5eff078ff64b3675
-generated_at: 2026-03-03T07:28:55.430Z
+facts_hash: 3ac082dcdbde9ca6
+generated_at: 2026-03-04T05:48:11.705Z
 generator_version: 1.0.0
 model: cheap
 quality_score: 85
@@ -9,33 +9,39 @@ quality_score: 85
 # File: scripts/drift-step-summary.js
 
 ## Purpose
-This file, drift-step-summary.js, generates a Markdown report summarizing the results of a docs drift check. It verifies if there are any changes in the codebase and checks for missing documentation. The report also includes suggested reviewers and ownership information.
+This file generates a summary report of drifts in the system's documentation, indicating the percentage of drift detected, missing documents, and suggested reviewers. It also provides instructions on how to fix the drift and includes context and review information.
 
 ## Exports / API Surface
+
 | Symbol | Type | Params | Description |
 |--------|------|--------|-------------|
-| `if` | method | `result.ok` | Checks if the drift check was successful and exits with an error message otherwise. |
-| `fs.appendFileSync` | function |  | Writes a message to a file indicating that an error occurred or exits the process. |
+| `summary` | function | `path, markdown` | Generates a summary report of drifts |
+| `driftJsonPath` | variable | - | Path to the drift.json file |
 
 ## Internal Logic
-The main execution flow of this script involves checking for the existence of a 'drift.json' file, parsing its content, and generating a Markdown report based on the results. The key functions include:
+The main execution flow involves:
+- Checking if the drift.json file exists and parsing its contents.
+- Generating the Markdown report based on the parsed data.
+- Writing the report to a file.
 
-- `fs.readFileSync` and `JSON.parse`: reads and parses the 'drift.json' file.
-- `fs.appendFileSync`: writes the generated Markdown report to a file.
-- The main logic is contained within the `if` statement, which checks the value of `result.ok` and generates the corresponding part of the Markdown report.
+Key functions include:
+- `try` block: catches errors during JSON parsing and file access.
+- `fs.readFileSync` and `fs.appendFileSync`: read and write files, respectively.
+- `JSON.parse` and `String.prototype.replace`: parse and manipulate JSON data.
 
 ## Dependencies
+
 | Module | Local | Why |
 |--------|-------|-----|
-| `fs` | No | Provides file system operations. |
-| `path` | No | Provides path manipulation utilities. |
+| `fs` | No | Provides functions for file system interactions |
+| `path` | No | Provides utilities for working with file paths |
 
 ## Side Effects
-- console_output: The script logs error messages to the console using `console.error`.
-- env_access: The script accesses environment variables, specifically `GITHUB_STEP_SUMMARY`, to determine the location of the summary file.
-- filesystem_read: The script reads files from the file system, including 'drift.json' and 'artifacts/drift-report.md'.
-- filesystem_write: The script writes messages to the file system using `fs.appendFileSync`.
-- process_control: The script exits the process with an error code if any of the drift check fails or no 'drift.json' file is found.
+- console_output: The script outputs error messages to the console when necessary.
+- env_access: The script accesses environment variables, such as `GITHUB_STEP_SUMMARY`, to determine the report path.
+- filesystem_read: The script reads files, including drift.json and summary reports.
+- filesystem_write: The script writes files, including summary reports and artifacts directories.
+- process_control: The script controls the process flow by checking for errors and exiting with a non-zero status code when necessary.
 
 ## Dependents
 No known dependents.

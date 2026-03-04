@@ -1,7 +1,7 @@
 ---
-source_hash: 1fda457da576aa58
-facts_hash: 1fda457da576aa58
-generated_at: 2026-03-03T07:55:54.018Z
+source_hash: beb3e3c71ca51a89
+facts_hash: beb3e3c71ca51a89
+generated_at: 2026-03-04T10:13:40.072Z
 generator_version: 1.0.0
 model: cheap
 quality_score: 100
@@ -9,29 +9,29 @@ quality_score: 100
 # Folder: agents
 
 ## Purpose
-This folder contains various agent classes responsible for managing tasks, skills, and security in a system. The agents interact with each other, systems, and external resources to learn, improve, and complete user missions.
+This folder contains a collection of JavaScript classes that implement various types of agents in a system, each responsible for handling tasks and interactions with other components.
 
 ## Key Files
 | File | Role |
-| Guru.js | Generates skills to improve understanding of topics based on incoming messages and extracted patterns. |
-| Koshpal.js | Ensures data safety and security in a database system by handling incoming messages and making decisions based on persona and skills. |
-| Rakshak.js | Handles security-related tasks, providing a persona-based experience, and triggering security audits upon processing incoming messages. |
-| Shilpi.js | Manages frontend lead tasks in a studio environment, critiquing UI aesthetics using an LLM, and managing skill sets for leads. |
-| Shishya.js | Proposes plans and tasks for junior agents to execute, generating plans, writing files, and handling incoming messages. |
-| Sutradhar.js | Manages a swarm of agents (Tark, Shilpi, Guru, Shishya) to complete user missions. |
-| Tark.js | Handles budget check and negotiation for tasks in the system using a large language model (LLM). |
-| TestAgent.js | Demonstrates a simple conversation between agents by responding with "PONG" when it receives a "PING" message. |
-| TestDrona.js | Simulates task completion, waiting for skill generation, and verifying task updates in the system. |
-| Vaidya.js | Boots up the system by checking various components, including environment, Docker, database, and node modules. |
-| Vishwakarma.js | Handles incoming messages, performs tasks such as spec negotiation, file auditing, and responds to users using various modules like LLM, Contractor, and CoreAgent. |
+| Guru.js | Analyzes patterns from code and tasks to learn new skills and improve knowledge. |
+| Koshpal.js | Provides a persona-driven assessment of database proposals while managing database scope and ensuring data integrity. |
+| Rakshak.js | Scans incoming messages for potential security vulnerabilities and generates a security report if necessary. |
+| Shilpi.js | Manages frontend-related tasks and interactions using natural language processing (NLP) to evaluate UI specifications. |
+| Shishya.js | Generates plans for tasks based on objectives, proposals, revisions, and execution. |
+| Sutradhar.js | Completes user missions safely and effectively while managing the swarm. |
+| Tark.js | Handles budget and skill-related tasks, as well as performs logical critiques of code. |
+| TestAgent.js | Tests and demonstrates agent functionality with a constructor that initializes an instance. |
+| TestDrona.js | Simulates task completion and verifies generated skills in a test environment. |
+| Vaidya.js | Verifies the health of the Vaidya agent by checking various components such as Docker connectivity. |
+| Vishwakarma.js | Provides expert advice on infrastructure configuration using natural language processing to evaluate proposed specifications. |
 
 ## Ownership
 Not yet assigned.
 
 ## Invariants / Rules
-Likely: All agent classes follow the Singleton pattern to ensure only one instance of each class exists in memory.
-Likely: The system uses a centralized logging mechanism for all agents to log their actions and decisions.
-The system enforces strict security measures by requiring agents to authenticate and authorize before performing tasks.
+Likely: Follows standard JavaScript coding conventions and best practices.
+Likely: Adheres to the principle of separation of concerns, where each file implements a single responsibility or agent type.
+Likely: Uses modular and object-oriented design principles to facilitate testing, maintenance, and scalability.
 
 ## Cross-References
 - [Guru.js](../../files/agents/Guru.js.md)

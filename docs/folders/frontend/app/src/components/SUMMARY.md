@@ -1,7 +1,7 @@
 ---
-source_hash: 7f0ef641b74b6bcb
-facts_hash: 7f0ef641b74b6bcb
-generated_at: 2026-03-03T07:56:36.756Z
+source_hash: 203ac9ae0ae0ade2
+facts_hash: 203ac9ae0ae0ade2
+generated_at: 2026-03-04T10:14:07.445Z
 generator_version: 1.0.0
 model: cheap
 quality_score: 100
@@ -9,28 +9,30 @@ quality_score: 100
 # Folder: frontend/app/src/components
 
 ## Purpose
-This folder contains a collection of React components used to build various UI elements and display information in a frontend application, including agent cards, chat interfaces, log viewers, modals, onboarding status displays, screenshot galleries, loading indicators, task boards, task cards, and task columns.
+This folder contains a collection of reusable UI components and functionality for the frontend application, including agent information displays, chat interfaces, log viewers, modals, onboarding status indicators, screenshot galleries, spinners, task boards, card displays, column lists, and modal detail windows. These components are designed to be reusable across the application to improve user experience and reduce code duplication.
 
 ## Key Files
 | File | Role |
 |------|------|
-| `AgentCard.jsx` | Renders an agent's information in a card layout. |
-| `ChatBox.jsx` | Displays a chat interface for users to send and receive messages. |
-| `LogViewer.jsx` | Renders the log viewer component with the given logs. |
-| `Modal.jsx` | Displays a dialog box with a title, content, and a close button. |
-| `OnboardingStatus.jsx` | Displays the status of an onboarding process and provides instructions. |
-| `ScreenshotGallery.jsx` | Fetches screenshots for a task ID from the API and displays them in a gallery layout. |
-| `Spinner.jsx` | Displays a loading indicator providing visual feedback to users. |
-| `TaskBoard.jsx` | Displays a task board, allowing users to create new tasks and view existing ones. |
-| `TaskCard.jsx` | Renders a card displaying task details, including its ID, title, and owner information. |
-| `TaskColumn.jsx` | Displays a list of tasks categorized by their status and allows user interaction. |
+| `AgentCard.jsx` | Renders a card displaying agent information |
+| `ChatBox.jsx` | Displays a conversation interface with agents |
+| `LogViewer.jsx` | Scrolls to the bottom of kernel logs when new ones are added |
+| `Modal.jsx` | Provides an on_close callback for modal closing behavior |
+| `OnboardingStatus.jsx` | Renders the onboarding status component with provided data |
+| `ScreenshotGallery.jsx` | Displays screenshots for a given task ID in a gallery format |
+| `Spinner.jsx` | Displays a spinning animation to indicate loading or progress |
+| `TaskBoard.jsx` | Displays a Kanban board for task management |
+| `TaskCard.jsx` | Displays task details and handles keyboard input |
+| `TaskColumn.jsx` | Displays a list of tasks organized by status |
+| `TaskCreationModal.jsx` | Allows users to create new tasks in a chat-based interface |
+| `TaskDetailModal.jsx` | Displays detailed information about a specific task |
 
 ## Ownership
 Not yet assigned.
 
 ## Invariants / Rules
-Likely: Follows the ReactJS coding conventions and best practices for building reusable UI components.
-Likely: Uses Redux or MobX for state management in some components, but not explicitly stated in the codebase description.
+Likely: All components must use React memoization for performance optimization.
+Likely: All state changes must be handled through controlled components or the `useEffect` hook.
 
 ## Cross-References
 - [AgentCard.jsx](../../../../../files/frontend/app/src/components/AgentCard.jsx.md)
@@ -43,4 +45,6 @@ Likely: Uses Redux or MobX for state management in some components, but not expl
 - [TaskBoard.jsx](../../../../../files/frontend/app/src/components/TaskBoard.jsx.md)
 - [TaskCard.jsx](../../../../../files/frontend/app/src/components/TaskCard.jsx.md)
 - [TaskColumn.jsx](../../../../../files/frontend/app/src/components/TaskColumn.jsx.md)
+- [TaskCreationModal.jsx](../../../../../files/frontend/app/src/components/TaskCreationModal.jsx.md)
+- [TaskDetailModal.jsx](../../../../../files/frontend/app/src/components/TaskDetailModal.jsx.md)
 
