@@ -1,9 +1,12 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Modal from './Modal';
 import ScreenshotGallery from './ScreenshotGallery';
 import styles from './TaskDetailModal.module.scss';
 
 const TaskDetailModal = ({ task, onClose }) => {
+    const [isDeleting, setIsDeleting] = useState(false);
+    const [isReverting, setIsReverting] = useState(false);
+
     if (!task) return null;
 
     return (
@@ -21,26 +24,40 @@ const TaskDetailModal = ({ task, onClose }) => {
                         className={styles.deleteButton}
                         onClick={async () => {
                             if (window.confirm('Delete this task?')) {
-                                await fetch(`/api/tasks/${task.id}`, { method: 'DELETE' });
-                                onClose();
+                                setIsDeleting(true);
+                                try {
+                                    await fetch(`/api/tasks/${task.id}`, { method: 'DELETE' });
+                                    onClose();
+                                } finally {
+                                    setIsDeleting(false);
+                                }
                             }
                         }}
+                        disabled={isDeleting}
+                        aria-label="Delete task"
                     >
-                        🗑️ Delete
+                        <span aria-hidden="true">🗑️</span> {isDeleting ? 'Deleting...' : 'Delete'}
                     </button>
                     {task.status === 'DONE' && (
                         <button
                             className={styles.revertButton}
                             onClick={async () => {
-                                await fetch(`/api/tasks/${task.id}`, {
-                                    method: 'PUT',
-                                    headers: { 'Content-Type': 'application/json' },
-                                    body: JSON.stringify({ status: 'TODO' })
-                                });
-                                onClose();
+                                setIsReverting(true);
+                                try {
+                                    await fetch(`/api/tasks/${task.id}`, {
+                                        method: 'PUT',
+                                        headers: { 'Content-Type': 'application/json' },
+                                        body: JSON.stringify({ status: 'TODO' })
+                                    });
+                                    onClose();
+                                } finally {
+                                    setIsReverting(false);
+                                }
                             }}
+                            disabled={isReverting}
+                            aria-label="Revert task to TODO"
                         >
-                            ↩️ Revert to TODO
+                            <span aria-hidden="true">↩️</span> {isReverting ? 'Reverting...' : 'Revert to TODO'}
                         </button>
                     )}
                 </div>

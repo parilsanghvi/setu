@@ -99,8 +99,13 @@
     align-items: center;
     gap: 0.25rem;
 
-    &:hover {
+    &:hover:not(:disabled) {
         background-color: rgba(239, 68, 68, 0.1);
+    }
+
+    &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
     }
 }
 
@@ -116,7 +121,12 @@
     align-items: center;
     gap: 0.25rem;
 
-    &:hover {
+    &:hover:not(:disabled) {
         background-color: rgba(245, 158, 11, 0.1);
+    }
+
+    &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
     }
 }
