@@ -18,8 +18,6 @@ const ChatBox = ({ agents, logs, prefillTaskText }) => {
 
     const chatHistory = useMemo(() => {
         const messages = [];
-        // Track typing agents using a Set for O(1) lookups and deletions.
-        // This avoids the O(N^2) complexity of filtering the accumulated array on every THOUGHT_END.
         const typingAgents = new Set();
 
         for (let i = 0; i < logs.length; i++) {
