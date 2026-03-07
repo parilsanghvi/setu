@@ -9,16 +9,16 @@ quality_score: 100
 # File: lib/onboarding/dependency-engine.js
 
 ## Purpose
-This file manages dependency graph resolution for onboarding components.
+This file manages dependency graph resolution for onboarding components within the Setu project. It is responsible for parsing package configurations and extracting dependency linkages.
 
 ## Exports / API Surface
-None exposed directly.
+- `DependencyEngine`: The main class responsible for executing dependency scanning.
 
 ## Internal Logic
-Manages dependencies.
+The module recursively scans directories designated in the onboarding configuration to trace dependency links, providing validation and structural mapping for `check-onboarding` routines.
 
 ## Dependencies
-None.
+- Built-in `fs` and `path` for file system traversal.
 
 ## Side Effects
-None.
+- Reads heavily from the filesystem to assemble the dependency tree. It does not write any state outside of its immediate execution context.
