@@ -8,6 +8,8 @@ const originalRequire = Module.prototype.require;
 const expressMock = () => {
     const app = {
         use: () => { },
+        put: () => { },
+        delete: () => { },
         get: function (path, handler) {
             this.routes = this.routes || {};
             this.routes[path] = handler;
