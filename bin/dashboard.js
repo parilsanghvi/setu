@@ -115,7 +115,7 @@ function refreshData() {
     // E. Onboarding Status
     try {
         const { getOnboardingStatus } = require('../lib/onboarding/status');
-        const stat = getOnboardingStatus();
+        const stat = getOnboardingStatus({ fast: true });
         let md = `\n`;
         md += ` **Completeness:** ${stat.completeness}%\n`;
         md += ` **Missing:** ${stat.missing.length}\n`;
