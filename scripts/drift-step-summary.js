@@ -67,13 +67,14 @@ if (result.ok) {
 
         if (result.ownership_sla && result.ownership_sla.mode !== 'off') {
             markdown += `\n#### Ownership SLA (${result.ownership_sla.mode})\n`;
+            const blockingFiles = result.ownership_sla.blocking_files || [];
             if (result.ownership_sla.unowned_blocking) {
-                markdown += `🛑 **SLA FAILED**: ${result.ownership_sla.blocking_files.length} unowned files matched \`require_owner_for_paths\` policies.\n`;
-                result.ownership_sla.blocking_files.forEach(f => {
+                markdown += `🛑 **SLA FAILED**: ${blockingFiles.length} unowned files matched \`require_owner_for_paths\` policies.\n`;
+                blockingFiles.forEach(f => {
                     markdown += `- 🚫 \`${f}\`\n`;
                 });
-            } else if (result.ownership_sla.blocking_files.length > 0) {
-                markdown += `⚠️ **SLA WARNING**: ${result.ownership_sla.blocking_files.length} unowned files matched \`require_owner_for_paths\` policies but enforcement is off.\n`;
+            } else if (blockingFiles.length > 0) {
+                markdown += `⚠️ **SLA WARNING**: ${blockingFiles.length} unowned files matched \`require_owner_for_paths\` policies but enforcement is off.\n`;
             } else {
                 markdown += `✅ SLA Compliant.\n`;
             }
