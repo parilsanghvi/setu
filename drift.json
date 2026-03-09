@@ -1,0 +1,24 @@
+{
+  "base_ref_used": "origin/master",
+  "changed_files_source": "git_diff",
+  "changed_files_count": 0,
+  "changed_files": [],
+  "ignored_files": [],
+  "required_docs": [],
+  "existing_docs": [],
+  "missing_docs": [],
+  "ownership": {
+    "owned_files": [],
+    "unowned_files": [],
+    "ownership_source": "none",
+    "owners_impacted": []
+  },
+  "ownership_sla": {
+    "unowned_blocking": false,
+    "warnings": []
+  },
+  "drift_percent": 0,
+  "strict_diff_warning": null,
+  "strict_diff_failed": false,
+  "ok": true
+}
