@@ -54,7 +54,7 @@ if (result.ok) {
     markdown += `- Ignored Files: **${result.ignored_files ? result.ignored_files.length : 0}**\n`;
 
     if (result.ownership) {
-        const owners = Object.keys(result.ownership.by_owner);
+        const owners = result.ownership.by_owner ? Object.keys(result.ownership.by_owner) : [];
         let sourceLabel = result.ownership.ownership_source === 'onboarding' ? 'ONBOARDING' :
             (result.ownership.ownership_source === 'codeowners' ? 'CODEOWNERS fallback' : 'None');
 
@@ -72,7 +72,7 @@ if (result.ok) {
                 result.ownership_sla.blocking_files.forEach(f => {
                     markdown += `- 🚫 \`${f}\`\n`;
                 });
-            } else if (result.ownership_sla.blocking_files.length > 0) {
+            } else if ((result.ownership_sla.blocking_files && result.ownership_sla.blocking_files.length > 0)) {
                 markdown += `⚠️ **SLA WARNING**: ${result.ownership_sla.blocking_files.length} unowned files matched \`require_owner_for_paths\` policies but enforcement is off.\n`;
             } else {
                 markdown += `✅ SLA Compliant.\n`;
