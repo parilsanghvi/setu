@@ -29,10 +29,10 @@ Likely: Ensures consistent indentation and spacing across all code files using E
 Enforces the use of semicolons at the end of every statement to prevent errors.
 
 ## Cross-References
-- [playwright-report/](./playwright-report/SUMMARY.md)
+- `playwright-report/`
 - [public/](./public/SUMMARY.md)
 - [src/](./src/SUMMARY.md)
-- [test-results/](./test-results/SUMMARY.md)
+- `test-results/`
 - [tests/](./tests/SUMMARY.md)
 - [eslint.config.js](../../../files/frontend/app/eslint.config.js.md)
 - [package.json](../../../files/frontend/app/package.json.md)

@@ -1,0 +1,11 @@
+{
+  "total_docs": 328,
+  "populated_docs": 256,
+  "placeholder_docs": 72,
+  "placeholder_rate": 22,
+  "avg_quality": 70,
+  "p50_quality": 88,
+  "p95_quality": 100,
+  "low_quality_count": 0,
+  "low_quality_files": []
+}
