@@ -123,7 +123,7 @@ The main execution flow of this file is as follows:
 | `if` | `lib/llm/BaseProvider.js` | [Doc](./llm/BaseProvider.js.md) |
 | `send` | `lib/middleware/auth.js` | [Doc](./middleware/auth.js.md) |
 | `if` | `lib/onboarding/codeowners.js` | [Doc](./onboarding/codeowners.js.md) |
-| `if` | `lib/onboarding/dependency-engine.js` | [Doc](./onboarding/dependency-engine.js.md) |
+| `if` | `lib/onboarding/dependency-engine.js` | |
 | `send` | `lib/onboarding/doc-facts.js` | [Doc](./onboarding/doc-facts.js.md) |
 | `if` | `lib/onboarding/paths.js` | [Doc](./onboarding/paths.js.md) |
 | `deleteTask` | `lib/routes.js` | [Doc](./routes.js.md) |
