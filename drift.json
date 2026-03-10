@@ -1,13 +1,47 @@
 {
-  "ok": false,
-  "drift_percent": 100,
-  "changed_files": ["lib/Agent.js"],
-  "required_docs": ["lib/Agent.js"],
-  "missing_docs": ["lib/Agent.js"],
-  "base_ref_used": "origin/master",
-  "changed_files_source": "git diff",
+  "base_ref_used": "HEAD~2",
+  "changed_files_source": "git_diff",
+  "changed_files_count": 10,
+  "changed_files": [
+    ".gitignore",
+    "artifacts/drift-report.md",
+    "docs/files/lib/Agent.js.md",
+    "docs/files/lib/onboarding/context-builder.js.md",
+    "docs/files/lib/onboarding/dependency-engine.js.md",
+    "docs/files/pnpm-lock.yaml.md",
+    "docs/folders/frontend/app/playwright-report/SUMMARY.md",
+    "docs/folders/frontend/app/test-results/SUMMARY.md",
+    "lib/Agent.js",
+    "scripts/drift-step-summary.js"
+  ],
+  "ignored_files": [],
+  "required_docs": [
+    "lib/Agent.js",
+    "scripts/drift-step-summary.js"
+  ],
+  "existing_docs": [
+    "/app/docs/files/lib/Agent.js.md",
+    "/app/docs/files/scripts/drift-step-summary.js.md"
+  ],
+  "missing_docs": [],
+  "ownership": {
+    "owned_files": [],
+    "unowned_files": [
+      "lib/Agent.js",
+      "scripts/drift-step-summary.js"
+    ],
+    "ownership_source": "none",
+    "owners_impacted": []
+  },
+  "ownership_sla": {
+    "unowned_blocking": false,
+    "warnings": [
+      "File lib/Agent.js has no registered owner.",
+      "File scripts/drift-step-summary.js has no registered owner."
+    ]
+  },
+  "drift_percent": 0,
   "strict_diff_warning": null,
   "strict_diff_failed": false,
-  "ignored_files": [],
-  "ownership": {}
+  "ok": true
 }
