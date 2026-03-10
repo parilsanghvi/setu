@@ -25,20 +25,20 @@ let markdown = '### Docs Drift Report 📝\n\n';
 
 if (result.ok) {
     markdown += '✅ **No Drift Detected**\n\n';
-    markdown += `- Checked changed files: **${result.changed_files.length}**\n`;
+    markdown += `- Checked changed files: **${result.changed_files ? result.changed_files.length : 0}**\n`;
 } else {
     markdown += `🛑 **Docs Drift Detected: ${result.drift_percent}%**\n\n`;
-    markdown += `- Changed Files: **${result.changed_files.length}**\n`;
-    markdown += `- Required Docs: **${result.required_docs.length}**\n`;
-    markdown += `- Missing Docs: **${result.missing_docs.length}**\n\n`;
+    markdown += `- Changed Files: **${result.changed_files ? result.changed_files.length : 0}**\n`;
+    markdown += `- Required Docs: **${result.required_docs ? result.required_docs.length : 0}**\n`;
+    markdown += `- Missing Docs: **${result.missing_docs ? result.missing_docs.length : 0}**\n\n`;
 
     markdown += '#### Top Missing Paths\n\n';
-    const missing = result.missing_docs.slice(0, 10);
+    const missing = result.missing_docs ? result.missing_docs.slice(0, 10) : [];
     missing.forEach(p => {
         markdown += `- \`${p}\`\n`;
     });
-    if (result.missing_docs.length > 10) {
-        markdown += `- ...and ${result.missing_docs.length - 10} more.\n`;
+    if (result.missing_docs ? result.missing_docs.length : 0 > 10) {
+        markdown += `- ...and ${result.missing_docs ? result.missing_docs.length : 0 - 10} more.\n`;
     }
 
     markdown += '\n#### Context & Reviewers\n\n';
