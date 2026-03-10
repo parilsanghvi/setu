@@ -1,1 +1,1 @@
-{"ok": true, "changed_files": null, "ownership": {"by_owner": {}}, "ownership_sla": {"mode": "warn", "blocking_files": null}}
+{"ok":false,"drift_percent":2,"changed_files":[],"required_docs":[],"missing_docs":[],"base_ref_used":"master","changed_files_source":"diff","ownership_sla":{"unowned_blocking":false},"ownership":{"by_owner":{}}}
