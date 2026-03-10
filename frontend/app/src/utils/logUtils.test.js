@@ -50,4 +50,41 @@ test('updateLogs', async (t) => {
          const result = updateLogs(prev, [], 5);
          assert.deepStrictEqual(result, [1, 2]);
     });
+
+    await t.test('returns empty array when maxLogs is 0', () => {
+        const prev = [1, 2];
+        const result = updateLogs(prev, 3, 0);
+        assert.deepStrictEqual(result, []);
+    });
+
+    await t.test('returns empty array when maxLogs is negative', () => {
+        const prev = [1, 2];
+        const result = updateLogs(prev, [3, 4], -5);
+        assert.deepStrictEqual(result, []);
+    });
+
+    await t.test('handles undefined previous logs', () => {
+        const result = updateLogs(undefined, [1, 2], 5);
+        assert.deepStrictEqual(result, [1, 2]);
+    });
+
+    await t.test('handles null previous logs', () => {
+        const result = updateLogs(null, [1, 2], 5);
+        assert.deepStrictEqual(result, [1, 2]);
+    });
+
+    await t.test('uses default maxLogs limit when not provided', () => {
+        // Default maxLogs is 500
+        const prev = Array(499).fill('log');
+        const result = updateLogs(prev, ['newLog1', 'newLog2']);
+        assert.strictEqual(result.length, 500);
+        assert.strictEqual(result[498], 'newLog1');
+        assert.strictEqual(result[499], 'newLog2');
+    });
+
+    await t.test('trims previous logs if they already exceed maxLogs', () => {
+        const prev = [1, 2, 3, 4, 5, 6];
+        const result = updateLogs(prev, [7, 8], 5);
+        assert.deepStrictEqual(result, [4, 5, 6, 7, 8]);
+    });
 });

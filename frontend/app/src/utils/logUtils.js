@@ -8,17 +8,22 @@
  * @param {number} maxLogs - The maximum number of logs to keep.
  * @returns {Array} - The updated array of logs.
  */
-export const updateLogs = (prevLogs, newItems, maxLogs = 500) => {
+export const updateLogs = (prevLogs = [], newItems, maxLogs = 500) => {
+    if (maxLogs <= 0) {
+        return [];
+    }
+
     const items = Array.isArray(newItems) ? newItems : [newItems];
 
     if (items.length >= maxLogs) {
         return items.slice(-maxLogs);
     }
 
+    const safePrevLogs = Array.isArray(prevLogs) ? prevLogs : [];
     const availableSpace = maxLogs - items.length;
     // slice(-N) extracts the last N elements
-    // If availableSpace > prevLogs.length, it returns all elements, which is what we want.
+    // If availableSpace > safePrevLogs.length, it returns all elements, which is what we want.
     // Note: slice(-0) returns the whole array, but since we check items.length < maxLogs,
     // availableSpace is always > 0.
-    return [...prevLogs.slice(-availableSpace), ...items];
+    return [...safePrevLogs.slice(-availableSpace), ...items];
 };
