@@ -1,47 +1,12 @@
 {
-  "ok": false,
+  "ok": true,
   "total_files": 339,
-  "total_links": 757,
+  "total_links": 753,
   "valid_links": 753,
-  "broken_links": 4,
+  "broken_links": 0,
   "github_blob_links": 0,
   "empty_links": 0,
-  "files_with_issues": 3,
-  "top_broken_patterns": {
-    "broken": 4
-  },
-  "broken_details": [
-    {
-      "file": "docs/files/agents/Guru.js.md",
-      "label": "Doc",
-      "href": "../lib/onboarding/dependency-engine.js.md",
-      "line": 112,
-      "status": "broken",
-      "reason": "Target does not exist: docs/files/lib/onboarding/dependency-engine.js.md"
-    },
-    {
-      "file": "docs/files/lib/db.js.md",
-      "label": "Doc",
-      "href": "./onboarding/dependency-engine.js.md",
-      "line": 126,
-      "status": "broken",
-      "reason": "Target does not exist: docs/files/lib/onboarding/dependency-engine.js.md"
-    },
-    {
-      "file": "docs/folders/frontend/app/SUMMARY.md",
-      "label": "playwright-report/",
-      "href": "./playwright-report/SUMMARY.md",
-      "line": 32,
-      "status": "broken",
-      "reason": "Target does not exist: docs/folders/frontend/app/playwright-report/SUMMARY.md"
-    },
-    {
-      "file": "docs/folders/frontend/app/SUMMARY.md",
-      "label": "test-results/",
-      "href": "./test-results/SUMMARY.md",
-      "line": 35,
-      "status": "broken",
-      "reason": "Target does not exist: docs/folders/frontend/app/test-results/SUMMARY.md"
-    }
-  ]
+  "files_with_issues": 0,
+  "top_broken_patterns": {},
+  "broken_details": []
 }
