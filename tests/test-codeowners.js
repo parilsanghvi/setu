@@ -1,21 +1,18 @@
-const assert = require('assert');
+const { test } = require('node:test');
+const assert = require('node:assert');
 const fs = require('fs');
-const path = require('path');
 const { parseCodeowners } = require('../lib/onboarding/codeowners');
 
-const TEST_FILE = path.join(__dirname, 'TEST_CODEOWNERS');
+test('parseCodeowners', async (t) => {
+    await t.test('Should return empty array when file does not exist', (t) => {
+        t.mock.method(fs, 'existsSync', () => false);
+        const rules = parseCodeowners('NON_EXISTENT_FILE');
+        assert.deepStrictEqual(rules, []);
+    });
 
-async function runTest() {
-    console.log('🧪 Testing CODEOWNERS parsing...');
-
-    try {
-        // 1. File does not exist
-        const noExist = parseCodeowners('NON_EXISTENT_FILE');
-        assert.deepStrictEqual(noExist, [], 'Should return empty array when file does not exist');
-        console.log('✅ Handled non-existent file correctly');
-
-        // 2. Valid file with various cases
-        const content = `
+    await t.test('Should parse a valid CODEOWNERS file correctly', (t) => {
+        t.mock.method(fs, 'existsSync', () => true);
+        const mockContent = `
 # This is a comment
 * @global-owner
 /build/ @build-team
@@ -24,45 +21,34 @@ docs/* @docs-team
 # Inline comment ignored? No, standard codeowners does not support inline comments, but let's test trimming
    src/  @src-team   @other-team
 `;
-        fs.writeFileSync(TEST_FILE, content);
+        t.mock.method(fs, 'readFileSync', () => mockContent);
 
-        const rules = parseCodeowners(TEST_FILE);
+        const rules = parseCodeowners('DUMMY_FILE');
 
-        assert.strictEqual(rules.length, 4, 'Should parse 4 valid rules');
+        assert.strictEqual(rules.length, 4);
 
-        assert.strictEqual(rules[0].pattern, '*', 'Rule 1 pattern mismatch');
-        assert.deepStrictEqual(rules[0].owners, ['global-owner'], 'Rule 1 owners mismatch');
-        assert.strictEqual(rules[0].lineNumber, 3, 'Rule 1 line number mismatch');
+        assert.strictEqual(rules[0].pattern, '*');
+        assert.deepStrictEqual(rules[0].owners, ['global-owner']);
+        assert.strictEqual(rules[0].lineNumber, 3);
 
-        assert.strictEqual(rules[1].pattern, '/build/', 'Rule 2 pattern mismatch');
-        assert.deepStrictEqual(rules[1].owners, ['build-team'], 'Rule 2 owners mismatch');
+        assert.strictEqual(rules[1].pattern, '/build/');
+        assert.deepStrictEqual(rules[1].owners, ['build-team']);
 
-        assert.strictEqual(rules[2].pattern, 'docs/*', 'Rule 3 pattern mismatch');
-        assert.deepStrictEqual(rules[2].owners, ['docs-team'], 'Rule 3 owners mismatch');
+        assert.strictEqual(rules[2].pattern, 'docs/*');
+        assert.deepStrictEqual(rules[2].owners, ['docs-team']);
 
-        assert.strictEqual(rules[3].pattern, 'src/', 'Rule 4 pattern mismatch');
-        assert.deepStrictEqual(rules[3].owners, ['src-team', 'other-team'], 'Rule 4 owners mismatch');
+        assert.strictEqual(rules[3].pattern, 'src/');
+        assert.deepStrictEqual(rules[3].owners, ['src-team', 'other-team']);
+    });
 
-        console.log('✅ Parsed valid CODEOWNERS file correctly');
-
-        // 3. File with invalid lines (no owners)
+    await t.test('Should ignore rules without owners', (t) => {
+        t.mock.method(fs, 'existsSync', () => true);
         const invalidContent = `
 # Missing owners
 pattern-without-owners
 `;
-        fs.writeFileSync(TEST_FILE, invalidContent);
-        const invalidRules = parseCodeowners(TEST_FILE);
-        assert.strictEqual(invalidRules.length, 0, 'Should ignore rules without owners');
-        console.log('✅ Handled rules without owners correctly');
-
-    } finally {
-        if (fs.existsSync(TEST_FILE)) {
-            fs.unlinkSync(TEST_FILE);
-        }
-    }
-}
-
-runTest().catch(err => {
-    console.error('❌ Test failed:', err);
-    process.exit(1);
+        t.mock.method(fs, 'readFileSync', () => invalidContent);
+        const invalidRules = parseCodeowners('DUMMY_FILE');
+        assert.strictEqual(invalidRules.length, 0);
+    });
 });
