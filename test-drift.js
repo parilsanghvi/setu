@@ -7,6 +7,9 @@ const result = {
     missing_docs: [],
     ownership: {
         ownership_source: 'none'
+    },
+    ownership_sla: {
+        mode: 'warn'
     }
 };
 
