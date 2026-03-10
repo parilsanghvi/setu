@@ -791,7 +791,7 @@ switch (cmd) {
           const ownerSourceTitle = result.ownership.ownership_source === 'onboarding' ? 'ONBOARDING' :
             (result.ownership.ownership_source === 'codeowners' ? 'CODEOWNERS fallback' : 'None');
           console.log(`\n👥 Suggested Reviewers/Owners (${ownerSourceTitle}):`);
-          const owners = Object.keys(result.ownership.by_owner);
+          const owners = result.ownership.by_owner ? Object.keys(result.ownership.by_owner) : [];
           if (owners.length > 0) {
             owners.forEach(owner => {
               console.log(`   - @${owner} (${result.ownership.by_owner[owner].length} files touched)`);
