@@ -34,24 +34,26 @@ const checkInterval = setInterval(() => {
         process.exit(1);
     }
 
-    if (fs.existsSync(skillDir)) {
-        const files = fs.readdirSync(skillDir);
-        if (files.length > 0) {
-            console.log(`[TEST] ✅ Drona generated skills: ${files.join(', ')}`);
-            // Verify content of one
-            const skillPath = path.join(skillDir, files[0], 'SKILL.md');
-            if (fs.existsSync(skillPath)) {
-                const content = fs.readFileSync(skillPath, 'utf8');
-                console.log(`[TEST] 📜 Skill Content:\n${content.substring(0, 200)}...`);
+    if (!fs.existsSync(skillDir)) return;
 
-                if (content.includes('---') && content.includes('name:')) {
-                    console.log('[TEST] ✅ Frontmatter detected!');
-                } else {
-                    console.error('[TEST] ❌ Frontmatter missing or invalid.');
-                }
-            }
-            clearInterval(checkInterval);
-            process.exit(0);
+    const files = fs.readdirSync(skillDir);
+    if (files.length === 0) return;
+
+    console.log(`[TEST] ✅ Drona generated skills: ${files.join(', ')}`);
+    // Verify content of one
+    const skillPath = path.join(skillDir, files[0], 'SKILL.md');
+
+    if (fs.existsSync(skillPath)) {
+        const content = fs.readFileSync(skillPath, 'utf8');
+        console.log(`[TEST] 📜 Skill Content:\n${content.substring(0, 200)}...`);
+
+        if (content.includes('---') && content.includes('name:')) {
+            console.log('[TEST] ✅ Frontmatter detected!');
+        } else {
+            console.error('[TEST] ❌ Frontmatter missing or invalid.');
         }
     }
+
+    clearInterval(checkInterval);
+    process.exit(0);
 }, 2000);
