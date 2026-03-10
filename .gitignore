@@ -17,8 +17,8 @@ lerna-debug.log*
 
 # Testing
 coverage/
-playwright-report/
-test-results/
+frontend/app/playwright-report/
+frontend/app/test-results/
 
 # Environment variables
 .env
