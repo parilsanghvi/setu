@@ -80,7 +80,29 @@ test('Docker Module Tests', async (t) => {
         assert.strictEqual(Docker.dockerPath, '/custom/docker');
     });
 
-    await t.test('disables if docker not found', () => {
+
+    await t.test('detectDocker returns null and swallows exception if execSync throws', () => {
+        mockConfig = {};
+        mockExecSync = (cmd) => {
+            if (cmd === 'which docker') {
+                throw new Error('Command failed: which docker');
+            }
+            return '';
+        };
+
+        const Docker = require('../lib/Docker');
+        // Constructor calls detectDocker, which throws and returns null
+        // Then checkAvailability will fail since dockerPath is null, leaving enabled = false
+        assert.strictEqual(Docker.dockerPath, null);
+
+        // Wait for async checkAvailability to finish its tick
+        return new Promise(resolve => setTimeout(() => {
+            assert.strictEqual(Docker.enabled, false);
+            resolve();
+        }, 20));
+    });
+
+await t.test('disables if docker not found', () => {
         mockConfig = {};
         mockExecSync = () => { throw new Error('Command failed'); };
 
