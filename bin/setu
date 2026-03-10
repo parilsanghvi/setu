@@ -285,7 +285,8 @@ switch (cmd) {
 
       const singleFile = fileIdx !== -1 ? args[fileIdx + 1] : null;
       const singleFolder = folderIdx !== -1 ? args[folderIdx + 1] : null;
-      const maxConcurrency = concIdx !== -1 ? parseInt(args[concIdx + 1]) || 2 : 2;
+      const Config = require('../lib/Config');
+      const maxConcurrency = concIdx !== -1 ? parseInt(args[concIdx + 1]) || Config.llmMaxConcurrent : Config.llmMaxConcurrent;
 
       log('🧠 Starting Documentation Enrichment...');
 
