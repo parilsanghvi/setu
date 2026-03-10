@@ -10,7 +10,8 @@ const result = {
     },
     ownership_sla: {
         mode: 'warn',
-        unowned_blocking: true
+        unowned_blocking: true,
+        blocking_files: []
     }
 };
 
