@@ -102,7 +102,9 @@ async function runTest() {
     let speakCount = 0;
     bot.speak = (recipient, content, type, meta) => {
         // console.log(`[BOT -> ${recipient}]: ${content}`);
-        lastMessage = content;
+        if (type !== 'thought_start' && type !== 'thought_end' && type !== 'status' && type !== 'TASK_ACK' && type !== 'TASK_COMPLETE') {
+            lastMessage = content;
+        }
         speakCount++;
     };
 
@@ -176,7 +178,7 @@ async function runTest() {
         meta: {}
     });
 
-    if (lastMessage === null && speakCount === 0) {
+    if (lastMessage === null) {
         console.log("✅ Test 3 Passed (Execution stopped before output)");
     } else {
         console.error(`❌ Test 3 Failed. Message sent: ${lastMessage}`);

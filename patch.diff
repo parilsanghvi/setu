@@ -1,0 +1,58 @@
+--- lib/CoreAgent.js
++++ lib/CoreAgent.js
+@@ -263,22 +263,7 @@
+                     if (this.interruptSignal === 'REDIRECT') break; // Break tool loop
+                 }
+
+-                // Event: Tool Start
+-                this.emit('tool_start', { name: call.name, args: call.args, agent: this.name });
+-
+-                // Notify User
+-                let statusMsg = `🛠️ Executing: ${call.name}`;
+-                if (call.args) {
+-                    const argStr = Object.entries(call.args)
+-                        .map(([k, v]) => `${k}: ${typeof v === 'object' ? JSON.stringify(v) : v}`)
+-                        .join(', ');
+-                    if (argStr) statusMsg += ` (${argStr})`;
+-                }
+-                this.speak(recipient, statusMsg, 'status', { taskId: originalMsg.meta?.taskId });
+-
+-                const result = await this.executeTool(call);
+-
+-                // Event: Tool End
+-                this.emit('tool_end', { name: call.name, result: result, agent: this.name });
+-
+-                toolResults.push({ name: call.name, content: result });
++                const toolResult = await this._processToolCall(call, recipient, originalMsg);
++                toolResults.push(toolResult);
+             }
+
+             // Bundle all tool results into one message
+@@ -303,6 +288,27 @@
+         }
+     }
+
++    async _processToolCall(call, recipient, originalMsg) {
++        // Event: Tool Start
++        this.emit('tool_start', { name: call.name, args: call.args, agent: this.name });
++
++        // Notify User
++        let statusMsg = `🛠️ Executing: ${call.name}`;
++        if (call.args) {
++            const argStr = Object.entries(call.args)
++                .map(([k, v]) => `${k}: ${typeof v === 'object' ? JSON.stringify(v) : v}`)
++                .join(', ');
++            if (argStr) statusMsg += ` (${argStr})`;
++        }
++        this.speak(recipient, statusMsg, 'status', { taskId: originalMsg.meta?.taskId });
++
++        const result = await this.executeTool(call);
++
++        // Event: Tool End
++        this.emit('tool_end', { name: call.name, result: result, agent: this.name });
++
++        return { name: call.name, content: result };
++    }
++
+     checkInterrupt() {
+         if (this.interruptSignal) {
