@@ -26,10 +26,10 @@ const mockDb = {
     db: {
         prepare: (sql) => {
             // Simple SQL parsing for mock behavior
-            if (sql.includes('SELECT count(*) as count FROM agents')) {
+            if (sql.includes("SELECT count(*) as count FROM agents WHERE status != 'OFFLINE'")) {
                 return { get: () => ({ count: MOCK_AGENTS.filter(a => a.status !== 'OFFLINE').length }) };
             }
-            if (sql.includes('SELECT count(*) as count FROM tasks')) {
+            if (sql.includes("SELECT count(*) as count FROM tasks WHERE status != 'DONE'")) {
                 return { get: () => ({ count: MOCK_TASKS.filter(t => t.status !== 'DONE').length }) };
             }
             if (sql.includes('SELECT * FROM tasks')) {
@@ -65,7 +65,7 @@ Module.prototype.require = function(id) {
     const caller = this.filename;
     // Only mock calls originating from our project source or test
     // We specifically want to intercept calls FROM lib/server.js
-    if (caller && (caller.endsWith('lib/server.js') || caller.endsWith('test-dashboard-api.js'))) {
+    if (caller && (caller.endsWith('lib/server.js') || caller.endsWith('lib/routes.js') || caller.endsWith('test-dashboard-api.js'))) {
         if (id === './db' || id.endsWith('/db')) return mockDb;
         if (id === './utils' || id.endsWith('/utils')) return mockUtils;
     }
