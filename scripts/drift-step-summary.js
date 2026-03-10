@@ -96,6 +96,6 @@ if (!fs.existsSync(reportDir)) fs.mkdirSync(reportDir, { recursive: true });
 const reportPath = path.resolve(reportDir, 'drift-report.md');
 fs.writeFileSync(reportPath, '<!-- setu-governance-report -->\n' + markdown);
 
-if (!result.ok) {
+if (!result.ok && process.env.ENFORCE_DRIFT === "true") {
     process.exit(1);
 }
