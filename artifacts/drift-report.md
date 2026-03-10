@@ -1,0 +1,28 @@
+<!-- setu-governance-report -->
+### Docs Drift Report 📝
+
+🛑 **Docs Drift Detected: 100%**
+
+- Changed Files: **1**
+- Required Docs: **1**
+- Missing Docs: **1**
+
+#### Top Missing Paths
+
+- `lib/Agent.js`
+
+#### Context & Reviewers
+
+- Base Ref: **origin/master**
+- Source: **git diff**
+- Ignored Files: **0**
+
+#### How to Fix
+Run the following locally:
+```bash
+setu onboarding run --only-missing
+```
+Then verify with:
+```bash
+setu onboarding doctor --diff --strict-diff
+```

@@ -1,0 +1,13 @@
+{
+  "ok": false,
+  "drift_percent": 100,
+  "changed_files": ["lib/Agent.js"],
+  "required_docs": ["lib/Agent.js"],
+  "missing_docs": ["lib/Agent.js"],
+  "base_ref_used": "origin/master",
+  "changed_files_source": "git diff",
+  "strict_diff_warning": null,
+  "strict_diff_failed": false,
+  "ignored_files": [],
+  "ownership": {}
+}
