@@ -9,7 +9,8 @@ const result = {
         ownership_source: 'none'
     },
     ownership_sla: {
-        mode: 'warn'
+        mode: 'warn',
+        unowned_blocking: true
     }
 };
 

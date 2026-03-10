@@ -24,3 +24,32 @@ Then verify with:
 ```bash
 setu onboarding doctor --diff --strict-diff
 ```
+### Docs Drift Report 📝
+
+🛑 **Docs Drift Detected: undefined%**
+
+- Changed Files: **0**
+- Required Docs: **0**
+- Missing Docs: **0**
+
+#### Top Missing Paths
+
+
+#### Context & Reviewers
+
+- Base Ref: **undefined**
+- Source: **undefined**
+- Ignored Files: **0**
+
+#### Ownership SLA (warn)
+✅ SLA Compliant.
+
+#### How to Fix
+Run the following locally:
+```bash
+setu onboarding run --only-missing
+```
+Then verify with:
+```bash
+setu onboarding doctor --diff --strict-diff
+```
