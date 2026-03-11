@@ -16,6 +16,14 @@ const expressMock = () => {
             this.routes = this.routes || {};
             this.routes[path] = handler;
         },
+        put: function (path, handler) {
+            this.routes = this.routes || {};
+            this.routes[path] = handler;
+        },
+        delete: function (path, handler) {
+            this.routes = this.routes || {};
+            this.routes[path] = handler;
+        },
         listen: () => { },
     };
     return app;
