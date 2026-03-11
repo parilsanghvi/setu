@@ -285,7 +285,8 @@ switch (cmd) {
 
       const singleFile = fileIdx !== -1 ? args[fileIdx + 1] : null;
       const singleFolder = folderIdx !== -1 ? args[folderIdx + 1] : null;
-      const maxConcurrency = concIdx !== -1 ? parseInt(args[concIdx + 1]) || 2 : 2;
+      const Config = require('../lib/Config');
+      const maxConcurrency = concIdx !== -1 ? parseInt(args[concIdx + 1]) || Config.llmMaxConcurrent : Config.llmMaxConcurrent;
 
       log('🧠 Starting Documentation Enrichment...');
 
@@ -790,7 +791,7 @@ switch (cmd) {
           const ownerSourceTitle = result.ownership.ownership_source === 'onboarding' ? 'ONBOARDING' :
             (result.ownership.ownership_source === 'codeowners' ? 'CODEOWNERS fallback' : 'None');
           console.log(`\n👥 Suggested Reviewers/Owners (${ownerSourceTitle}):`);
-          const owners = Object.keys(result.ownership.by_owner);
+          const owners = result.ownership.by_owner ? Object.keys(result.ownership.by_owner) : [];
           if (owners.length > 0) {
             owners.forEach(owner => {
               console.log(`   - @${owner} (${result.ownership.by_owner[owner].length} files touched)`);
