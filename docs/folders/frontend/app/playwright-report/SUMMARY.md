@@ -1,11 +1,8 @@
----
-title: "Playwright Report Directory Summary"
-description: "Documentation for the frontend/app/playwright-report folder."
----
+# Playwright Report Directory
 
 ## Purpose
-This directory stores the generated Playwright end-to-end (e2e) test reports. Whenever the frontend test suite runs via Playwright, this folder holds the artifacts, such as the HTML report pages, screenshots of failed tests, and execution traces. This helps developers easily inspect test results locally or within a CI environment.
+This directory stores the output of automated browser tests executed by Playwright. It contains detailed HTML reports, logs, traces, and visual regression snapshots that are generated during the `npx playwright test` execution to verify frontend changes in the `frontend/app` application. This is essential for debugging CI failures and visual parity checks.
 
 ## Key Files
-- `index.html`: The main entry point for the Playwright test report.
-- `data/`: Folder containing test execution trace and network data.
+- `index.html`: The entry point for the Playwright generated test report, allowing users to visually navigate test results and errors.
+- `/data/`: Contains JSON and trace data utilized by the HTML report.
