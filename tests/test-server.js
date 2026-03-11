@@ -11,6 +11,8 @@ const mocks = {
                 use: () => { },
                 get: () => { },
                 post: () => { },
+                put: () => { },
+                delete: () => { },
                 listen: () => { },
             };
             app.static = () => { };
