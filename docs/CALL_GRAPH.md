@@ -1,7 +1,7 @@
 ---
-source_hash: b264458b15b9032e
-facts_hash: b264458b15b9032e
-generated_at: 2026-03-04T07:15:24.375Z
+source_hash: 25d6987bbf000f07
+facts_hash: 25d6987bbf000f07
+generated_at: 2026-03-08T19:57:26.649Z
 generator_version: 1.0.0
 model: cheap
 quality_score: 0
@@ -74,6 +74,7 @@ graph LR
         lib_models_providers_openai_js["openai.js"]
         lib_onboarding_changed_files_js["changed-files.js"]
         lib_onboarding_codeowners_js["codeowners.js"]
+        lib_onboarding_context_builder_js["context-builder.js"]
         lib_onboarding_dependency_engine_js["dependency-engine.js"]
         lib_onboarding_doc_enricher_js["doc-enricher.js"]
         lib_onboarding_doc_facts_js["doc-facts.js"]
@@ -130,6 +131,7 @@ graph LR
     agents_Vaidya_js --> lib_Agent_js
     agents_Vaidya_js --> lib_Config_js
     agents_Vaidya_js --> lib_db_js
+    agents_Vaidya_js --> lib_onboarding_context_builder_js
     agents_Vishwakarma_js --> lib_Context_js
     agents_Vishwakarma_js --> lib_Contractor_js
     agents_Vishwakarma_js --> lib_CoreAgent_js
@@ -190,6 +192,9 @@ graph LR
     lib_models_providers_ollama_js --> lib_models_providers_base_js
     lib_models_providers_openai_js --> lib_Logger_js
     lib_models_providers_openai_js --> lib_models_providers_base_js
+    lib_onboarding_context_builder_js --> lib_onboarding_dependency_engine_js
+    lib_onboarding_context_builder_js --> lib_onboarding_doc_facts_js
+    lib_onboarding_context_builder_js --> lib_onboarding_status_js
     lib_onboarding_doc_enricher_js --> lib_onboarding_dependency_engine_js
     lib_onboarding_doc_enricher_js --> lib_onboarding_doc_facts_js
     lib_onboarding_doc_enricher_js --> lib_onboarding_doc_links_js
@@ -225,7 +230,7 @@ graph LR
 
 ## Summary
 
-- **70** files participate in the call graph
-- **127** import edges detected
+- **71** files participate in the call graph
+- **131** import edges detected
 - **Agents** depend on **Lib** for core functionality (DB, LLM, Context, Agent base class).
 - **CLI** tools in `bin/` orchestrate onboarding and the agent lifecycle.

@@ -62,3 +62,4 @@ pi-mono-temp/
 temp_intern_scope/
 output/demo-project/frontend/app/test-results/
 artifacts/
+contracts.json

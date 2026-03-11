@@ -53,8 +53,8 @@ if (result.ok) {
     }
     markdown += `- Ignored Files: **${result.ignored_files ? result.ignored_files.length : 0}**\n`;
 
-    if (result.ownership) {
-        const owners = result.ownership.by_owner ? Object.keys(result.ownership.by_owner) : [];
+    if (result.ownership && result.ownership.by_owner) {
+        const owners = Object.keys(result.ownership.by_owner);
         let sourceLabel = result.ownership.ownership_source === 'onboarding' ? 'ONBOARDING' :
             (result.ownership.ownership_source === 'codeowners' ? 'CODEOWNERS fallback' : 'None');
 

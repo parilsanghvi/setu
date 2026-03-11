@@ -1,15 +1,8 @@
----
-source_hash: a04e0e5621fb7a6b
-facts_hash: f9a08ea2cb95dfd0
-generated_at: 2026-03-09T20:10:00.000Z
-generator_version: 1.0.0
-model: cheap
-quality_score: 100
----
-# Folder: frontend/app/test-results
+# Test Results Directory
 
 ## Purpose
-This folder stores the test results, traces, and screenshots from Playwright test runs.
+This directory stores artifacts generated during test executions, such as screenshots, diffs, and specific error contexts. When a visual regression test or functional test fails in Playwright, the relevant outputs are saved here to assist developers in identifying what specifically broke in the `frontend/app` environment during testing.
 
 ## Key Files
-- results.xml
+- `*-diff.png`: Visual differences generated during `toHaveScreenshot` failures.
+- `error-context.md`: Markdown exports of specific failure states for easier review.

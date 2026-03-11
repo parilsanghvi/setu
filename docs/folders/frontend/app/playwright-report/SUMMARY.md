@@ -1,15 +1,8 @@
----
-source_hash: a04e0e5621fb7a6b
-facts_hash: f9a08ea2cb95dfd0
-generated_at: 2026-03-09T20:10:00.000Z
-generator_version: 1.0.0
-model: cheap
-quality_score: 100
----
-# Folder: frontend/app/playwright-report
+# Playwright Report Directory
 
 ## Purpose
-This folder contains the HTML report generated after running Playwright tests.
+This directory stores the output of automated browser tests executed by Playwright. It contains detailed HTML reports, logs, traces, and visual regression snapshots that are generated during the `npx playwright test` execution to verify frontend changes in the `frontend/app` application. This is essential for debugging CI failures and visual parity checks.
 
 ## Key Files
-- index.html
+- `index.html`: The entry point for the Playwright generated test report, allowing users to visually navigate test results and errors.
+- `/data/`: Contains JSON and trace data utilized by the HTML report.
