@@ -61,10 +61,25 @@ test('Bus: Mark Read', (t) => {
     assert.ok(row.read_at > 0, 'read_at should be set');
 });
 
-test('Bus: Mark Read - Empty & Invalid', (t) => {
-    // Should not crash
+test('Bus: Mark Read - Empty & Invalid & Injection', (t) => {
+    // Should not crash on invalid inputs
     assert.doesNotThrow(() => bus.markRead([]));
     assert.doesNotThrow(() => bus.markRead([999999])); // Non-existent ID
+    assert.doesNotThrow(() => bus.markRead(null));
+    assert.doesNotThrow(() => bus.markRead(undefined));
+    assert.doesNotThrow(() => bus.markRead("string"));
+    assert.doesNotThrow(() => bus.markRead({ id: 1 }));
+
+    // Test injection protection
+    const msgId = bus.send('Alice', 'Bob', 'Injection Test', 'chat');
+
+    // Try to inject via array elements
+    assert.doesNotThrow(() => bus.markRead([msgId, "1) OR 1=1; --"]));
+
+    // Verify it still marks the valid one as read
+    let unread = bus.getUnread('Bob');
+    const msg = unread.find(m => m.id === msgId);
+    assert.strictEqual(msg, undefined, 'Valid message should be marked read despite injection attempt');
 });
 
 test('Bus: Get Chat History', (t) => {
