@@ -16,8 +16,10 @@ const ChatBox = ({ agents, logs, prefillTaskText }) => {
         }
     }, [prefillTaskText]);
 
+    const chatHistory = useMemo(() => {
         // ⚡ Bolt: Replaced O(N²) reallocation inside `.reduce()` with a single-pass O(N) loop
         // using a Set to track active typing states. This prevents severe UI jank as chat history grows.
+        // ⚡ Bolt: Added useMemo to prevent re-processing the entire log history on every render.
         const messages = [];
         const typingAgents = new Set();
 
