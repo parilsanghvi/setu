@@ -39,7 +39,7 @@ app.use(cors({ // 2. CORS (Strict)
   credentials: true
 }));
 app.use(authMiddleware); // 3. Authentication (Block unauth before parsing body)
-app.use(express.json()); // 4. Body Parsing
+app.use(express.json({ limit: '100kb' })); // 4. Body Parsing
 
 // Serve Static Files (Production Build & Screenshots)
 const frontendDist = path.join(__dirname, 'frontend/app/dist');
