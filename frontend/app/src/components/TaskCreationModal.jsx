@@ -32,9 +32,15 @@ const TaskCreationModal = ({ isOpen, onClose, agents, logs }) => {
 
     return (
         <div className={styles.overlay} onClick={onClose}>
-            <div className={styles.modal} onClick={e => e.stopPropagation()}>
+            <div
+                className={styles.modal}
+                onClick={e => e.stopPropagation()}
+                role="dialog"
+                aria-modal="true"
+                aria-labelledby="task-creation-title"
+            >
                 <div className={styles.header}>
-                    <h2>Draft New Task</h2>
+                    <h2 id="task-creation-title">Draft New Task</h2>
                     <button className={styles.closeButton} onClick={onClose} aria-label="Close task creation modal">
                         &times;
                     </button>
