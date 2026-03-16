@@ -46,6 +46,11 @@ const mockDb = {
             };
         }
     },
+    getActiveAgentsCount: () => ({ count: MOCK_AGENTS.filter(a => a.status !== 'OFFLINE').length }),
+    getPendingTasksCount: () => ({ count: MOCK_TASKS.filter(t => t.status !== 'DONE').length }),
+    getAgents: () => MOCK_AGENTS,
+    getTasks: () => MOCK_TASKS,
+    getTasksOrdered: () => MOCK_TASKS,
     updateTask: (id, status, meta) => {
         // console.log('Mock updateTask called:', id, status, meta);
     },

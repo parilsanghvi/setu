@@ -9,3 +9,7 @@
 ## 2024-05-24 - Avoid Sync Filesystem Scans in Hot Paths
 **Learning:** The `getOnboardingStatus()` function in `lib/onboarding/status.js` does heavy synchronous filesystem scans when called without arguments. Calling this function in API endpoints like `/api/onboarding` blocks the main Node.js event loop and significantly degrades performance.
 **Action:** Always call `getOnboardingStatus({ fast: true })` in hot paths, such as Express API routes, to use the cached `ONBOARDING.json` file instead of triggering a full synchronous filesystem scan. The fast path correctly returns stale cache data natively if necessary.
+
+## 2026-03-16 - Cache SQLite prepared statements
+**Learning:** Calling `db.prepare(sql).get()` or `.all()` repeatedly on hot paths like dashboard polling routes forces better-sqlite3 to parse and compile the SQL string every time, wasting CPU cycles and memory.
+**Action:** Use cached prepared statements. Add wrapper methods to the database wrapper class using `_stmt(key, sql)` to instantiate and cache the `better-sqlite3` statements upon first execution and reuse them for subsequent calls.

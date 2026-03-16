@@ -33,6 +33,10 @@ const mocks = {
                 return { all: () => [], get: () => ({}) }
             }
         },
+        getActiveAgentsCount: () => ({ count: 1 }),
+        getPendingTasksCount: () => ({ count: 1 }),
+        getTasksOrdered: () => [{ id: 'TASK-1' }],
+        getAgents: () => [{ name: 'Agent1' }],
         updateTask: (id, status, meta) => { lastTaskEmitted = { id, status, meta }; },
         send: (sender, recipient, message, type) => { lastMessageEmitted = { sender, recipient, message, type }; }
     }

@@ -10,26 +10,14 @@ let mockRun = () => ({ changes: 0 });
 let lastQuery = '';
 let lastParams = [];
 
-const mockPrepare = {
-    get: (...args) => {
-        // BudgetManager calls .get(taskId)
-        // args will be [taskId]
-        // But wait, .get() takes varargs for binding parameters if prepare() has ? placeholders
-        // In BudgetManager: .prepare('...').get(taskId)
-        // So args[0] is taskId
+const mockDb = {
+    getTaskMetaById: (...args) => {
+        lastQuery = 'SELECT meta FROM tasks WHERE id = ?';
         return mockGet(...args);
     },
-    run: (...args) => {
-        // BudgetManager calls .run(JSON.stringify(meta), taskId)
-        // args will be [metaString, taskId]
+    updateTaskMeta: (...args) => {
+        lastQuery = 'UPDATE tasks SET meta = ? WHERE id = ?';
         return mockRun(...args);
-    }
-};
-
-const mockDb = {
-    prepare: (sql) => {
-        lastQuery = sql;
-        return mockPrepare;
     }
 };
 
@@ -38,7 +26,7 @@ const originalRequire = Module.prototype.require;
 Module.prototype.require = function(id) {
     // Check for both relative and absolute path resolution attempts
     if (id === './db' || id.endsWith('/lib/db.js') || id.endsWith('\\lib\\db.js')) {
-        return { db: mockDb };
+        return mockDb;
     }
     return originalRequire.apply(this, arguments);
 };
@@ -136,7 +124,7 @@ test('BudgetManager: record() - Task found, updates cost', (t) => {
     let capturedMetaString = '';
     let capturedTaskId = '';
 
-    mockRun = (metaStr, id) => {
+    mockRun = (id, metaStr) => {
         capturedMetaString = metaStr;
         capturedTaskId = id;
         return { changes: 1 };
