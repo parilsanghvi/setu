@@ -1,8 +1,9 @@
 const { z } = require('zod');
-const { exec } = require('child_process');
+const { execFile } = require('child_process');
 const util = require('util');
 const path = require('path');
-const execAsync = util.promisify(exec);
+const fsPromises = require('fs/promises');
+const execFileAsync = util.promisify(execFile);
 
 const tools = [
     {
@@ -24,8 +25,7 @@ const tools = [
             try {
                 // Windows 'findstr' or 'grep' if available. let's assume git bash or standard windows
                 // findstr /s /n "pattern" *
-                const cmd = `findstr /s /n /i "${pattern}" "${path.join(searchPath, '*')}"`;
-                const { stdout } = await execAsync(cmd, { encoding: 'utf8', stdio: 'pipe' });
+                const { stdout } = await execFileAsync('findstr', ['/s', '/n', '/i', pattern, path.join(searchPath, '*')], { encoding: 'utf8', stdio: 'pipe' });
                 return stdout || "No matches found.";
             } catch (e) {
                 // findstr returns exit code 1 if no match, which throws error in execSync
@@ -46,11 +46,17 @@ const tools = [
             dir: z.string().optional().default('.')
         }),
         execute: async ({ dir }) => {
-            // PowerShell or dir /s /b
             try {
-                const cmd = `dir /s /b "${dir}"`;
-                const { stdout } = await execAsync(cmd, { encoding: 'utf8' });
-                return stdout.split('\r\n').slice(0, 50).join('\n') + "\n...(truncated)";
+                async function getFiles(dirPath) {
+                    const dirents = await fsPromises.readdir(dirPath, { withFileTypes: true });
+                    const files = await Promise.all(dirents.map((dirent) => {
+                        const res = path.resolve(dirPath, dirent.name);
+                        return dirent.isDirectory() ? getFiles(res) : res;
+                    }));
+                    return files.flat();
+                }
+                const allFiles = await getFiles(dir);
+                return allFiles.slice(0, 50).join('\n') + (allFiles.length > 50 ? "\n...(truncated)" : "");
             } catch (e) {
                 return `Error: ${e.message}`;
             }
