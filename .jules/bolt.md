@@ -9,3 +9,7 @@
 ## 2024-05-24 - Avoid Sync Filesystem Scans in Hot Paths
 **Learning:** The `getOnboardingStatus()` function in `lib/onboarding/status.js` does heavy synchronous filesystem scans when called without arguments. Calling this function in API endpoints like `/api/onboarding` blocks the main Node.js event loop and significantly degrades performance.
 **Action:** Always call `getOnboardingStatus({ fast: true })` in hot paths, such as Express API routes, to use the cached `ONBOARDING.json` file instead of triggering a full synchronous filesystem scan. The fast path correctly returns stale cache data natively if necessary.
+
+## 2024-05-18 - Missing useMemo on Computed React Property
+**Learning:** Found a severe performance anti-pattern in React frontend where a computationally expensive array reconstruction (`chatHistory` building) was running on every single render cycle of `ChatBox` because it lacked a `useMemo` wrapper, which causes significant UI jank as chat logs grow.
+**Action:** Always wrap derived, computationally heavy array/object creations in `useMemo` inside React components to prevent unnecessary re-evaluations on every render, especially when dealing with lists that grow over time like logs or chat history.
