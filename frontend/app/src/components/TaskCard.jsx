@@ -39,10 +39,15 @@ const TaskCard = ({ task, onClick }) => {
 
             <div className={styles.taskFooter}>
                 <div className={styles.assignee}>
-                    <span className={styles.avatarIcon}>👤</span>
+                    <span className={styles.avatarIcon} aria-hidden="true">👤</span>
                     {task.assignee || 'Unassigned'}
                 </div>
-                <div className={styles.timeSince}>{getTimeSince(task.created_at)}</div>
+                <div
+                    className={styles.timeSince}
+                    title={task.created_at ? new Date(task.created_at).toLocaleString() : ''}
+                >
+                    {getTimeSince(task.created_at)}
+                </div>
             </div>
         </div>
     );
