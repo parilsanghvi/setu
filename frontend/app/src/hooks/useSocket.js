@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { io } from 'socket.io-client';
 import { updateLogs } from '../utils/logUtils';
 
@@ -22,7 +22,7 @@ export const useSocket = () => {
     const [tasks, setTasks] = useState([]);
     const [logs, setLogs] = useState([]);
     const logIdRef = useRef(0);
-    const socketRef = useRef(null);
+    const [socket, setSocket] = useState(null);
 
     useEffect(() => {
         let cancelled = false;
@@ -39,7 +39,9 @@ export const useSocket = () => {
                         // Browser is sending auth automatically — but we can't extract the header
                         // So we prompt user for credentials to pass to socket.io
                     }
-                } catch (_) { }
+                } catch {
+                    // Ignore error since it means basic auth hasn't been cached
+                }
 
                 // Prompt for credentials if not stored
                 const user = prompt('Dashboard Username:', 'admin');
@@ -53,7 +55,7 @@ export const useSocket = () => {
 
             if (cancelled) return;
 
-            const socket = io({
+            const newSocket = io({
                 autoConnect: true,
                 extraHeaders: {
                     authorization: `Basic ${authHeader}`
@@ -67,56 +69,56 @@ export const useSocket = () => {
                 }
             });
 
-            socketRef.current = socket;
+            setSocket(newSocket);
 
             function formatLog(content) {
                 logIdRef.current += 1;
                 return { id: logIdRef.current, content };
             }
 
-            socket.on('connect', () => {
+            newSocket.on('connect', () => {
                 if (!cancelled) setIsConnected(true);
                 console.log('[Socket] Connected');
             });
 
-            socket.on('disconnect', () => {
+            newSocket.on('disconnect', () => {
                 if (!cancelled) setIsConnected(false);
                 console.log('[Socket] Disconnected');
             });
 
-            socket.on('connect_error', (err) => {
+            newSocket.on('connect_error', (err) => {
                 console.error('[Socket] Connection error:', err.message);
                 if (err.message === 'Invalid credentials' || err.message === 'Authentication required') {
                     // Clear stored credentials and retry
                     sessionStorage.removeItem('setu_auth');
-                    socket.disconnect();
+                    newSocket.disconnect();
                     if (!cancelled) initSocket();
                 }
             });
 
-            socket.on('log', (msg) => {
+            newSocket.on('log', (msg) => {
                 if (!cancelled) setLogs((prev) => updateLogs(prev, formatLog(msg), MAX_LOGS));
             });
 
-            socket.on('log_history', (hist) => {
+            newSocket.on('log_history', (hist) => {
                 const formatted = hist.map(content => formatLog(content));
                 if (!cancelled) setLogs((prev) => updateLogs(prev, formatted, MAX_LOGS));
             });
 
-            socket.on('agents_update', (data) => {
+            newSocket.on('agents_update', (data) => {
                 if (!cancelled) setAgents(data);
             });
 
-            socket.on('tasks_update', (data) => {
+            newSocket.on('tasks_update', (data) => {
                 if (!cancelled) setTasks(data);
             });
 
-            socket.on('chat_message', (msg) => {
+            newSocket.on('chat_message', (msg) => {
                 const logMsg = `[CHAT] ${msg.sender} -> ${msg.recipient}: ${msg.content}`;
                 if (!cancelled) setLogs((prev) => updateLogs(prev, formatLog(logMsg), MAX_LOGS));
             });
 
-            socket.on('chat_history', (history) => {
+            newSocket.on('chat_history', (history) => {
                 const formatted = history.map(msg => formatLog(`[CHAT] ${msg.sender} -> ${msg.recipient}: ${msg.content}`));
                 if (!cancelled) setLogs((prev) => updateLogs(prev, formatted, MAX_LOGS));
             });
@@ -126,14 +128,15 @@ export const useSocket = () => {
 
         return () => {
             cancelled = true;
-            if (socketRef.current) {
-                socketRef.current.disconnect();
-            }
+            setSocket((prevSocket) => {
+                if (prevSocket) prevSocket.disconnect();
+                return null;
+            });
         };
     }, []);
 
     return {
-        socket: socketRef.current,
+        socket,
         isConnected,
         agents,
         tasks,
