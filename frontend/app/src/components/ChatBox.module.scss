@@ -171,6 +171,11 @@
     outline: none;
     border: 1px solid #374151;
     padding: 0.25rem;
+
+    &:focus-visible {
+        outline: 2px solid #60a5fa; // border-blue-400
+        outline-offset: 2px;
+    }
 }
 
 .msgInput {
@@ -184,6 +189,11 @@
     padding: 0.4rem 0.5rem;
     font-family: inherit;
     resize: none;
+
+    &:focus-visible {
+        outline: 2px solid #60a5fa; // border-blue-400
+        outline-offset: 2px;
+    }
 }
 
 .sendButton {
@@ -204,5 +214,10 @@
 
     &:not(:disabled):hover {
         background-color: #3b82f6; // bg-blue-500
+    }
+
+    &:focus-visible {
+        outline: 2px solid #60a5fa; // border-blue-400
+        outline-offset: 2px;
     }
 }
