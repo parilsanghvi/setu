@@ -65,6 +65,16 @@ test('Bus: Mark Read - Empty & Invalid', (t) => {
     // Should not crash
     assert.doesNotThrow(() => bus.markRead([]));
     assert.doesNotThrow(() => bus.markRead([999999])); // Non-existent ID
+
+    // SQL Injection / Invalid Type Protection
+    assert.doesNotThrow(() => bus.markRead('1) OR 1=1; --')); // Not an array
+    assert.doesNotThrow(() => bus.markRead([1, '2) OR 1=1; --', 3])); // Array with malicious string
+
+    // Ensure legitimate IDs still work when mixed with invalid ones
+    const msgId = bus.send('Alice', 'Bob', 'Read Me', 'chat');
+    bus.markRead([msgId, 'invalid_id']);
+    const row = bus.db.prepare('SELECT * FROM messages WHERE id = ?').get(msgId);
+    assert.ok(row.read_at > 0, 'Valid ID should be marked read even if mixed with invalid ones');
 });
 
 test('Bus: Get Chat History', (t) => {
