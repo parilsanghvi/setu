@@ -16,6 +16,37 @@ const ChatBox = ({ agents, logs, prefillTaskText }) => {
         }
     }, [prefillTaskText]);
 
+    const handleKeyDown = (e) => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            send(e);
+        }
+    };
+
+    const send = async (e) => {
+        e.preventDefault();
+        if (!msg.trim() || loading) return;
+
+        setLoading(true);
+        try {
+            await fetch('/api/chat', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
+                body: JSON.stringify({ agent: target, message: msg })
+            });
+            setMsg("");
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const renderMessageContent = (content) => {
+        const html = marked.parse(content, { breaks: true });
+        return <div dangerouslySetInnerHTML={{ __html: html }} />;
+    };
+
+    const chatHistory = useMemo(() => {
         // ⚡ Bolt: Replaced O(N²) reallocation inside `.reduce()` with a single-pass O(N) loop
         // using a Set to track active typing states. This prevents severe UI jank as chat history grows.
         const messages = [];
@@ -67,36 +98,6 @@ const ChatBox = ({ agents, logs, prefillTaskText }) => {
     useEffect(() => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     }, [chatHistory]);
-
-    const handleKeyDown = (e) => {
-        if (e.key === 'Enter' && !e.shiftKey) {
-            e.preventDefault();
-            send(e);
-        }
-    };
-
-    const send = async (e) => {
-        e.preventDefault();
-        if (!msg.trim() || loading) return;
-
-        setLoading(true);
-        try {
-            await fetch('/api/chat', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                credentials: 'include',
-                body: JSON.stringify({ agent: target, message: msg })
-            });
-            setMsg("");
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    const renderMessageContent = (content) => {
-        const html = marked.parse(content, { breaks: true });
-        return <div dangerouslySetInnerHTML={{ __html: html }} />;
-    };
 
     return (
         <div className={styles.container}>

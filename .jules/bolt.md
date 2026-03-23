@@ -9,3 +9,6 @@
 ## 2024-05-24 - Avoid Sync Filesystem Scans in Hot Paths
 **Learning:** The `getOnboardingStatus()` function in `lib/onboarding/status.js` does heavy synchronous filesystem scans when called without arguments. Calling this function in API endpoints like `/api/onboarding` blocks the main Node.js event loop and significantly degrades performance.
 **Action:** Always call `getOnboardingStatus({ fast: true })` in hot paths, such as Express API routes, to use the cached `ONBOARDING.json` file instead of triggering a full synchronous filesystem scan. The fast path correctly returns stale cache data natively if necessary.
+## 2026-03-23 - Prevented Cascading Renders in TaskCreationModal
+**Learning:** React effects that synchronously call `setState` during render cause severe performance issues (cascading re-renders) because React throws away the in-progress render and restarts it. I found `setFilteredAgents` inside `useEffect` in `TaskCreationModal.jsx`.
+**Action:** Replace derived state that is strictly dependent on props (like filtering `agents`) with `useMemo` instead of an effect + local state. This applies to all components dealing with list filtering.
