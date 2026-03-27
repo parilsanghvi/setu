@@ -1,8 +1,32 @@
 const { z } = require('zod');
-const { exec } = require('child_process');
-const util = require('util');
+const fs = require('fs');
 const path = require('path');
-const execAsync = util.promisify(exec);
+
+async function walkDir(dir, pattern = null, results = []) {
+    const list = await fs.promises.readdir(dir, { withFileTypes: true });
+    for (const dirent of list) {
+        if (dirent.name === 'node_modules' || dirent.name === '.git') continue;
+        const res = path.resolve(dir, dirent.name);
+        if (dirent.isDirectory()) {
+            await walkDir(res, pattern, results);
+        } else {
+            if (pattern) {
+                try {
+                    const content = await fs.promises.readFile(res, 'utf8');
+                    const lines = content.split('\n');
+                    for (let i = 0; i < lines.length; i++) {
+                        if (lines[i].toLowerCase().includes(pattern.toLowerCase())) {
+                            results.push(`${res}:${i + 1}:${lines[i].trim()}`);
+                        }
+                    }
+                } catch (e) { } // ignore unreadable/binary files
+            } else {
+                results.push(res);
+            }
+        }
+    }
+    return results;
+}
 
 const tools = [
     {
@@ -22,14 +46,12 @@ const tools = [
         }),
         execute: async ({ pattern, path: searchPath }) => {
             try {
-                // Windows 'findstr' or 'grep' if available. let's assume git bash or standard windows
-                // findstr /s /n "pattern" *
-                const cmd = `findstr /s /n /i "${pattern}" "${path.join(searchPath, '*')}"`;
-                const { stdout } = await execAsync(cmd, { encoding: 'utf8', stdio: 'pipe' });
-                return stdout || "No matches found.";
+                const resolvedDir = path.resolve(searchPath);
+                const results = await walkDir(resolvedDir, pattern);
+                if (results.length === 0) return "No matches found.";
+                return results.slice(0, 50).join('\n') + (results.length > 50 ? "\n...(truncated)" : "");
             } catch (e) {
-                // findstr returns exit code 1 if no match, which throws error in execSync
-                return "No matches found.";
+                return `Error: ${e.message}`;
             }
         }
     },
@@ -46,11 +68,10 @@ const tools = [
             dir: z.string().optional().default('.')
         }),
         execute: async ({ dir }) => {
-            // PowerShell or dir /s /b
             try {
-                const cmd = `dir /s /b "${dir}"`;
-                const { stdout } = await execAsync(cmd, { encoding: 'utf8' });
-                return stdout.split('\r\n').slice(0, 50).join('\n') + "\n...(truncated)";
+                const resolvedDir = path.resolve(dir);
+                const results = await walkDir(resolvedDir);
+                return results.slice(0, 50).join('\n') + (results.length > 50 ? "\n...(truncated)" : "");
             } catch (e) {
                 return `Error: ${e.message}`;
             }
