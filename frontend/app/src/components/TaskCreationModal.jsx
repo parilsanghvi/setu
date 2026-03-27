@@ -1,16 +1,14 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import ChatBox from './ChatBox';
 import styles from './TaskCreationModal.module.scss';
 
 const TaskCreationModal = ({ isOpen, onClose, agents, logs }) => {
     // Only allow selecting top-level leads
-    const [filteredAgents, setFilteredAgents] = useState([]);
-
-    useEffect(() => {
-        if (agents) {
-            const topLevelNames = ['Sutradhar', 'Guru', 'Tark', 'Shilpi', 'Vishwakarma'];
-            setFilteredAgents(agents.filter(a => topLevelNames.includes(a.name)));
-        }
+    // ⚡ Bolt: Derived filteredAgents purely via useMemo to prevent unnecessary React re-renders from synchronized state in useEffect
+    const filteredAgents = React.useMemo(() => {
+        if (!agents) return [];
+        const topLevelNames = ['Sutradhar', 'Guru', 'Tark', 'Shilpi', 'Vishwakarma'];
+        return agents.filter(a => topLevelNames.includes(a.name));
     }, [agents]);
 
     // Trap focus and close on escape
