@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect, useMemo } from 'react';
 import Spinner from './Spinner';
 import { marked } from 'marked';
+import DOMPurify from 'dompurify';
 import styles from './ChatBox.module.scss';
 
 const ChatBox = ({ agents, logs, prefillTaskText }) => {
@@ -16,6 +17,7 @@ const ChatBox = ({ agents, logs, prefillTaskText }) => {
         }
     }, [prefillTaskText]);
 
+    const chatHistory = useMemo(() => {
         // ⚡ Bolt: Replaced O(N²) reallocation inside `.reduce()` with a single-pass O(N) loop
         // using a Set to track active typing states. This prevents severe UI jank as chat history grows.
         const messages = [];
@@ -95,7 +97,9 @@ const ChatBox = ({ agents, logs, prefillTaskText }) => {
 
     const renderMessageContent = (content) => {
         const html = marked.parse(content, { breaks: true });
-        return <div dangerouslySetInnerHTML={{ __html: html }} />;
+        // Sanitize HTML to prevent XSS vulnerabilities
+        const cleanHtml = DOMPurify.sanitize(html);
+        return <div dangerouslySetInnerHTML={{ __html: cleanHtml }} />;
     };
 
     return (
