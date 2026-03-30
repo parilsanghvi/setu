@@ -24,6 +24,7 @@ const TaskDetailModal = ({ task, onClose }) => {
                     <button
                         className={styles.deleteButton}
                         disabled={isDeleting || isReverting}
+                        aria-label="Delete task"
                         onClick={async () => {
                             if (window.confirm('Delete this task?')) {
                                 setIsDeleting(true);
@@ -36,12 +37,13 @@ const TaskDetailModal = ({ task, onClose }) => {
                             }
                         }}
                     >
-                        {isDeleting ? <Spinner size="1em" /> : '🗑️ Delete'}
+                        {isDeleting ? <Spinner size="1em" /> : <><span aria-hidden="true">🗑️</span> Delete</>}
                     </button>
                     {task.status === 'DONE' && (
                         <button
                             className={styles.revertButton}
                             disabled={isDeleting || isReverting}
+                            aria-label="Revert task to TODO"
                             onClick={async () => {
                                 setIsReverting(true);
                                 try {
@@ -56,7 +58,7 @@ const TaskDetailModal = ({ task, onClose }) => {
                                 }
                             }}
                         >
-                            {isReverting ? <Spinner size="1em" /> : '↩️ Revert to TODO'}
+                            {isReverting ? <Spinner size="1em" /> : <><span aria-hidden="true">↩️</span> Revert to TODO</>}
                         </button>
                     )}
                 </div>
