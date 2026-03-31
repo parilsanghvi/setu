@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { io } from 'socket.io-client';
 import { updateLogs } from '../utils/logUtils';
 
@@ -39,7 +39,9 @@ export const useSocket = () => {
                         // Browser is sending auth automatically — but we can't extract the header
                         // So we prompt user for credentials to pass to socket.io
                     }
-                } catch (_) { }
+                } catch {
+                    // Ignore network errors
+                }
 
                 // Prompt for credentials if not stored
                 const user = prompt('Dashboard Username:', 'admin');
@@ -132,8 +134,13 @@ export const useSocket = () => {
         };
     }, []);
 
+    const [socketInstance, setSocketInstance] = useState(null);
+    useEffect(() => {
+        setSocketInstance(socketRef.current);
+    }, [isConnected]); // update instance reference when connection state changes
+
     return {
-        socket: socketRef.current,
+        socket: socketInstance,
         isConnected,
         agents,
         tasks,
