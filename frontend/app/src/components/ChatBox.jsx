@@ -16,6 +16,7 @@ const ChatBox = ({ agents, logs, prefillTaskText }) => {
         }
     }, [prefillTaskText]);
 
+    const chatHistory = useMemo(() => {
         // ⚡ Bolt: Replaced O(N²) reallocation inside `.reduce()` with a single-pass O(N) loop
         // using a Set to track active typing states. This prevents severe UI jank as chat history grows.
         const messages = [];
@@ -111,7 +112,7 @@ const ChatBox = ({ agents, logs, prefillTaskText }) => {
                     {agents.map(a => <option key={a.name} value={a.name}>{a.name}</option>)}
                 </select>
             </div>
-            <div className={styles.messageList}>
+            <div className={styles.messageList} aria-live="polite" aria-atomic="false">
                 {chatHistory.map((h, i) => (
                     <div key={h.id + i} className={`${styles.messageWrapper} ${h.isAgent ? styles.agentWrapper : styles.userWrapper}`}>
                         <div className={`${styles.messageBubble} ${h.isAgent ? styles.agentBubble : styles.userBubble}`}>
