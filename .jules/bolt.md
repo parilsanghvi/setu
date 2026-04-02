@@ -9,3 +9,7 @@
 ## 2024-05-24 - Avoid Sync Filesystem Scans in Hot Paths
 **Learning:** The `getOnboardingStatus()` function in `lib/onboarding/status.js` does heavy synchronous filesystem scans when called without arguments. Calling this function in API endpoints like `/api/onboarding` blocks the main Node.js event loop and significantly degrades performance.
 **Action:** Always call `getOnboardingStatus({ fast: true })` in hot paths, such as Express API routes, to use the cached `ONBOARDING.json` file instead of triggering a full synchronous filesystem scan. The fast path correctly returns stale cache data natively if necessary.
+
+## 2026-04-02 - Avoid Unconditional Database Polling in Socket Loop
+**Learning:** Polling the database unconditionally inside a fast `setInterval` loop in `lib/socket.js` (e.g., to fetch all agents and tasks every 2 seconds) causes excessive database reads and large network payloads, even when no state has changed.
+**Action:** Use lightweight change detection techniques—such as tracking a state hash (excluding volatile fields like `last_heartbeat`) or leveraging a fast aggregate method like `getTaskMeta()` (which returns `MAX(updated_at)` and `COUNT(*)`)—to query and emit data only when actual changes occur.

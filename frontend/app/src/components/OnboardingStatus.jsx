@@ -3,7 +3,7 @@ import styles from './OnboardingStatus.module.scss';
 
 const OnboardingStatus = ({ data }) => {
     if (!data) return null;
-    const { ok, completeness, stale, missing, generatedAt } = data;
+    const { completeness, stale, missing, generatedAt } = data;
 
     // 100% completeness = success, regardless of staleness
     const isComplete = completeness === 100;

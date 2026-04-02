@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { io } from 'socket.io-client';
 import { updateLogs } from '../utils/logUtils';
 
@@ -23,6 +23,7 @@ export const useSocket = () => {
     const [logs, setLogs] = useState([]);
     const logIdRef = useRef(0);
     const socketRef = useRef(null);
+    const [socketInstance, setSocketInstance] = useState(null);
 
     useEffect(() => {
         let cancelled = false;
@@ -39,7 +40,9 @@ export const useSocket = () => {
                         // Browser is sending auth automatically — but we can't extract the header
                         // So we prompt user for credentials to pass to socket.io
                     }
-                } catch (_) { }
+                } catch {
+                    // Ignore errors during auth check
+                }
 
                 // Prompt for credentials if not stored
                 const user = prompt('Dashboard Username:', 'admin');
@@ -68,6 +71,7 @@ export const useSocket = () => {
             });
 
             socketRef.current = socket;
+            if (!cancelled) setSocketInstance(socket);
 
             function formatLog(content) {
                 logIdRef.current += 1;
@@ -133,7 +137,7 @@ export const useSocket = () => {
     }, []);
 
     return {
-        socket: socketRef.current,
+        socket: socketInstance,
         isConnected,
         agents,
         tasks,
