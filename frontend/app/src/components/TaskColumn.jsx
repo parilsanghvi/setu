@@ -15,11 +15,20 @@ const TaskColumn = ({ status, items, onTaskClick }) => {
             <div className={styles.taskList}>
                 {items.length === 0 ? (
                     <div className={styles.emptyState}>
-                        {{
-                            TODO: 'No pending tasks',
-                            IN_PROGRESS: 'No active tasks',
-                            DONE: 'No completed tasks'
-                        }[status] || 'No tasks'}
+                        <span className={styles.emptyIcon} role="img" aria-hidden="true">
+                            {{
+                                TODO: '📝',
+                                IN_PROGRESS: '⏳',
+                                DONE: '✅'
+                            }[status] || '📋'}
+                        </span>
+                        <span>
+                            {{
+                                TODO: 'No pending tasks',
+                                IN_PROGRESS: 'No active tasks',
+                                DONE: 'No completed tasks'
+                            }[status] || 'No tasks'}
+                        </span>
                     </div>
                 ) : (
                     items.map(t => (
