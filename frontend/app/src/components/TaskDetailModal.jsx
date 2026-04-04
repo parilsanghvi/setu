@@ -36,7 +36,7 @@ const TaskDetailModal = ({ task, onClose }) => {
                             }
                         }}
                     >
-                        {isDeleting ? <Spinner size="1em" /> : '🗑️ Delete'}
+                        {isDeleting ? <Spinner size="1em" /> : <><span role="img" aria-hidden="true">🗑️</span> Delete</>}
                     </button>
                     {task.status === 'DONE' && (
                         <button
@@ -56,7 +56,7 @@ const TaskDetailModal = ({ task, onClose }) => {
                                 }
                             }}
                         >
-                            {isReverting ? <Spinner size="1em" /> : '↩️ Revert to TODO'}
+                            {isReverting ? <Spinner size="1em" /> : <><span role="img" aria-hidden="true">↩️</span> Revert to TODO</>}
                         </button>
                     )}
                 </div>

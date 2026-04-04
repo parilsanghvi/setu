@@ -16,13 +16,13 @@ const OnboardingStatus = ({ data }) => {
             aria-label={isComplete ? "Onboarding Complete" : "Onboarding Incomplete"}
         >
             <div className={styles.header}>
-                <span className={styles.icon} aria-hidden="true">{isComplete ? '✅' : '❌'}</span>
+                <span className={styles.icon} role="img" aria-hidden="true">{isComplete ? '✅' : '❌'}</span>
                 Onboarding: <span className={styles.percent}>{completeness}%</span>
             </div>
 
             {stale && (
                 <div className={styles.staleBadge}>
-                    <span className={styles.staleIcon}>⟳</span> Docs may be out of sync with latest commit
+                    <span className={styles.staleIcon} role="img" aria-hidden="true">⟳</span> Docs may be out of sync with latest commit
                 </div>
             )}
 
