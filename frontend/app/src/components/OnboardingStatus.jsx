@@ -22,7 +22,7 @@ const OnboardingStatus = ({ data }) => {
 
             {stale && (
                 <div className={styles.staleBadge}>
-                    <span className={styles.staleIcon}>⟳</span> Docs may be out of sync with latest commit
+                    <span className={styles.staleIcon} role="img" aria-hidden="true">⟳</span> Docs may be out of sync with latest commit
                 </div>
             )}
 

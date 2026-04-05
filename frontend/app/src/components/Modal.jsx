@@ -73,7 +73,7 @@ const Modal = ({ children, onClose, title = "Modal" }) => {
                     onClick={onClose}
                     aria-label="Close modal"
                 >
-                    ✕
+                    <span aria-hidden="true">✕</span>
                 </button>
             </div>
         </div>

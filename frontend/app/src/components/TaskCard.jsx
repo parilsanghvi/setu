@@ -39,7 +39,7 @@ const TaskCard = ({ task, onClick }) => {
 
             <div className={styles.taskFooter}>
                 <div className={styles.assignee}>
-                    <span className={styles.avatarIcon}>👤</span>
+                    <span className={styles.avatarIcon} role="img" aria-hidden="true">👤</span>
                     {task.assignee || 'Unassigned'}
                 </div>
                 <div className={styles.timeSince}>{getTimeSince(task.created_at)}</div>
