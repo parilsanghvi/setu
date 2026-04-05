@@ -37,7 +37,7 @@ async function main() {
     console.log(`Using profile: ${profileKey} (forced discovery)`);
 
     const crypto = require('crypto');
-    const { execSync } = require('child_process');
+    const { execFileSync } = require('child_process');
 
     // Only test the exact match from CLI logs now
     const variations = [
@@ -66,14 +66,14 @@ async function main() {
 
         console.log(`Testing with UA: ${ua}`);
 
-        const curlCmd = `curl -s -X POST "https://cloudcode-pa.googleapis.com/v1internal:generateContent" \\
-        -H "Authorization: Bearer ${profile.access}" \\
-        -H "Content-Type: application/json" \\
-        -H "User-Agent: ${ua}" \\
-        -d '${JSON.stringify(payload)}'`;
-
         try {
-            const output = execSync(curlCmd, { encoding: 'utf8', stdio: 'pipe' });
+            const output = execFileSync('curl', [
+                '-s', '-X', 'POST', 'https://cloudcode-pa.googleapis.com/v1internal:generateContent',
+                '-H', `Authorization: Bearer ${profile.access}`,
+                '-H', 'Content-Type: application/json',
+                '-H', `User-Agent: ${ua}`,
+                '-d', JSON.stringify(payload)
+            ], { encoding: 'utf8', stdio: 'pipe' });
             console.log(`[Project: ${v.project}] Result:`, output.substring(0, 150));
         } catch (e) {
             console.error('Curl failed:', e.message);
