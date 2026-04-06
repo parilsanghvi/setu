@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { io } from 'socket.io-client';
 import { updateLogs } from '../utils/logUtils';
 
@@ -22,10 +22,11 @@ export const useSocket = () => {
     const [tasks, setTasks] = useState([]);
     const [logs, setLogs] = useState([]);
     const logIdRef = useRef(0);
-    const socketRef = useRef(null);
+    const [socketInstance, setSocketInstance] = useState(null);
 
     useEffect(() => {
         let cancelled = false;
+        let socket = null;
 
         async function initSocket() {
             // Try to get stored credentials or prompt user
@@ -39,7 +40,9 @@ export const useSocket = () => {
                         // Browser is sending auth automatically — but we can't extract the header
                         // So we prompt user for credentials to pass to socket.io
                     }
-                } catch (_) { }
+                } catch {
+                    // Ignore catch parameter error
+                }
 
                 // Prompt for credentials if not stored
                 const user = prompt('Dashboard Username:', 'admin');
@@ -53,7 +56,7 @@ export const useSocket = () => {
 
             if (cancelled) return;
 
-            const socket = io({
+            socket = io({
                 autoConnect: true,
                 extraHeaders: {
                     authorization: `Basic ${authHeader}`
@@ -67,7 +70,7 @@ export const useSocket = () => {
                 }
             });
 
-            socketRef.current = socket;
+            setSocketInstance(socket);
 
             function formatLog(content) {
                 logIdRef.current += 1;
@@ -126,14 +129,14 @@ export const useSocket = () => {
 
         return () => {
             cancelled = true;
-            if (socketRef.current) {
-                socketRef.current.disconnect();
+            if (socket) {
+                socket.disconnect();
             }
         };
     }, []);
 
     return {
-        socket: socketRef.current,
+        socket: socketInstance,
         isConnected,
         agents,
         tasks,
