@@ -36,7 +36,7 @@ const TaskCreationModal = ({ isOpen, onClose, agents, logs }) => {
                 <div className={styles.header}>
                     <h2>Draft New Task</h2>
                     <button className={styles.closeButton} onClick={onClose} aria-label="Close task creation modal">
-                        &times;
+                        <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
                 <div className={styles.content}>
