@@ -22,7 +22,8 @@ const ScreenshotGallery = ({ taskId }) => {
         <div className={styles.gallery}>
             {images.map((img) => (
                 <a key={img} href={img} target="_blank" rel="noopener noreferrer" className={styles.imageLink}>
-                    <img src={img} className={styles.image} alt="Task Screenshot" />
+                    {/* ⚡ Bolt: Added lazy loading to off-screen gallery images to improve frontend performance and reduce browser memory usage */}
+                    <img src={img} className={styles.image} alt="Task Screenshot" loading="lazy" />
                 </a>
             ))}
         </div>
