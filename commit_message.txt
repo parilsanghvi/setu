@@ -1,0 +1,13 @@
+🎨 Palette: Improve accessibility of modal close buttons
+
+💡 What:
+Wrapped the visual close symbols ("✕" and "&times;") in `<span aria-hidden="true">` inside `Modal.jsx` and `TaskCreationModal.jsx`.
+
+🎯 Why:
+To prevent screen readers from reading out confusing or redundant character names (like "multiply") on top of the already-provided `aria-label`s ("Close modal" and "Close task creation modal").
+
+📸 Before/After:
+No visible UI changes. Semantic HTML improvements only.
+
+♿ Accessibility:
+Improves screen reader experience by hiding decorative icon characters from the accessibility tree when an explicit `aria-label` already exists.
