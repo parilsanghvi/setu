@@ -235,20 +235,29 @@ app.post('/api/agents/:name/redirect', (req, res) => {
 });
 
 // API: List Sessions (Time Travel)
-app.get('/api/sessions', (req, res) => {
+app.get('/api/sessions', async (req, res) => {
   const sessionDir = path.join(__dirname, 'logs/sessions');
-  if (!fs.existsSync(sessionDir)) return res.json([]);
 
   try {
-    const files = fs.readdirSync(sessionDir)
-      .filter(f => f.endsWith('.jsonl'))
-      .map(f => {
-        const stat = fs.statSync(path.join(sessionDir, f));
-        return { name: f, time: stat.mtime };
-      })
-      .sort((a, b) => b.time - a.time);
+    // Check if dir exists asynchronously
+    await fs.promises.access(sessionDir);
+  } catch {
+    return res.json([]);
+  }
 
-    res.json(files);
+  try {
+    // ⚡ Bolt: Convert synchronous readdirSync/statSync to async for non-blocking I/O
+    const fileNames = await fs.promises.readdir(sessionDir);
+    const jsonlFiles = fileNames.filter(f => f.endsWith('.jsonl'));
+
+    // ⚡ Bolt: Parallelize stat calls for better performance
+    const fileStats = await Promise.all(jsonlFiles.map(async f => {
+      const stat = await fs.promises.stat(path.join(sessionDir, f));
+      return { name: f, time: stat.mtime };
+    }));
+
+    const sortedFiles = fileStats.sort((a, b) => b.time - a.time);
+    res.json(sortedFiles);
   } catch (e) {
     res.status(500).json({ error: e.message });
   }
