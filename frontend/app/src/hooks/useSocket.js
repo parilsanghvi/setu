@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { io } from 'socket.io-client';
 import { updateLogs } from '../utils/logUtils';
 
@@ -39,7 +39,9 @@ export const useSocket = () => {
                         // Browser is sending auth automatically — but we can't extract the header
                         // So we prompt user for credentials to pass to socket.io
                     }
-                } catch (_) { }
+                } catch (err) {
+                    console.warn('Failed to auto-fetch credentials', err);
+                }
 
                 // Prompt for credentials if not stored
                 const user = prompt('Dashboard Username:', 'admin');
@@ -132,8 +134,13 @@ export const useSocket = () => {
         };
     }, []);
 
+    // React strictly forbids accessing ref.current during render.
+    // If the socket instance is required in the UI, we would need to store it in state instead.
+    // Given the current hooks design, returning the socket is an anti-pattern.
+    // However, to maintain the API surface and avoid breaking consumers, we return undefined.
+    // Any external component needing the socket should subscribe to its state or we should use useState.
+    // Better yet, remove `socket` from the return entirely if it's unused.
     return {
-        socket: socketRef.current,
         isConnected,
         agents,
         tasks,
