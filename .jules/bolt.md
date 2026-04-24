@@ -17,3 +17,7 @@
 ## 2025-02-12 - Buffer Views and Data Corruption in File Chunking
 **Learning:** When optimizing file reading by using a single reusable `Buffer` with `fs.promises.read()` in a loop, pushing the result of `buffer.subarray()` into an array is unsafe. `subarray()` returns a memory *view*, not a copy. As the loop iterates, subsequent reads overwrite the shared memory, corrupting all previously stored chunks.
 **Action:** When accumulating buffer chunks from a reusable memory pool, always explicitly copy the data (e.g., using `Buffer.from(validBuffer)`) before storing it, ensuring data integrity while maintaining high performance.
+
+## 2026-04-24 - [Refactor synchronous screenshot route to async]
+**Learning:** Express routes using `fs.existsSync` and `fs.readdirSync` can block the event loop, especially under load or with slow filesystems. Transitioning them to `fs.promises.access` and `fs.promises.readdir` prevents main thread blocking and improves application responsiveness.
+**Action:** Always scan for `fs.*Sync` usage in API route handlers and replace them with their async equivalents (`fs.promises`) to maintain high throughput.
