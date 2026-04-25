@@ -20,9 +20,9 @@ const ScreenshotGallery = ({ taskId }) => {
 
     return (
         <div className={styles.gallery}>
-            {images.map((img) => (
-                <a key={img} href={img} target="_blank" rel="noopener noreferrer" className={styles.imageLink}>
-                    <img src={img} className={styles.image} alt="Task Screenshot" loading="lazy" />
+            {images.map((img, index) => (
+                <a key={img} href={img} target="_blank" rel="noopener noreferrer" className={styles.imageLink} aria-label={`View screenshot ${index + 1} in new tab`}>
+                    <img src={img} className={styles.image} alt={`Task Screenshot ${index + 1}`} loading="lazy" />
                 </a>
             ))}
         </div>
