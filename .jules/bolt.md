@@ -17,3 +17,7 @@
 ## 2025-02-12 - Buffer Views and Data Corruption in File Chunking
 **Learning:** When optimizing file reading by using a single reusable `Buffer` with `fs.promises.read()` in a loop, pushing the result of `buffer.subarray()` into an array is unsafe. `subarray()` returns a memory *view*, not a copy. As the loop iterates, subsequent reads overwrite the shared memory, corrupting all previously stored chunks.
 **Action:** When accumulating buffer chunks from a reusable memory pool, always explicitly copy the data (e.g., using `Buffer.from(validBuffer)`) before storing it, ensuring data integrity while maintaining high performance.
+
+## 2026-04-25 - Cache prepared statements for active agent and pending task stats
+**Learning:** Extracting complex queries that use the `count(*)` function to `db.js` where prepared statements are explicitly cached using `this._stmt` prevents heavy synchronous recompilation during API calls, thus reducing query latency for common dashboard statistics like active agents and pending tasks.
+**Action:** When implementing repeating API endpoints that frequently hit the database (like `/api/stats`, `/api/tasks`, `/api/agents`), always use the `_stmt` cache inside `Bus` and expose wrapper methods like `getStats()` to prevent recreating `prepare()` queries on every client render.
