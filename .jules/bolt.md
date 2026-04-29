@@ -17,3 +17,7 @@
 ## 2025-02-12 - Buffer Views and Data Corruption in File Chunking
 **Learning:** When optimizing file reading by using a single reusable `Buffer` with `fs.promises.read()` in a loop, pushing the result of `buffer.subarray()` into an array is unsafe. `subarray()` returns a memory *view*, not a copy. As the loop iterates, subsequent reads overwrite the shared memory, corrupting all previously stored chunks.
 **Action:** When accumulating buffer chunks from a reusable memory pool, always explicitly copy the data (e.g., using `Buffer.from(validBuffer)`) before storing it, ensuring data integrity while maintaining high performance.
+
+## 2026-04-29 - Parallelize I/O bounds in Screenshot APIs
+**Learning:** In the `/api/tasks/:id/screenshots` express handler, synchronous filesystem operations like `fs.readdirSync` and `fs.existsSync` block the main Node.js event loop. Under heavy load, this significantly degrades performance.
+**Action:** Use `fs.promises` equivalent methods (`fs.promises.readdir` and `fs.promises.access`) to move file I/O out of the main thread, greatly increasing throughput for disk-heavy API endpoints.

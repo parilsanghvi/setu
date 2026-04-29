@@ -143,7 +143,7 @@ app.post('/api/tasks', (req, res) => {
 });
 
 // API: Get Screenshots for Task
-app.get('/api/tasks/:id/screenshots', (req, res) => {
+app.get('/api/tasks/:id/screenshots', async (req, res) => {
   const taskId = req.params.id;
 
   // Security: Validate taskId to prevent Path Traversal
@@ -161,13 +161,18 @@ app.get('/api/tasks/:id/screenshots', (req, res) => {
     return res.status(403).json({ error: 'Access denied' });
   }
 
-  if (!fs.existsSync(resolvedPath)) {
+  try {
+    await fs.promises.access(resolvedPath);
+  } catch {
     return res.json([]);
   }
 
   try {
-    const files = fs.readdirSync(resolvedPath).filter(f => f.endsWith('.png'));
-    const urls = files.map(f => `/screenshots/${taskId}/${f}`);
+    // ⚡ Bolt: Use asynchronous fs.promises.readdir to prevent blocking the Node.js event loop
+    // 📊 Impact: Increases concurrency and throughput for disk-heavy API requests
+    const files = await fs.promises.readdir(resolvedPath);
+    const pngFiles = files.filter(f => f.endsWith('.png'));
+    const urls = pngFiles.map(f => `/screenshots/${taskId}/${f}`);
     res.json(urls);
   } catch (e) {
     res.status(500).json({ error: e.message });
