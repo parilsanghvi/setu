@@ -17,3 +17,6 @@
 ## 2025-02-12 - Buffer Views and Data Corruption in File Chunking
 **Learning:** When optimizing file reading by using a single reusable `Buffer` with `fs.promises.read()` in a loop, pushing the result of `buffer.subarray()` into an array is unsafe. `subarray()` returns a memory *view*, not a copy. As the loop iterates, subsequent reads overwrite the shared memory, corrupting all previously stored chunks.
 **Action:** When accumulating buffer chunks from a reusable memory pool, always explicitly copy the data (e.g., using `Buffer.from(validBuffer)`) before storing it, ensuring data integrity while maintaining high performance.
+## 2026-04-30 - Replace Synchronous File Existence Checks with Async Try-Catch
+**Learning:** Found an anti-pattern where routes used `fs.existsSync` combined with `fs.readdirSync`. This blocks the main event loop and creates a Time-of-Check to Time-of-Use (TOCTOU) race condition. Removing the `existsSync` entirely and handling the `ENOENT` error from `fs.promises.readdir` is both faster and safer.
+**Action:** Always prefer asynchronous file operations wrapped in `try/catch` and checking `error.code === 'ENOENT'` instead of using `fs.existsSync` before operating on a path.
