@@ -16,6 +16,16 @@
     text-align: center;
     margin-bottom: 0.5rem;
     color: #6b7280; // text-gray-500
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.taskCount {
+    font-weight: 500;
+    font-size: 0.7rem;
+    color: #9ca3af; // text-gray-400
 }
 
 .taskList {

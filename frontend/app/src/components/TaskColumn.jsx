@@ -11,6 +11,9 @@ const TaskColumn = ({ status, items, onTaskClick }) => {
                     IN_PROGRESS: 'In Progress',
                     DONE: 'Done'
                 }[status] || status}
+                <span className={styles.taskCount} aria-label={`${items.length} tasks`}>
+                    ({items.length})
+                </span>
             </div>
             <div className={styles.taskList}>
                 {items.length === 0 ? (

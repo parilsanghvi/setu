@@ -18,8 +18,9 @@ const ChatBox = ({ agents, logs, prefillTaskText }) => {
 
         // ⚡ Bolt: Replaced O(N²) reallocation inside `.reduce()` with a single-pass O(N) loop
         // using a Set to track active typing states. This prevents severe UI jank as chat history grows.
-        const messages = [];
-        const typingAgents = new Set();
+        const chatHistory = useMemo(() => {
+            const messages = [];
+            const typingAgents = new Set();
 
         for (let i = 0; i < logs.length; i++) {
             const l = logs[i];
@@ -52,17 +53,17 @@ const ChatBox = ({ agents, logs, prefillTaskText }) => {
             }
         }
 
-        for (const agent of typingAgents) {
-            messages.push({
-                id: `typing-${agent}`,
-                isAgent: true,
-                sender: agent,
-                isTyping: true
-            });
-        }
+            for (const agent of typingAgents) {
+                messages.push({
+                    id: `typing-${agent}`,
+                    isAgent: true,
+                    sender: agent,
+                    isTyping: true
+                });
+            }
 
-        return messages;
-    }, [logs]);
+            return messages;
+        }, [logs]);
 
     useEffect(() => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
