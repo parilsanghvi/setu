@@ -15,12 +15,11 @@ try {
     assert(Array.isArray(tasks), 'Tasks should be an array');
 
     // 3. Test Stats (GUI specific)
-    const activeAgents = db.db.prepare('SELECT count(*) as count FROM agents WHERE status != "OFFLINE"').get();
-    const pendingTasks = db.db.prepare('SELECT count(*) as count FROM tasks WHERE status != "DONE"').get();
+    const stats = db.getStats();
 
-    console.log(`✅ Stats: Active Agents=${activeAgents.count}, Pending Tasks=${pendingTasks.count}`);
-    assert(typeof activeAgents.count === 'number', 'Active agents count should be a number');
-    assert(typeof pendingTasks.count === 'number', 'Pending tasks count should be a number');
+    console.log(`✅ Stats: Active Agents=${stats.activeAgents}, Pending Tasks=${stats.pendingTasks}`);
+    assert(typeof stats.activeAgents === 'number', 'Active agents count should be a number');
+    assert(typeof stats.pendingTasks === 'number', 'Pending tasks count should be a number');
 
     console.log('🎉 All Dashboard Data Tests Passed!');
     process.exit(0);
