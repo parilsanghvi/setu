@@ -12,7 +12,7 @@ const TaskColumn = ({ status, items, onTaskClick }) => {
                     DONE: 'Done'
                 }[status] || status}
             </div>
-            <div className={styles.taskList}>
+            <div className={styles.taskList} aria-live="polite">
                 {items.length === 0 ? (
                     <div className={styles.emptyState}>
                         {{
