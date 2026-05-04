@@ -23,15 +23,13 @@ const MOCK_TASKS = [
 
 // Mock Implementation for lib/db
 const mockDb = {
+    getStats: () => ({
+        activeAgents: MOCK_AGENTS.filter(a => a.status !== 'OFFLINE').length,
+        pendingTasks: MOCK_TASKS.filter(t => t.status !== 'DONE').length
+    }),
     db: {
         prepare: (sql) => {
             // Simple SQL parsing for mock behavior
-            if (sql.includes("count(*) as count FROM agents")) {
-                return { get: () => ({ count: MOCK_AGENTS.filter(a => a.status !== 'OFFLINE').length }) };
-            }
-            if (sql.includes("count(*) as count FROM tasks")) {
-                return { get: () => ({ count: MOCK_TASKS.filter(t => t.status !== 'DONE').length }) };
-            }
             if (sql.includes('FROM tasks')) {
                 return { all: () => MOCK_TASKS };
             }
