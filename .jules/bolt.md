@@ -17,3 +17,7 @@
 ## 2025-02-12 - Buffer Views and Data Corruption in File Chunking
 **Learning:** When optimizing file reading by using a single reusable `Buffer` with `fs.promises.read()` in a loop, pushing the result of `buffer.subarray()` into an array is unsafe. `subarray()` returns a memory *view*, not a copy. As the loop iterates, subsequent reads overwrite the shared memory, corrupting all previously stored chunks.
 **Action:** When accumulating buffer chunks from a reusable memory pool, always explicitly copy the data (e.g., using `Buffer.from(validBuffer)`) before storing it, ensuring data integrity while maintaining high performance.
+
+## 2026-06-25 - Avoid TOCTOU and Sync Filesystem Checks in API Routes
+**Learning:** Using synchronous `fs.existsSync` followed by `fs.readdirSync` in Express API routes blocks the main event loop and creates a Time-Of-Check to Time-Of-Use (TOCTOU) race condition. Doing this on every request degrades application scalability.
+**Action:** Replace `fs.existsSync` and `fs.readdirSync` with a direct call to `await fs.promises.readdir(path)`. Handle the file absence gracefully by wrapping it in a `try...catch` and checking for `e.code === 'ENOENT'` to return a fallback response.
