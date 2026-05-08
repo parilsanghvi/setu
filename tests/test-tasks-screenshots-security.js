@@ -35,6 +35,19 @@ fs.readdirSync = (p) => {
     return originalReaddirSync(p);
 };
 
+const originalPromisesReaddir = fs.promises?.readdir;
+fs.promises.readdir = async (p) => {
+    if (typeof p === 'string' && p.includes('screenshots')) {
+        if (p.endsWith(VALID_TASK_ID)) return ['screenshot1.png', 'screenshot2.png', 'ignore.txt'];
+        if (p.endsWith(EMPTY_TASK_ID)) return [];
+        // Simulate ENOENT if directory doesn't exist
+        const err = new Error(`ENOENT: no such file or directory, scandir '${p}'`);
+        err.code = 'ENOENT';
+        throw err;
+    }
+    return originalPromisesReaddir(p);
+};
+
 fs.watchFile = (filename, options, listener) => {
     // No-op to prevent hanging
     if (filename.endsWith('setu.log')) return;
@@ -157,6 +170,9 @@ test('Security: /api/tasks/:id/screenshots Path Traversal Protection', async (t)
     // Restore
     fs.existsSync = originalExistsSync;
     fs.readdirSync = originalReaddirSync;
+    if (fs.promises) {
+        fs.promises.readdir = originalPromisesReaddir;
+    }
     fs.watchFile = originalWatchFile;
     global.setInterval = originalSetInterval;
     delete process.env.DASHBOARD_PASS;
