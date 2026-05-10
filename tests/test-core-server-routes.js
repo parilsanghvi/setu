@@ -28,11 +28,12 @@ const mocks = {
     './db': {
         db: {
             prepare: (sql) => {
-                if (sql.includes('agents')) return { all: () => [{ name: 'Agent1' }], get: () => ({ count: 1 }) };
-                if (sql.includes('tasks')) return { all: () => [{ id: 'TASK-1' }], get: () => ({ count: 1 }) };
+                if (sql.includes('agents')) return { all: () => [{ name: 'Agent1' }] };
+                if (sql.includes('tasks')) return { all: () => [{ id: 'TASK-1' }] };
                 return { all: () => [], get: () => ({}) }
             }
         },
+        getStats: () => ({ activeAgents: 1, pendingTasks: 1 }),
         updateTask: (id, status, meta) => { lastTaskEmitted = { id, status, meta }; },
         send: (sender, recipient, message, type) => { lastMessageEmitted = { sender, recipient, message, type }; }
     }
