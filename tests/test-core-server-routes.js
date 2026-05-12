@@ -26,6 +26,10 @@ const mocks = {
     },
     './Logger': class MockLogger { info() { } error() { } warn() { } },
     './db': {
+        getStats: () => ({
+            activeAgents: 1,
+            pendingTasks: 1
+        }),
         db: {
             prepare: (sql) => {
                 if (sql.includes('agents')) return { all: () => [{ name: 'Agent1' }], get: () => ({ count: 1 }) };

@@ -17,3 +17,7 @@
 ## 2025-02-12 - Buffer Views and Data Corruption in File Chunking
 **Learning:** When optimizing file reading by using a single reusable `Buffer` with `fs.promises.read()` in a loop, pushing the result of `buffer.subarray()` into an array is unsafe. `subarray()` returns a memory *view*, not a copy. As the loop iterates, subsequent reads overwrite the shared memory, corrupting all previously stored chunks.
 **Action:** When accumulating buffer chunks from a reusable memory pool, always explicitly copy the data (e.g., using `Buffer.from(validBuffer)`) before storing it, ensuring data integrity while maintaining high performance.
+
+## 2026-05-12 - Recompile overhead in frequent SQLite API routes
+**Learning:** Recompiling SQLite prepared statements (like `db.prepare("SELECT count(*) ...").get()`) on every request to frequently accessed endpoints (e.g., `/api/stats`) introduces unnecessary overhead.
+**Action:** Use the `this._stmt(key, sql)` pattern to cache prepared statements within the database layer instead of calling `db.prepare()` directly on each request.

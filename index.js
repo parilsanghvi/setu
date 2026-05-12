@@ -75,11 +75,10 @@ app.get('/api/onboarding', (req, res) => {
 // API: Stats
 app.get('/api/stats', (req, res) => {
   try {
-    const agents = bus.db.prepare("SELECT count(*) as count FROM agents WHERE status != 'OFFLINE'").get();
-    const tasks = bus.db.prepare("SELECT count(*) as count FROM tasks WHERE status != 'DONE'").get();
+    const stats = bus.getStats();
     res.json({
-      activeAgents: agents.count,
-      pendingTasks: tasks.count,
+      activeAgents: stats.activeAgents,
+      pendingTasks: stats.pendingTasks,
       uptime: process.uptime()
     });
   } catch (e) {
