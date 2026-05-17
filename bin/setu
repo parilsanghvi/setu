@@ -193,11 +193,7 @@ switch (cmd) {
   case 'adopt':
   case 'init':
     log(`⚠️ WARNING: "setu ${cmd}" is deprecated. Please use "setu onboarding run" instead.`);
-    const adoptLegacy = spawn('node', [path.join(__dirname, 'setu-init.js')], {
-      cwd: process.cwd(),
-      stdio: 'inherit'
-    });
-    adoptLegacy.on('exit', (code) => process.exit(code));
+    process.exit(1);
     break;
 
   case 'onboarding':
