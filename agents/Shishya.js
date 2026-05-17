@@ -33,7 +33,7 @@ class Shishya extends CoreAgent {
         this.status = 'PLANNING';
 
         const plan = await this.generatePlan(objective);
-        this.writePlan(plan);
+        await this.writePlan(plan);
 
         this.speak(this.leadRole, `PROPOSAL: ${objective}. I have drafted a PLAN.md in ${this.scope}. Please review.`, 'proposal', {
             taskId,
@@ -53,12 +53,14 @@ class Shishya extends CoreAgent {
         return await LLM.generate("System: You are a productive junior engineer/student.", prompt);
     }
 
-    writePlan(content) {
-        if (!fs.existsSync(this.scope)) {
-            fs.mkdirSync(this.scope, { recursive: true });
+    async writePlan(content) {
+        try {
+            await fs.promises.access(this.scope);
+        } catch {
+            await fs.promises.mkdir(this.scope, { recursive: true });
         }
         const planPath = path.join(this.scope, 'PLAN.md');
-        fs.writeFileSync(planPath, content);
+        await fs.promises.writeFile(planPath, content);
         console.log(`[${this.name}] 📝 PLAN.md written to ${planPath}`);
     }
 
