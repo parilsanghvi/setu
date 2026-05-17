@@ -129,8 +129,6 @@ The main execution flow of this file is as follows:
 | `deleteTask` | `lib/routes.js` | [Doc](./routes.js.md) |
 | `send` | `lib/routes.js` | [Doc](./routes.js.md) |
 | `updateTask` | `lib/routes.js` | [Doc](./routes.js.md) |
-| `send` | `lib/routes/api.js` | [Doc](./routes/api.js.md) |
-| `updateTask` | `lib/routes/api.js` | [Doc](./routes/api.js.md) |
 | `if` | `lib/server.js` | [Doc](./server.js.md) |
 | `if` | `scripts/ignite.js` | [Doc](../scripts/ignite.js.md) |
 | `send` | `scripts/ignite.js` | [Doc](../scripts/ignite.js.md) |

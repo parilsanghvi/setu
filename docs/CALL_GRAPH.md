@@ -85,7 +85,6 @@ graph LR
         lib_onboarding_paths_js["paths.js"]
         lib_onboarding_status_js["status.js"]
         lib_routes_js["routes.js"]
-        lib_routes_api_js["api.js"]
         lib_server_js["server.js"]
         lib_socket_js["socket.js"]
         lib_sockets_dashboard_js["dashboard.js"]
@@ -207,11 +206,6 @@ graph LR
     lib_onboarding_drift_js --> lib_onboarding_status_js
     lib_onboarding_generator_js --> lib_onboarding_status_js
     lib_onboarding_governance_profiles_js --> lib_onboarding_paths_js
-    lib_routes_api_js --> lib_db_js
-    lib_routes_api_js --> lib_onboarding_governance_profiles_js
-    lib_routes_api_js --> lib_onboarding_paths_js
-    lib_routes_api_js --> lib_onboarding_status_js
-    lib_routes_api_js --> lib_utils_js
     lib_routes_js --> lib_db_js
     lib_routes_js --> lib_middleware_auth_js
     lib_routes_js --> lib_onboarding_governance_profiles_js
