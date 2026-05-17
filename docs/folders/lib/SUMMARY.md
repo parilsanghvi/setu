@@ -50,7 +50,6 @@ Likely: Utilizes modular design patterns such as encapsulation and abstraction t
 - [middleware/](./middleware/SUMMARY.md)
 - [models/](./models/SUMMARY.md)
 - [onboarding/](./onboarding/SUMMARY.md)
-- [routes/](./routes/SUMMARY.md)
 - [sockets/](./sockets/SUMMARY.md)
 - [utils/](./utils/SUMMARY.md)
 - [Agent.js](../../files/lib/Agent.js.md)
