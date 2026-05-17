@@ -39,5 +39,5 @@ Note: There is only one side effect mentioned in the code, which is env_access.
 No known dependents.
 
 ## Cross-References
-- [basic.js](../lib/auth/basic.js.md)
-- [socketAuth.js](../lib/middleware/socketAuth.js.md)
+- [basic.js](../auth/basic.js.md)
+- [socketAuth.js](socketAuth.js.md)
