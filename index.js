@@ -76,11 +76,11 @@ app.get('/api/onboarding', (req, res) => {
 // API: Stats
 app.get('/api/stats', (req, res) => {
   try {
-    const agents = bus.db.prepare("SELECT count(*) as count FROM agents WHERE status != 'OFFLINE'").get();
-    const tasks = bus.db.prepare("SELECT count(*) as count FROM tasks WHERE status != 'DONE'").get();
+    // ⚡ Bolt: Use cached prepared statements via bus.getStats()
+    const stats = bus.getStats();
     res.json({
-      activeAgents: agents.count,
-      pendingTasks: tasks.count,
+      activeAgents: stats.activeAgents,
+      pendingTasks: stats.pendingTasks,
       uptime: process.uptime()
     });
   } catch (e) {
@@ -92,6 +92,7 @@ app.get('/api/stats', (req, res) => {
 // API: Tasks
 app.get('/api/tasks', (req, res) => {
   try {
+    // ⚡ Bolt: Use cached prepared statements via bus.getTasks()
     const tasks = bus.getTasks();
     res.json(tasks);
   } catch (e) {
@@ -103,6 +104,7 @@ app.get('/api/tasks', (req, res) => {
 // API: Agents
 app.get('/api/agents', (req, res) => {
   try {
+    // ⚡ Bolt: Use cached prepared statements via bus.getAgents()
     const agents = bus.getAgents();
     res.json(agents);
   } catch (e) {
@@ -521,6 +523,7 @@ io.on('connection', (socket) => {
   log(`🔌 Client connected: ${socket.id}`);
 
   // Send initial state
+  // ⚡ Bolt: Use cached prepared statements via bus methods
   const agents = bus.getAgents();
   socket.emit('agents_update', agents);
 

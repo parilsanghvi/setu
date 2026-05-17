@@ -23,6 +23,12 @@ const MOCK_TASKS = [
 
 // Mock Implementation for lib/db
 const mockDb = {
+    getStats: () => ({
+        activeAgents: MOCK_AGENTS.filter(a => a.status !== 'OFFLINE').length,
+        pendingTasks: MOCK_TASKS.filter(t => t.status !== 'DONE').length
+    }),
+    getTasks: () => MOCK_TASKS,
+    getAgents: () => MOCK_AGENTS,
     db: {
         prepare: (sql) => {
             // Simple SQL parsing for mock behavior
