@@ -15,13 +15,17 @@ fs.writeFileSync(TEST_FILE, fileContent);
 
 const app = express();
 
-app.get('/sync', (req, res) => {
-  const content = fs.readFileSync(TEST_FILE, 'utf8');
-  const lines = content.split('\n').filter(Boolean);
-  const data = lines.map(l => {
-    try { return JSON.parse(l); } catch(e) { return null; }
-  });
-  res.json({ count: data.length });
+app.get('/sync', async (req, res) => {
+  try {
+    const content = await fs.promises.readFile(TEST_FILE, 'utf8');
+    const lines = content.split('\n').filter(Boolean);
+    const data = lines.map(l => {
+      try { return JSON.parse(l); } catch(e) { return null; }
+    });
+    res.json({ count: data.length });
+  } catch(e) {
+    res.status(500).json({ error: e.message });
+  }
 });
 
 app.get('/async', async (req, res) => {

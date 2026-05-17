@@ -17,3 +17,7 @@
 ## 2025-02-12 - Buffer Views and Data Corruption in File Chunking
 **Learning:** When optimizing file reading by using a single reusable `Buffer` with `fs.promises.read()` in a loop, pushing the result of `buffer.subarray()` into an array is unsafe. `subarray()` returns a memory *view*, not a copy. As the loop iterates, subsequent reads overwrite the shared memory, corrupting all previously stored chunks.
 **Action:** When accumulating buffer chunks from a reusable memory pool, always explicitly copy the data (e.g., using `Buffer.from(validBuffer)`) before storing it, ensuring data integrity while maintaining high performance.
+
+## 2024-05-24 - Async Route Handlers for File I/O
+**Learning:** Using synchronous file I/O functions like `fs.readFileSync` in Express route handlers blocks the Node.js event loop, delaying all other concurrent requests.
+**Action:** Always use asynchronous methods like `fs.promises.readFile` combined with `async`/`await` in route handlers. Remember to wrap the async logic in a `try...catch` block to handle errors gracefully and avoid unhandled promise rejections that could crash the server.
