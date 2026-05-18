@@ -7,6 +7,8 @@ const path = require('path');
 // Mock fs methods BEFORE requiring the server
 const originalExistsSync = fs.existsSync;
 const originalReaddirSync = fs.readdirSync;
+const originalPromisesAccess = fs.promises.access;
+const originalPromisesReaddir = fs.promises.readdir;
 const originalWatchFile = fs.watchFile;
 const originalSetInterval = global.setInterval;
 
@@ -14,25 +16,26 @@ const VALID_TASK_ID = 'TASK-VALID';
 const EMPTY_TASK_ID = 'TASK-EMPTY';
 
 // Mock Implementation
-fs.existsSync = (p) => {
-    // Only mock calls related to screenshots directory
+fs.promises.access = async (p) => {
     if (typeof p === 'string' && p.includes('screenshots')) {
-        // Simulate existence based on Task ID
-        if (p.endsWith(VALID_TASK_ID)) return true;
-        if (p.endsWith(EMPTY_TASK_ID)) return true; // Exists but empty
-        // Any traversal attempt that bypasses regex (unlikely) or just random ID
-        return false;
+        if (p.endsWith(VALID_TASK_ID)) return;
+        if (p.endsWith(EMPTY_TASK_ID)) return;
+        const err = new Error('ENOENT');
+        err.code = 'ENOENT';
+        throw err;
     }
-    return originalExistsSync(p);
+    if (originalPromisesAccess) return originalPromisesAccess(p);
+    return;
 };
 
-fs.readdirSync = (p) => {
+fs.promises.readdir = async (p) => {
     if (typeof p === 'string' && p.includes('screenshots')) {
         if (p.endsWith(VALID_TASK_ID)) return ['screenshot1.png', 'screenshot2.png', 'ignore.txt'];
         if (p.endsWith(EMPTY_TASK_ID)) return [];
-        return []; // Should not happen if existsSync is false, but good for safety
+        return [];
     }
-    return originalReaddirSync(p);
+    if (originalPromisesReaddir) return originalPromisesReaddir(p);
+    return [];
 };
 
 fs.watchFile = (filename, options, listener) => {
@@ -155,8 +158,8 @@ test('Security: /api/tasks/:id/screenshots Path Traversal Protection', async (t)
     server.server.close();
 
     // Restore
-    fs.existsSync = originalExistsSync;
-    fs.readdirSync = originalReaddirSync;
+    fs.promises.access = originalPromisesAccess;
+    fs.promises.readdir = originalPromisesReaddir;
     fs.watchFile = originalWatchFile;
     global.setInterval = originalSetInterval;
     delete process.env.DASHBOARD_PASS;
