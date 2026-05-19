@@ -9,6 +9,7 @@ const originalExistsSync = fs.existsSync;
 const originalReaddirSync = fs.readdirSync;
 const originalWatchFile = fs.watchFile;
 const originalSetInterval = global.setInterval;
+const originalPromisesReaddir = fs.promises.readdir;
 
 const VALID_TASK_ID = 'TASK-VALID';
 const EMPTY_TASK_ID = 'TASK-EMPTY';
@@ -33,6 +34,18 @@ fs.readdirSync = (p) => {
         return []; // Should not happen if existsSync is false, but good for safety
     }
     return originalReaddirSync(p);
+};
+
+fs.promises.readdir = async (p) => {
+    if (typeof p === 'string' && p.includes('screenshots')) {
+        if (p.endsWith(VALID_TASK_ID)) return ['screenshot1.png', 'screenshot2.png', 'ignore.txt'];
+        if (p.endsWith(EMPTY_TASK_ID)) return [];
+
+        const err = new Error(`ENOENT: no such file or directory, scandir '${p}'`);
+        err.code = 'ENOENT';
+        throw err;
+    }
+    return originalPromisesReaddir(p);
 };
 
 fs.watchFile = (filename, options, listener) => {
@@ -157,6 +170,7 @@ test('Security: /api/tasks/:id/screenshots Path Traversal Protection', async (t)
     // Restore
     fs.existsSync = originalExistsSync;
     fs.readdirSync = originalReaddirSync;
+    fs.promises.readdir = originalPromisesReaddir;
     fs.watchFile = originalWatchFile;
     global.setInterval = originalSetInterval;
     delete process.env.DASHBOARD_PASS;
