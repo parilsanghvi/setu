@@ -7,6 +7,8 @@ const path = require('path');
 // Mock fs methods BEFORE requiring the server
 const originalExistsSync = fs.existsSync;
 const originalReaddirSync = fs.readdirSync;
+const originalPromisesAccess = fs.promises.access;
+const originalPromisesReaddir = fs.promises.readdir;
 const originalWatchFile = fs.watchFile;
 const originalSetInterval = global.setInterval;
 
@@ -33,6 +35,27 @@ fs.readdirSync = (p) => {
         return []; // Should not happen if existsSync is false, but good for safety
     }
     return originalReaddirSync(p);
+};
+
+fs.promises.access = async (p) => {
+    if (typeof p === 'string' && p.includes('screenshots')) {
+        if (p.endsWith(VALID_TASK_ID) || p.endsWith(EMPTY_TASK_ID)) {
+            return; // Resolves if exists
+        }
+        const err = new Error('ENOENT');
+        err.code = 'ENOENT';
+        throw err;
+    }
+    return originalPromisesAccess(p);
+};
+
+fs.promises.readdir = async (p) => {
+    if (typeof p === 'string' && p.includes('screenshots')) {
+        if (p.endsWith(VALID_TASK_ID)) return ['screenshot1.png', 'screenshot2.png', 'ignore.txt'];
+        if (p.endsWith(EMPTY_TASK_ID)) return [];
+        return [];
+    }
+    return originalPromisesReaddir(p);
 };
 
 fs.watchFile = (filename, options, listener) => {
@@ -157,6 +180,8 @@ test('Security: /api/tasks/:id/screenshots Path Traversal Protection', async (t)
     // Restore
     fs.existsSync = originalExistsSync;
     fs.readdirSync = originalReaddirSync;
+    fs.promises.access = originalPromisesAccess;
+    fs.promises.readdir = originalPromisesReaddir;
     fs.watchFile = originalWatchFile;
     global.setInterval = originalSetInterval;
     delete process.env.DASHBOARD_PASS;
