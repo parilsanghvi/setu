@@ -6,6 +6,7 @@ import LogViewer from './components/LogViewer';
 import ChatBox from './components/ChatBox';
 import OnboardingStatus from './components/OnboardingStatus';
 import TaskCreationModal from './components/TaskCreationModal';
+import Spinner from './components/Spinner';
 import styles from './App.module.scss';
 import './index.scss';
 
@@ -63,9 +64,10 @@ const App = () => {
             onClick={handleGitCommit}
             disabled={isCommitting}
             className={styles.commitButton}
-            aria-label="Commit to Git"
+            aria-label={isCommitting ? "Committing to Git" : "Commit to Git"}
+            aria-busy={isCommitting}
           >
-            {isCommitting ? 'Committing...' : 'Commit to Git'}
+            {isCommitting ? <><Spinner size="1em" /> Committing...</> : 'Commit to Git'}
           </button>
           <div className={styles.stats}>
             {activeAgentsCount} <span className={styles.statsLabel}>Active Agents</span>
