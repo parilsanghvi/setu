@@ -46,6 +46,12 @@ const mockDb = {
             };
         }
     },
+    getStats: () => ({
+        activeAgents: MOCK_AGENTS.filter(a => a.status !== 'OFFLINE').length,
+        pendingTasks: MOCK_TASKS.filter(t => t.status !== 'DONE').length
+    }),
+    getTasks: () => MOCK_TASKS,
+    getAgents: () => MOCK_AGENTS,
     updateTask: (id, status, meta) => {
         // console.log('Mock updateTask called:', id, status, meta);
     },
