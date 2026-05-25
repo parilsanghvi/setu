@@ -17,3 +17,7 @@
 ## 2025-02-12 - Buffer Views and Data Corruption in File Chunking
 **Learning:** When optimizing file reading by using a single reusable `Buffer` with `fs.promises.read()` in a loop, pushing the result of `buffer.subarray()` into an array is unsafe. `subarray()` returns a memory *view*, not a copy. As the loop iterates, subsequent reads overwrite the shared memory, corrupting all previously stored chunks.
 **Action:** When accumulating buffer chunks from a reusable memory pool, always explicitly copy the data (e.g., using `Buffer.from(validBuffer)`) before storing it, ensuring data integrity while maintaining high performance.
+
+## 2024-05-25 - Mocking fs.promises requires precise Native Error simulation
+**Learning:** When writing tests that mock asynchronous methods like `fs.promises.readdir`, simple exception throwing (e.g., `throw new Error('not found')`) can cause routing logic that specifically checks native Node.js error codes (like `if (e.code === 'ENOENT')`) to fail unexpectedly.
+**Action:** Always instantiate an explicit `Error` object and manually attach the `.code = 'ENOENT'` property before throwing it inside the mocked `fs.promises` function to perfectly mimic Node's native error structure.

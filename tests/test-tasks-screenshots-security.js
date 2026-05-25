@@ -7,6 +7,8 @@ const path = require('path');
 // Mock fs methods BEFORE requiring the server
 const originalExistsSync = fs.existsSync;
 const originalReaddirSync = fs.readdirSync;
+const originalAccess = fs.promises.access;
+const originalReaddir = fs.promises.readdir;
 const originalWatchFile = fs.watchFile;
 const originalSetInterval = global.setInterval;
 
@@ -14,6 +16,17 @@ const VALID_TASK_ID = 'TASK-VALID';
 const EMPTY_TASK_ID = 'TASK-EMPTY';
 
 // Mock Implementation
+fs.promises.access = async (p) => {
+    if (typeof p === 'string' && p.includes('screenshots')) {
+        if (p.endsWith(VALID_TASK_ID)) return;
+        if (p.endsWith(EMPTY_TASK_ID)) return;
+        const err = new Error('ENOENT: no such file or directory');
+        err.code = 'ENOENT';
+        throw err;
+    }
+    return originalAccess(p);
+};
+
 fs.existsSync = (p) => {
     // Only mock calls related to screenshots directory
     if (typeof p === 'string' && p.includes('screenshots')) {
@@ -24,6 +37,21 @@ fs.existsSync = (p) => {
         return false;
     }
     return originalExistsSync(p);
+};
+
+fs.promises.readdir = async (p) => {
+    if (typeof p === 'string' && p.includes('screenshots')) {
+        if (p.endsWith(VALID_TASK_ID)) {
+            return ['screenshot1.png', 'screenshot2.png', 'not-a-png.txt'];
+        }
+        if (p.endsWith(EMPTY_TASK_ID)) {
+            return [];
+        }
+        const err = new Error('ENOENT: no such file or directory');
+        err.code = 'ENOENT';
+        throw err;
+    }
+    return originalReaddir(p);
 };
 
 fs.readdirSync = (p) => {
