@@ -143,7 +143,7 @@ app.post('/api/tasks', (req, res) => {
 });
 
 // API: Get Screenshots for Task
-app.get('/api/tasks/:id/screenshots', (req, res) => {
+app.get('/api/tasks/:id/screenshots', async (req, res) => {
   const taskId = req.params.id;
 
   // Security: Validate taskId to prevent Path Traversal
@@ -161,15 +161,15 @@ app.get('/api/tasks/:id/screenshots', (req, res) => {
     return res.status(403).json({ error: 'Access denied' });
   }
 
-  if (!fs.existsSync(resolvedPath)) {
-    return res.json([]);
-  }
-
   try {
-    const files = fs.readdirSync(resolvedPath).filter(f => f.endsWith('.png'));
-    const urls = files.map(f => `/screenshots/${taskId}/${f}`);
+    // ⚡ Bolt: Use asynchronous readdir to avoid blocking the event loop
+    const files = await fs.promises.readdir(resolvedPath);
+    const urls = files.filter(f => f.endsWith('.png')).map(f => `/screenshots/${taskId}/${f}`);
     res.json(urls);
   } catch (e) {
+    if (e.code === 'ENOENT') {
+      return res.json([]);
+    }
     res.status(500).json({ error: e.message });
   }
 });
