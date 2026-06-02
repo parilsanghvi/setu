@@ -17,3 +17,6 @@
 ## 2025-02-12 - Buffer Views and Data Corruption in File Chunking
 **Learning:** When optimizing file reading by using a single reusable `Buffer` with `fs.promises.read()` in a loop, pushing the result of `buffer.subarray()` into an array is unsafe. `subarray()` returns a memory *view*, not a copy. As the loop iterates, subsequent reads overwrite the shared memory, corrupting all previously stored chunks.
 **Action:** When accumulating buffer chunks from a reusable memory pool, always explicitly copy the data (e.g., using `Buffer.from(validBuffer)`) before storing it, ensuring data integrity while maintaining high performance.
+## 2026-06-02 - Backend Polling Optimization
+**Learning:** The database polling loop in socket.js and dashboard.js recompiled SQL statements continuously using db.prepare. Reusing cached prepared statements (db.getAgents, db.getTasks) significantly reduces event loop overhead during polling.
+**Action:** When writing polling mechanisms that fetch from SQLite, always use cached prepared statements instead of calling db.prepare on every tick.
