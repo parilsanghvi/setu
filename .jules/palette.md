@@ -5,3 +5,7 @@
 ## 2024-04-07 - Screen Readers and Decorative Icons
 **Learning:** Screen readers announce text-based icons (like emojis or special characters like `✕` and `&times;`) redundantly if they are placed inside elements like buttons that already have descriptive `aria-label` attributes.
 **Action:** When using visual-only icon characters (like `&times;`, `✕`, or emojis) inside buttons that already have descriptive `aria-label` attributes or visible text, wrap the character in `<span aria-hidden="true">` (and `role="img"` for emojis) to prevent redundant screen reader announcements.
+
+## 2024-06-02 - Screen Readers and Complex Interactive Container Widgets
+**Learning:** Adding top-level `aria-label` attributes to complex interactive container widgets (e.g., a card with `role="button"` containing multiple text elements) hides the internal semantic content from screen readers. Screen readers will only announce the top-level label, completely ignoring the rich content inside.
+**Action:** Use a `title` attribute instead to provide a visual tooltip while allowing screen readers to naturally traverse the inner semantic content.
