@@ -42,6 +42,7 @@ const TaskBoard = React.memo(({ tasks, onTaskCreateRequest }) => {
                         onClick={onTaskCreateRequest}
                         className={styles.addButton}
                         aria-label="Add new task"
+                        title="Create a new task"
                     >
                         ADD BOARD TASK
                     </button>
