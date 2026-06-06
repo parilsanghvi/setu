@@ -8,6 +8,7 @@ const http = require('http');
 
 // Setup temp env
 const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'setu-test-'));
+fs.mkdirSync(path.join(tempDir, '.setu'), { recursive: true });
 const dbPath = path.join(tempDir, '.setu', 'setu.db');
 const PORT = 3101;
 const SERVER_URL = `http://127.0.0.1:${PORT}`;
@@ -17,7 +18,7 @@ console.log(`Setup: using temp HOME=${tempDir}`);
 
 // Spawn index.js with modified HOME
 const child = spawn('node', ['index.js'], {
-    env: { ...process.env, PORT: PORT, HOME: tempDir, LOG_LEVEL: 'verbose', DASHBOARD_PASS: DASHBOARD_PASS },
+    env: { ...process.env, PORT: PORT, HOME: tempDir, USERPROFILE: tempDir, LOG_LEVEL: 'verbose', DASHBOARD_PASS: DASHBOARD_PASS },
     cwd: process.cwd(),
     stdio: 'pipe'
 });
