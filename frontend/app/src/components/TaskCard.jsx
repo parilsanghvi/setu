@@ -27,7 +27,7 @@ const TaskCard = ({ task, onClick }) => {
                     onClick(task);
                 }
             }}
-            aria-label={`View details for task: ${task.displayTitle}`}
+            title={`View details for task: ${task.displayTitle}`}
             className={`${styles.taskCard} ${styles[`status${task.status}`] || ''}`}
         >
             <div className={styles.headerRow}>
