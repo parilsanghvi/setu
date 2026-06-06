@@ -46,6 +46,8 @@ const mockDb = {
             };
         }
     },
+    getTasks: () => MOCK_TASKS,
+    getAgents: () => MOCK_AGENTS,
     updateTask: (id, status, meta) => {
         // console.log('Mock updateTask called:', id, status, meta);
     },

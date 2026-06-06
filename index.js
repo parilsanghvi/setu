@@ -92,7 +92,7 @@ app.get('/api/stats', (req, res) => {
 // API: Tasks
 app.get('/api/tasks', (req, res) => {
   try {
-    const tasks = bus.db.prepare('SELECT * FROM tasks ORDER BY updated_at DESC').all();
+    const tasks = bus.getTasks();
     res.json(tasks);
   } catch (e) {
     log(`[API] Error: ${e.message}`, 'error');
@@ -103,7 +103,7 @@ app.get('/api/tasks', (req, res) => {
 // API: Agents
 app.get('/api/agents', (req, res) => {
   try {
-    const agents = bus.db.prepare('SELECT * FROM agents').all();
+    const agents = bus.getAgents();
     res.json(agents);
   } catch (e) {
     log(`[API] Error: ${e.message}`, 'error');
@@ -521,10 +521,10 @@ io.on('connection', (socket) => {
   log(`🔌 Client connected: ${socket.id}`);
 
   // Send initial state
-  const agents = bus.db.prepare('SELECT * FROM agents').all();
+  const agents = bus.getAgents();
   socket.emit('agents_update', agents);
 
-  const tasks = bus.db.prepare('SELECT * FROM tasks').all();
+  const tasks = bus.getTasks();
   socket.emit('tasks_update', tasks);
 
   // Send recent logs from setu.log if exists
