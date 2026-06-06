@@ -52,6 +52,41 @@ test('readLastLines: handles non-existent file', async () => {
     assert.deepStrictEqual(lines, []);
 });
 
+test('readLastLines: correctly handles fs.open ENOENT error', async () => {
+    const fsPromises = require('fs/promises');
+    const originalOpen = fsPromises.open;
+    try {
+        fsPromises.open = async () => {
+            const error = new Error('ENOENT: no such file or directory');
+            error.code = 'ENOENT';
+            throw error;
+        };
+        const lines = await readLastLines('fake_file.log', 5);
+        assert.deepStrictEqual(lines, []);
+    } finally {
+        fsPromises.open = originalOpen;
+    }
+});
+
+test('readLastLines: catches other fs.open errors and returns empty array', async () => {
+    const fsPromises = require('fs/promises');
+    const originalOpen = fsPromises.open;
+    const originalConsoleError = console.error;
+    console.error = () => {};
+    try {
+        fsPromises.open = async () => {
+            const error = new Error('EACCES: permission denied');
+            error.code = 'EACCES';
+            throw error;
+        };
+        const lines = await readLastLines('fake_file.log', 5);
+        assert.deepStrictEqual(lines, []);
+    } finally {
+        fsPromises.open = originalOpen;
+        console.error = originalConsoleError;
+    }
+});
+
 test('readLastLines: reads large file correctly', async () => {
     const largeContent = Array.from({ length: 1000 }, (_, i) => `line${i}`).join('\n') + '\n';
     const filePath = createTestFile('large.log', largeContent);

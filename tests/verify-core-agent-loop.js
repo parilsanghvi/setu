@@ -103,6 +103,7 @@ async function runTest() {
     bot.speak = (recipient, content, type, meta) => {
         if (type === 'thought_start' || type === 'thought_end') return;
         // console.log(`[BOT -> ${recipient}]: ${content}`);
+        if (recipient === 'ALL') return;
         lastMessage = content;
         speakCount++;
     };

@@ -38,6 +38,12 @@ async function runTest(file) {
         // Skip list-models as it's interactive/informational
         if (file === 'list-models.js' || file === 'debug-payload.js') continue;
 
+        // Skip verify-llm-connection if LLM provider API key is not set
+        if (file === 'verify-llm-connection.js' && !process.env.OPENAI_API_KEY && !process.env.ANTHROPIC_API_KEY) {
+            console.log(`⚠️ Skipping ${file} because no LLM API key is set in environment.\n`);
+            continue;
+        }
+
         const success = await runTest(file);
         if (success) passed++;
         else failed++;

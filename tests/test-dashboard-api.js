@@ -63,9 +63,8 @@ const mockUtils = {
 // Intercept require
 Module.prototype.require = function (id) {
     const caller = this.filename;
-    // Only mock calls originating from our project source or test
-    // We specifically want to intercept calls FROM lib/server.js or lib/routes.js
-    if (caller && (caller.endsWith('lib/server.js') || caller.endsWith('lib/routes.js') || caller.endsWith('test-dashboard-api.js'))) {
+    const normalizedCaller = caller ? caller.replace(/\\/g, '/') : '';
+    if (normalizedCaller && (normalizedCaller.endsWith('lib/server.js') || normalizedCaller.endsWith('lib/routes.js') || normalizedCaller.endsWith('lib/routes/api.js') || normalizedCaller.endsWith('test-dashboard-api.js'))) {
         if (id === './db' || id.endsWith('/db')) return mockDb;
         if (id === './utils' || id.endsWith('/utils')) return mockUtils;
     }
