@@ -68,7 +68,8 @@ app.get('/api/onboarding', (req, res) => {
     const status = getOnboardingStatus({ fast: true });
     res.json(status);
   } catch (e) {
-    res.status(500).json({ error: e.message });
+    log(`[API] Error: ${e.message}`, 'error');
+    res.status(500).json({ error: 'Internal Server Error' });
   }
 });
 
@@ -83,7 +84,8 @@ app.get('/api/stats', (req, res) => {
       uptime: process.uptime()
     });
   } catch (e) {
-    res.status(500).json({ error: e.message });
+    log(`[API] Error: ${e.message}`, 'error');
+    res.status(500).json({ error: 'Internal Server Error' });
   }
 });
 
@@ -93,7 +95,8 @@ app.get('/api/tasks', (req, res) => {
     const tasks = bus.db.prepare('SELECT * FROM tasks ORDER BY updated_at DESC').all();
     res.json(tasks);
   } catch (e) {
-    res.status(500).json({ error: e.message });
+    log(`[API] Error: ${e.message}`, 'error');
+    res.status(500).json({ error: 'Internal Server Error' });
   }
 });
 
@@ -103,7 +106,8 @@ app.get('/api/agents', (req, res) => {
     const agents = bus.db.prepare('SELECT * FROM agents').all();
     res.json(agents);
   } catch (e) {
-    res.status(500).json({ error: e.message });
+    log(`[API] Error: ${e.message}`, 'error');
+    res.status(500).json({ error: 'Internal Server Error' });
   }
 });
 
@@ -175,7 +179,8 @@ app.get('/api/tasks/:id/screenshots', async (req, res) => {
     const urls = files.map(f => `/screenshots/${taskId}/${f}`);
     res.json(urls);
   } catch (e) {
-    res.status(500).json({ error: e.message });
+    log(`[API] Error: ${e.message}`, 'error');
+    res.status(500).json({ error: 'Internal Server Error' });
   }
 });
 
@@ -196,7 +201,7 @@ app.post('/api/chat', (req, res) => {
     res.json({ status: 'sent', to: agent });
   } catch (err) {
     log(`[API] Error dispatching chat to bus: ${err.message}`, 'error');
-    res.status(500).json({ error: err.message });
+    res.status(500).json({ error: 'Internal Server Error' });
   }
 });
 
@@ -264,7 +269,8 @@ app.get('/api/sessions', async (req, res) => {
     const sortedFiles = fileStats.sort((a, b) => b.time - a.time);
     res.json(sortedFiles);
   } catch (e) {
-    res.status(500).json({ error: e.message });
+    log(`[API] Error: ${e.message}`, 'error');
+    res.status(500).json({ error: 'Internal Server Error' });
   }
 });
 
@@ -288,7 +294,8 @@ app.get('/api/sessions/:filename', async (req, res) => {
     if (e.code === 'ENOENT') {
       return res.status(404).json({ error: 'Session not found' });
     }
-    res.status(500).json({ error: e.message });
+    log(`[API] Error: ${e.message}`, 'error');
+    res.status(500).json({ error: 'Internal Server Error' });
   }
 });
 
@@ -308,7 +315,8 @@ app.get('/api/onboarding-trend', async (req, res) => {
     const allRuns = lines.map(l => { try { return JSON.parse(l); } catch (e) { return null; } }).filter(Boolean);
     res.json({ runs: allRuns.slice(-20) });
   } catch (e) {
-    res.status(500).json({ error: e.message });
+    log(`[API] Error: ${e.message}`, 'error');
+    res.status(500).json({ error: 'Internal Server Error' });
   }
 });
 
@@ -372,7 +380,8 @@ app.get('/api/drift-trend', async (req, res) => {
       strict_diff: activeProfile.config.strict_diff
     });
   } catch (e) {
-    res.status(500).json({ error: e.message });
+    log(`[API] Error: ${e.message}`, 'error');
+    res.status(500).json({ error: 'Internal Server Error' });
   }
 });
 
