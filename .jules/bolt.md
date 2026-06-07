@@ -24,3 +24,6 @@
 ## 2026-06-02 - Backend Polling Optimization
 **Learning:** The database polling loop in socket.js and dashboard.js recompiled SQL statements continuously using db.prepare. Reusing cached prepared statements (db.getAgents, db.getTasks) significantly reduces event loop overhead during polling.
 **Action:** When writing polling mechanisms that fetch from SQLite, always use cached prepared statements instead of calling db.prepare on every tick.
+## 2026-06-07 - Avoid Recompiling Regex Objects in loops
+**Learning:** Re-evaluating `new RegExp()` with the same constant values within a hot loop degrades application performance.
+**Action:** Always precompile regular expressions before entering inner loops. When the regular expressions contain state, like with the `g` flag, make sure to manually clear the state (e.g. `re.lastIndex = 0`) before using `.exec()`.
