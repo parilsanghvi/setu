@@ -17,3 +17,7 @@
 **Vulnerability:** Raw `stdout` and `stderr` from shell commands (like `git add` and `git commit` via `execFile`) were being passed directly into HTTP 500 JSON responses.
 **Learning:** Exposing raw command output or stack traces to clients is an Information Exposure vulnerability. It can leak sensitive internal paths, environment configurations, and stack details to end users.
 **Prevention:** To prevent data leakage, always return generic error messages to the client (e.g., `res.status(500).json({ error: 'Git add failed' })`) and securely log the verbose details internally using the server logger (e.g., `logger.error(..., { stderr })`).
+## 2026-06-10 - DOMPurify usage for Markdown rendering
+**Vulnerability:** Cross-Site Scripting (XSS) vulnerability via `dangerouslySetInnerHTML` when rendering parsed Markdown in React.
+**Learning:** Parsing markdown without sanitization and rendering it directly opens up an XSS vector. Always sanitize the output of the markdown parser using a library like DOMPurify.
+**Prevention:** Integrate `DOMPurify.sanitize()` on any parsed Markdown or un-trusted HTML before passing it to `dangerouslySetInnerHTML`.
