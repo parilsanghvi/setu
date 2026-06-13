@@ -26,13 +26,11 @@ graph LR
         agents_Tark_js["Tark.js"]
         agents_TestAgent_js["TestAgent.js"]
         agents_TestDrona_js["TestDrona.js"]
-        agents_Vaidya_js["Vaidya.js"]
         agents_Vishwakarma_js["Vishwakarma.js"]
     end
     subgraph bin
         bin_dashboard_js["dashboard.js"]
         bin_setu_auth_js["setu-auth.js"]
-        bin_setu_init_js["setu-init.js"]
         bin_setup_js["setup.js"]
         bin_test_dashboard_js["test-dashboard.js"]
     end
@@ -128,10 +126,6 @@ graph LR
     agents_Tark_js --> lib_db_js
     agents_TestAgent_js --> lib_Agent_js
     agents_TestDrona_js --> lib_db_js
-    agents_Vaidya_js --> lib_Agent_js
-    agents_Vaidya_js --> lib_Config_js
-    agents_Vaidya_js --> lib_db_js
-    agents_Vaidya_js --> lib_onboarding_context_builder_js
     agents_Vishwakarma_js --> lib_Context_js
     agents_Vishwakarma_js --> lib_Contractor_js
     agents_Vishwakarma_js --> lib_CoreAgent_js
@@ -142,7 +136,6 @@ graph LR
     bin_dashboard_js --> lib_onboarding_status_js
     bin_setu_auth_js --> lib_auth_auth_store_js
     bin_setu_auth_js --> lib_auth_google_js
-    bin_setu_init_js --> lib_db_js
     bin_setup_js --> lib_auth_profile_mgr_js
     bin_setup_js --> lib_llm_OpenAICompatible_js
     bin_setup_js --> lib_models_providers_google_js

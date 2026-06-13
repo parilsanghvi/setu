@@ -65,7 +65,6 @@ No known dependents.
 
 | Symbol | Source File | Doc |
 | --- | --- | --- |
-| `boot` | `agents/Vaidya.js` | [Doc](./Vaidya.js.md) |
 | `boot` | `lib/Agent.js` | [Doc](../lib/Agent.js.md) |
 | `speak` | `lib/Agent.js` | [Doc](../lib/Agent.js.md) |
 | `load` | `lib/auth/auth-store.js` | [Doc](../lib/auth/auth-store.js.md) |

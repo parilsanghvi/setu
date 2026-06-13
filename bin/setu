@@ -80,17 +80,6 @@ switch (cmd) {
     }
     break;
 
-  case 'init':
-    log('Initializing Project...');
-    const contextPath = path.join(process.cwd(), 'CONTEXT.md');
-    if (!fs.existsSync(contextPath)) {
-      fs.writeFileSync(contextPath, '# Project Context\n\n');
-      log('Created CONTEXT.md');
-    } else {
-      log('CONTEXT.md already exists.');
-    }
-    break;
-
   case 'chat':
     const message = args.join(' ');
     if (!message) {
@@ -122,12 +111,6 @@ switch (cmd) {
     }
     break;
 
-    break;
-
-  case 'doctor':
-    log('⚠️ WARNING: "setu doctor" is deprecated. Please use "setu onboarding doctor" instead.');
-    const doctorLegacy = require('child_process').spawn('node', [path.join(__dirname, '../agents/Vaidya.js')], { stdio: 'inherit' });
-    doctorLegacy.on('exit', (code) => process.exit(code));
     break;
 
   case 'setup':
@@ -188,16 +171,6 @@ switch (cmd) {
       stdio: 'inherit'
     });
     ignite.on('exit', (code) => process.exit(code));
-    break;
-
-  case 'adopt':
-  case 'init':
-    log(`⚠️ WARNING: "setu ${cmd}" is deprecated. Please use "setu onboarding run" instead.`);
-    const adoptLegacy = spawn('node', [path.join(__dirname, 'setu-init.js')], {
-      cwd: process.cwd(),
-      stdio: 'inherit'
-    });
-    adoptLegacy.on('exit', (code) => process.exit(code));
     break;
 
   case 'onboarding':
