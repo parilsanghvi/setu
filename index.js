@@ -9,7 +9,7 @@ const helmet = require('helmet');
 const bus = require('./lib/db');
 const readline = require('readline');
 const fs = require('fs');
-const { readLastLines } = require('./lib/utils');
+const { readLastLines, getCachedOnboardingRuns } = require('./lib/utils');
 const authMiddleware = require('./lib/middleware/auth');
 
 // High-performance write stream for logging (Initialized early to avoid TDZ)
@@ -307,13 +307,16 @@ const { getSetuPath } = require('./lib/onboarding/paths');
 app.get('/api/onboarding-trend', async (req, res) => {
   try {
     const logPath = getSetuPath('onboarding-history.jsonl');
-    if (!fs.existsSync(logPath)) {
-      return res.json({ runs: [], error: 'No history found' });
+    const lastRuns = await getCachedOnboardingRuns(logPath);
+    if (lastRuns.length === 0) {
+      // Check if file exists to return correct empty response format
+      try {
+        await fs.promises.access(logPath);
+      } catch (err) {
+        return res.json({ runs: [], error: 'No history found' });
+      }
     }
-    const content = await fs.promises.readFile(logPath, 'utf8');
-    const lines = content.split('\n').filter(Boolean);
-    const allRuns = lines.map(l => { try { return JSON.parse(l); } catch (e) { return null; } }).filter(Boolean);
-    res.json({ runs: allRuns.slice(-20) });
+    res.json({ runs: lastRuns });
   } catch (e) {
     log(`[API] Error: ${e.message}`, 'error');
     res.status(500).json({ error: 'Internal Server Error' });
