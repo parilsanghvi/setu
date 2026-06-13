@@ -1,7 +1,7 @@
 ---
-source_hash: 25d6987bbf000f07
-facts_hash: 25d6987bbf000f07
-generated_at: 2026-03-08T19:57:26.649Z
+source_hash: 643b8f42176712f4
+facts_hash: 643b8f42176712f4
+generated_at: 2026-06-13T16:42:30.479Z
 generator_version: 1.0.0
 model: cheap
 quality_score: 0
@@ -89,6 +89,9 @@ graph LR
         lib_server_js["server.js"]
         lib_socket_js["socket.js"]
         lib_sockets_dashboard_js["dashboard.js"]
+        lib_system_agentManager_js["agentManager.js"]
+        lib_system_boot_js["boot.js"]
+        lib_system_logger_js["logger.js"]
         lib_utils_js["utils.js"]
         lib_utils_JsonParser_js["JsonParser.js"]
         lib_utils_pkce_js["pkce.js"]
@@ -225,12 +228,18 @@ graph LR
     lib_socket_js --> lib_utils_js
     lib_sockets_dashboard_js --> lib_db_js
     lib_sockets_dashboard_js --> lib_utils_js
+    lib_system_agentManager_js --> lib_db_js
+    lib_system_agentManager_js --> lib_system_logger_js
+    lib_system_boot_js --> lib_db_js
+    lib_system_boot_js --> lib_server_js
+    lib_system_boot_js --> lib_system_agentManager_js
+    lib_system_boot_js --> lib_system_logger_js
 
 ```
 
 ## Summary
 
-- **71** files participate in the call graph
-- **131** import edges detected
+- **74** files participate in the call graph
+- **137** import edges detected
 - **Agents** depend on **Lib** for core functionality (DB, LLM, Context, Agent base class).
 - **CLI** tools in `bin/` orchestrate onboarding and the agent lifecycle.
