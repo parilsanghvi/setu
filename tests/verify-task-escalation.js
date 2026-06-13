@@ -98,7 +98,6 @@ test('Task Escalation: DONE bypasses Block', (t) => {
 
     // Now update to DONE
     // Logic: If status is DONE, attempts might not increment (depends on implementation) but should not block.
-    // In lib/db.js: if (status === 'TODO' || status === 'FAILED') attempts++;
     // So for DONE, attempts stays same (3).
     // if (attempts >= 3 && status !== 'DONE') -> false.
     bus.updateTask(taskId, 'DONE');
