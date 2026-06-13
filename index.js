@@ -11,6 +11,7 @@ const readline = require('readline');
 const fs = require('fs');
 const { readLastLines } = require('./lib/utils');
 const authMiddleware = require('./lib/middleware/auth');
+const { getTotalRuns } = require('./lib/driftCache');
 
 // High-performance write stream for logging (Initialized early to avoid TDZ)
 const logStream = fs.createWriteStream(path.join(__dirname, 'setu.log'), { flags: 'a' });
@@ -329,22 +330,7 @@ app.get('/api/drift-trend', async (req, res) => {
       return res.json({ total_runs: 0, fail_rate: 0, drift_percent: 0, top_missing: 'N/A' });
     }
 
-
-    let total_runs = 0;
-    try {
-      await new Promise((resolve, reject) => {
-        const stream = fs.createReadStream(logPath);
-        stream.on('data', chunk => {
-          for (let i = 0; i < chunk.length; ++i) {
-            if (chunk[i] === 10) total_runs++;
-          }
-        });
-        stream.on('end', resolve);
-        stream.on('error', reject);
-      });
-    } catch (err) {
-      console.error('[SUTRADHAR] Stream error reading drift history:', err);
-    }
+    let total_runs = await getTotalRuns(logPath);
 
     const last20Lines = await readLastLines(logPath, 20);
     const last20 = last20Lines.map(l => { try { return JSON.parse(l); } catch (e) { return null; } }).filter(Boolean);

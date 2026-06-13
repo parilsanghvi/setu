@@ -1,7 +1,7 @@
 ---
-source_hash: 25d6987bbf000f07
-facts_hash: 25d6987bbf000f07
-generated_at: 2026-03-08T19:57:26.649Z
+source_hash: 874c5daa548a4331
+facts_hash: 874c5daa548a4331
+generated_at: 2026-06-13T16:50:52.251Z
 generator_version: 1.0.0
 model: cheap
 quality_score: 0
@@ -58,6 +58,7 @@ graph LR
         lib_auth_google_js["google.js"]
         lib_auth_profile_mgr_js["profile-mgr.js"]
         lib_db_js["db.js"]
+        lib_driftCache_js["driftCache.js"]
         lib_llm_Anthropic_js["Anthropic.js"]
         lib_llm_BaseProvider_js["BaseProvider.js"]
         lib_llm_Ollama_js["Ollama.js"]
@@ -208,11 +209,13 @@ graph LR
     lib_onboarding_generator_js --> lib_onboarding_status_js
     lib_onboarding_governance_profiles_js --> lib_onboarding_paths_js
     lib_routes_api_js --> lib_db_js
+    lib_routes_api_js --> lib_driftCache_js
     lib_routes_api_js --> lib_onboarding_governance_profiles_js
     lib_routes_api_js --> lib_onboarding_paths_js
     lib_routes_api_js --> lib_onboarding_status_js
     lib_routes_api_js --> lib_utils_js
     lib_routes_js --> lib_db_js
+    lib_routes_js --> lib_driftCache_js
     lib_routes_js --> lib_middleware_auth_js
     lib_routes_js --> lib_onboarding_governance_profiles_js
     lib_routes_js --> lib_onboarding_paths_js
@@ -230,7 +233,7 @@ graph LR
 
 ## Summary
 
-- **71** files participate in the call graph
-- **131** import edges detected
+- **72** files participate in the call graph
+- **133** import edges detected
 - **Agents** depend on **Lib** for core functionality (DB, LLM, Context, Agent base class).
 - **CLI** tools in `bin/` orchestrate onboarding and the agent lifecycle.
