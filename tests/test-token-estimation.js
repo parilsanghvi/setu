@@ -199,6 +199,16 @@ async function runTest() {
     console.log(`Test 13 (Skipped keys): ${count13} (Expected: ${expected13})`);
     assert.strictEqual(count13, expected13);
 
+    // 14. Fallback for unstringifiable objects
+    const unstringifiableObj = 10n; // BigInt bypasses `typeof === 'object'` in the code, falling down to the fallback try-catch.
+    const msg14 = { role: 'user', content: unstringifiableObj };
+    agent.context = [msg14];
+    const count14 = agent.estimateTokenCount();
+    // 'user'.length (4) + 50 (fallback arbitrary penalty) = 54. / 4 = 13.5
+    const expected14 = (msg14.role.length + 50) / 4;
+    console.log(`Test 14 (Fallback for tricky objects): ${count14} (Expected: ${expected14})`);
+    assert.strictEqual(count14, expected14);
+
     console.log("✅ Token Estimation Tests Passed (Baseline and Edge Cases)");
 }
 
