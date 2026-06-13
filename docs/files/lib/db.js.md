@@ -101,7 +101,6 @@ The main execution flow of this file is as follows:
 | `updateTask` | `agents/TestDrona.js` | [Doc](../agents/TestDrona.js.md) |
 | `heartbeat` | `agents/Vishwakarma.js` | [Doc](../agents/Vishwakarma.js.md) |
 | `if` | `benchmarks/log_benchmark.js` | [Doc](../benchmarks/log_benchmark.js.md) |
-| `send` | `bin/setu-init.js` | [Doc](../bin/setu-init.js.md) |
 | `if` | `frontend/app/src/App.jsx` | [Doc](../frontend/app/src/App.jsx.md) |
 | `if` | `frontend/app/src/components/OnboardingStatus.jsx` | [Doc](../frontend/app/src/components/OnboardingStatus.jsx.md) |
 | `if` | `frontend/app/src/components/ScreenshotGallery.jsx` | [Doc](../frontend/app/src/components/ScreenshotGallery.jsx.md) |

@@ -8,8 +8,7 @@ const agents = [
     { name: 'Koshpal', role: 'Koshpal' },
     { name: 'Rakshak', role: 'Rakshak' },
     { name: 'Vishwakarma', role: 'Vishwakarma' },
-    { name: 'Guru', role: 'Guru' },
-    { name: 'Vaidya', role: 'Vaidya' }
+    { name: 'Guru', role: 'Guru' }
 ];
 
 agents.forEach(agent => {

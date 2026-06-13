@@ -22,7 +22,6 @@ This folder contains a collection of JavaScript classes that implement various t
 | Tark.js | Handles budget and skill-related tasks, as well as performs logical critiques of code. |
 | TestAgent.js | Tests and demonstrates agent functionality with a constructor that initializes an instance. |
 | TestDrona.js | Simulates task completion and verifies generated skills in a test environment. |
-| Vaidya.js | Verifies the health of the Vaidya agent by checking various components such as Docker connectivity. |
 | Vishwakarma.js | Provides expert advice on infrastructure configuration using natural language processing to evaluate proposed specifications. |
 
 ## Ownership
@@ -43,6 +42,5 @@ Likely: Uses modular and object-oriented design principles to facilitate testing
 - [Tark.js](../../files/agents/Tark.js.md)
 - [TestAgent.js](../../files/agents/TestAgent.js.md)
 - [TestDrona.js](../../files/agents/TestDrona.js.md)
-- [Vaidya.js](../../files/agents/Vaidya.js.md)
 - [Vishwakarma.js](../../files/agents/Vishwakarma.js.md)
 
