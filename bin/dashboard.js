@@ -156,7 +156,10 @@ function refreshData() {
             }).filter(Boolean);
             if (allRuns.length > 0) {
                 const last20 = allRuns.slice(-20);
-                const fails = last20.filter(r => !r.ok).length;
+                let fails = 0;
+                for (let i = 0; i < last20.length; i++) {
+                    if (!last20[i].ok) fails++;
+                }
                 const failRate = ((fails / last20.length) * 100).toFixed(1);
                 const lastRun = last20[last20.length - 1];
                 const unowned = lastRun.ownership && lastRun.ownership.unowned_files ? lastRun.ownership.unowned_files.length : 0;
