@@ -122,14 +122,6 @@ switch (cmd) {
     }
     break;
 
-    break;
-
-  case 'doctor':
-    log('⚠️ WARNING: "setu doctor" is deprecated. Please use "setu onboarding doctor" instead.');
-    const doctorLegacy = require('child_process').spawn('node', [path.join(__dirname, '../agents/Vaidya.js')], { stdio: 'inherit' });
-    doctorLegacy.on('exit', (code) => process.exit(code));
-    break;
-
   case 'setup':
     require('child_process').spawn('node', [path.join(__dirname, 'setup.js')], { stdio: 'inherit' });
     break;
