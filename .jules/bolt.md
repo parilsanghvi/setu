@@ -24,3 +24,6 @@
 ## 2026-06-02 - Backend Polling Optimization
 **Learning:** The database polling loop in socket.js and dashboard.js recompiled SQL statements continuously using db.prepare. Reusing cached prepared statements (db.getAgents, db.getTasks) significantly reduces event loop overhead during polling.
 **Action:** When writing polling mechanisms that fetch from SQLite, always use cached prepared statements instead of calling db.prepare on every tick.
+## 2026-06-13 - Avoid File-Slurping in Caching Mechanisms
+**Learning:** When implementing an in-memory cache for a file, it's tempting to use `fs.promises.readFile` on cache misses. However, if the file is unbounded (like a `.jsonl` log file) and only the tail end is needed, reading the entire file and parsing it creates an `O(N)` CPU block.
+**Action:** Use existing `readLastLines` utilities or a stream-based approach to only load the necessary chunks of the file into memory, even when populating a cache.
