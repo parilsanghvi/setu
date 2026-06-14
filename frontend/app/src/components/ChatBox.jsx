@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect, useMemo } from 'react';
 import Spinner from './Spinner';
 import { marked } from 'marked';
+import DOMPurify from 'dompurify';
 import styles from './ChatBox.module.scss';
 
 const ChatBox = ({ agents, logs, prefillTaskText }) => {
@@ -95,7 +96,9 @@ const ChatBox = ({ agents, logs, prefillTaskText }) => {
 
     const renderMessageContent = (content) => {
         const html = marked.parse(content, { breaks: true });
-        return <div dangerouslySetInnerHTML={{ __html: html }} />;
+        // Sanitize parsed HTML to prevent XSS vulnerabilities
+        const cleanHtml = DOMPurify.sanitize(html);
+        return <div dangerouslySetInnerHTML={{ __html: cleanHtml }} />;
     };
 
     return (

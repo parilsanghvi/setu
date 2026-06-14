@@ -17,3 +17,7 @@
 **Vulnerability:** Raw `stdout` and `stderr` from shell commands (like `git add` and `git commit` via `execFile`) were being passed directly into HTTP 500 JSON responses.
 **Learning:** Exposing raw command output or stack traces to clients is an Information Exposure vulnerability. It can leak sensitive internal paths, environment configurations, and stack details to end users.
 **Prevention:** To prevent data leakage, always return generic error messages to the client (e.g., `res.status(500).json({ error: 'Git add failed' })`) and securely log the verbose details internally using the server logger (e.g., `logger.error(..., { stderr })`).
+## 2025-02-24 - Cross-Site Scripting (XSS) via `marked` output
+**Vulnerability:** Found un-sanitized parsed Markdown from `marked` being passed directly to React's `dangerouslySetInnerHTML` in `ChatBox.jsx`.
+**Learning:** `marked` does not sanitize HTML by default since version 0.7.0, allowing malicious user-generated content (like scripts within markdown) to be executed by the browser.
+**Prevention:** Always use a sanitization library like `DOMPurify` to clean the HTML string from `marked.parse` before inserting it into the DOM via `dangerouslySetInnerHTML`.
