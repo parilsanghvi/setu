@@ -24,3 +24,6 @@
 ## 2026-06-02 - Backend Polling Optimization
 **Learning:** The database polling loop in socket.js and dashboard.js recompiled SQL statements continuously using db.prepare. Reusing cached prepared statements (db.getAgents, db.getTasks) significantly reduces event loop overhead during polling.
 **Action:** When writing polling mechanisms that fetch from SQLite, always use cached prepared statements instead of calling db.prepare on every tick.
+## 2026-06-18 - Avoid Sync File System methods in Express Routes
+**Learning:** Using synchronous file system methods like `fs.existsSync` and `fs.readdirSync` in Express API endpoints blocks the main Node.js event loop. This degrades the performance of the server and reduces its concurrent throughput capacity.
+**Action:** Always replace synchronous `fs` calls with their asynchronous equivalents like `fs.promises.access` and `fs.promises.readdir` wrapped in `try/catch` blocks inside API route handlers to ensure non-blocking I/O operations.
