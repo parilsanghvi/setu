@@ -307,7 +307,10 @@ const { getSetuPath } = require('./lib/onboarding/paths');
 app.get('/api/onboarding-trend', async (req, res) => {
   try {
     const logPath = getSetuPath('onboarding-history.jsonl');
-    if (!fs.existsSync(logPath)) {
+    try {
+      // ⚡ Bolt: Convert synchronous existsSync to async access for non-blocking I/O
+      await fs.promises.access(logPath);
+    } catch {
       return res.json({ runs: [], error: 'No history found' });
     }
     const content = await fs.promises.readFile(logPath, 'utf8');
